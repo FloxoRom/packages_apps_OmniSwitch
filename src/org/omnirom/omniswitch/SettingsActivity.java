@@ -30,12 +30,17 @@ import org.omnirom.omniswitch.ui.BitmapUtils;
 import org.omnirom.omniswitch.ui.CheckboxListDialog;
 import org.omnirom.omniswitch.ui.HiddenAppsDialog;
 import org.omnirom.omniswitch.ui.IconPackHelper;
+import org.omnirom.omniswitch.ui.IconShapeOverride;
 import org.omnirom.omniswitch.ui.NumberPickerPreference;
 import org.omnirom.omniswitch.ui.SeekBarPreference;
 import org.omnirom.omniswitch.ui.SettingsGestureView;
 import org.omnirom.omniswitch.ui.FavoriteDialog;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,6 +49,8 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -113,6 +120,7 @@ public class SettingsActivity extends PreferenceActivity implements
     private static final String PREF_HIDDEN_APPS_CONFIG = "hidden_apps_config";
     public static final String PREF_HIDDEN_APPS = "hidden_apps";
     public static final String PREF_COLOR_TASK_HEADER = "color_task_header";
+    public static final String PREF_ICON_SHAPE = "icon_shape";
 
     public static final String WEATHER_ICON_PACK_PREFERENCE_KEY = "pref_weatherIconPack";
     public static final String SHOW_ALL_DAY_EVENTS_PREFERENCE_KEY = "pref_allDayEvents";
@@ -144,6 +152,8 @@ public class SettingsActivity extends PreferenceActivity implements
     public static int BUTTON_SPEED_SWITCH_TOGGLE_APP = 6;
     public static int BUTTON_SPEED_SWITCH_MENU = 7;
 
+    private static final int RESTART_REQUEST_CODE = 42; // the answer to everything
+
     private ListPreference mIconSize;
     private SeekBarPreference mOpacity;
     private Preference mFavoriteAppsConfig;
@@ -174,6 +184,8 @@ public class SettingsActivity extends PreferenceActivity implements
     private CheckBoxPreference mRevertRecents;
     private Preference mHiddenAppsConfig;
     private CheckBoxPreference mColorTaskHeader;
+    private ListPreference mIconShape;
+    private Handler mHandler;
 
     @Override
     public void onPause() {
@@ -201,6 +213,7 @@ public class SettingsActivity extends PreferenceActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mHandler = new Handler();
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         addPreferencesFromResource(R.xml.recents_settings);
@@ -276,6 +289,13 @@ public class SettingsActivity extends PreferenceActivity implements
         mRevertRecents.setEnabled(vertical);
         mThumbSize.setEnabled(vertical);
         mColorTaskHeader.setEnabled(vertical);
+
+        mIconShape = (ListPreference) findPreference(PREF_ICON_SHAPE);
+        mIconShape.setOnPreferenceChangeListener(this);
+        idx = mIconShape.findIndexOfValue(mPrefs.getString(PREF_ICON_SHAPE,
+                mIconShape.getEntryValues()[0].toString()));
+        mIconShape.setValueIndex(idx);
+        mIconShape.setSummary(mIconShape.getEntries()[idx]);
 
         mHiddenAppsConfig = findPreference(PREF_HIDDEN_APPS_CONFIG);
 
@@ -485,6 +505,17 @@ public class SettingsActivity extends PreferenceActivity implements
                 Toast.makeText(SettingsActivity.this, R.string.launcher_mode_enable_check, Toast.LENGTH_LONG).show();
             }
             return true;
+        } else if (preference == mIconShape) {
+            String value = (String) newValue;
+            mPrefs.edit().putString(SettingsActivity.PREF_ICON_SHAPE, value).commit();
+
+            ProgressDialog.show(this,
+                    null /* title */,
+                    getResources().getString(R.string.icon_shape_override_progress),
+                    true /* indeterminate */,
+                    false /* cancelable */);
+            mHandler.postDelayed(new OverrideApplyHandler(this), 1000);
+            return false;
         }
         return false;
     }
@@ -608,6 +639,30 @@ public class SettingsActivity extends PreferenceActivity implements
             }
             values.add(packageName + ".weather");
             entries.add(label);
+        }
+    }
+
+    private static class OverrideApplyHandler implements Runnable {
+
+        private final Context mContext;
+
+        private OverrideApplyHandler(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public void run() {
+            // Schedule an alarm before we kill ourself.
+            Intent settingsActivity = new Intent(mContext, SettingsActivity.class);
+            settingsActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                    | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            PendingIntent pi = PendingIntent.getActivity(mContext, RESTART_REQUEST_CODE,
+                    settingsActivity, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_ONE_SHOT);
+            mContext.getSystemService(AlarmManager.class).setExact(
+                    AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 50, pi);
+
+            // Kill process
+            android.os.Process.killProcess(android.os.Process.myPid());
         }
     }
 }

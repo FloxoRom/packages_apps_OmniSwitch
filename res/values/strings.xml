@@ -212,4 +212,17 @@
         <string name="pref_show_events_summary"></string>
         <string name="color_task_header_summary">Use application primary color as header background</string>
         <string name="color_task_header_title">Color task header</string>
+        <string name="icon_shape_system_default">Use system default</string>
+        <string name="icon_shape_square">Square</string>
+        <string name="icon_shape_squircle">Squircle</string>
+        <string name="icon_shape_circle">Circle</string>
+        <string name="icon_shape_teardrop">Teardrop</string>
+        <string name="icon_shape_square_value" translatable="false">M50,0L100,0 100,100 0,100 0,0z</string>
+        <string name="icon_shape_squircle_value" translatable="false">M50,0 C10,0 0,10 0,50 0,90 10,100 50,100 90,100 100,90 100,50 100,10 90,0 50,0 Z</string>
+        <string name="icon_shape_circle_value" translatable="false">M50 0A50 50,0,1,1,50 100A50 50,0,1,1,50 0</string>
+        <string name="icon_shape_teardrop_value" translatable="false">M50,0A50,50,0,0 1 100,50 L100,85 A15,15,0,0 1 85,100 L50,100 A50,50,0,0 1 50,0z</string>
+        <string name="icon_shape_title">Icon shape - needs restart</string>
+        <string name="icon_shape_override_progress">Applying icon shape changes</string>
+        <string name="category_icons_title">Icons</string>
+
 </resources>

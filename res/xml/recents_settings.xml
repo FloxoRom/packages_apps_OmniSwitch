@@ -24,14 +24,8 @@
         android:title="@string/enable_title" />
 
     <PreferenceCategory
-        android:key="category_overlay"
-        android:title="@string/category_overlay_title" >
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="animate"
-            android:summary="@string/animate_title_summary"
-            android:title="@string/animate_title" />
-
+        android:key="category_icons"
+        android:title="@string/category_icons_title" >
         <ListPreference
             android:entries="@array/icon_size_entries"
             android:entryValues="@array/icon_size_values"
@@ -43,6 +37,23 @@
             android:key="iconpack"
             android:summary="@string/icon_pack_summary"
             android:title="@string/icon_pack_title" />
+
+        <ListPreference
+            android:entries="@array/icon_shape_override_paths_names"
+            android:entryValues="@array/icon_shape_override_paths_values"
+            android:key="icon_shape"
+            android:summary="@string/icon_shape_system_default"
+            android:title="@string/icon_shape_title" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="category_overlay"
+        android:title="@string/category_overlay_title" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="animate"
+            android:summary="@string/animate_title_summary"
+            android:title="@string/animate_title" />
 
         <ListPreference
             android:entries="@array/bg_style_entries"
