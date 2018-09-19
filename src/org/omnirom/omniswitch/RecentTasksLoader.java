@@ -218,8 +218,7 @@ public class RecentTasksLoader {
             BitmapCache.getInstance(mContext).clearThumbs();
         }
 
-        final long currentTime = System.currentTimeMillis();
-        final long bootTimeMillis = currentTime - SystemClock.elapsedRealtime();
+        final long currentTime = SystemClock.elapsedRealtime();
         mLockedAppsList.clear();
         mLockedAppsList.addAll(mConfiguration.mLockedAppList);
 
@@ -313,16 +312,8 @@ public class RecentTasksLoader {
                     // never time filter locked tasks
                     if (mConfiguration.mFilterActive && !item.isLocked()) {
                         long lastActiveTime = recentInfo.lastActiveTime;
-                        long firstActiveTime = recentInfo.firstActiveTime;
                         if (DEBUG) {
-                            Log.d(TAG, intent.getComponent().getPackageName() + ": " + firstActiveTime + ":" + lastActiveTime + ":" + bootTimeMillis);
-                        }
-                        // only show active since boot
-                        if (mConfiguration.mFilterBoot && lastActiveTime < bootTimeMillis) {
-                            if (DEBUG) {
-                                Log.d(TAG, intent.getComponent().getPackageName() + ": filter app not active since boot");
-                            }
-                            activeTask = false;
+                            Log.d(TAG, intent.getComponent().getPackageName() + ": " + lastActiveTime + ":" + currentTime);
                         }
                         if (activeTask) {
                             // filter older then time

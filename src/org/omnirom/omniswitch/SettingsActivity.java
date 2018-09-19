@@ -99,7 +99,6 @@ public class SettingsActivity extends PreferenceActivity implements
     public static final String PREF_SPEED_SWITCHER_ITEMS = "speed_switch_items";
     public static final String PREF_BUTTON_POS = "button_pos";
     public static final String PREF_BG_STYLE = "bg_style";
-    public static final String PREF_APP_FILTER_BOOT = "app_filter_boot";
     public static final String PREF_LAYOUT_STYLE = "layout_style";
     public static final String PREF_APP_FILTER_TIME = "app_filter_time";
     public static final String PREF_THUMB_SIZE = "thumb_size";

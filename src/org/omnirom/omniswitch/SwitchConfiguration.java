@@ -86,7 +86,6 @@ public class SwitchConfiguration {
     public List<String> mFavoriteList = new ArrayList<String>();
     public boolean mSpeedSwitcher = true;
     public boolean mFilterActive = true;
-    public boolean mFilterBoot;
     public boolean mFilterRunning;
     public long mFilterTime;
     public boolean mSideHeader = true;
@@ -283,7 +282,6 @@ public class SwitchConfiguration {
         String favoriteListString = prefs.getString(SettingsActivity.PREF_FAVORITE_APPS, "");
         Utils.parseCollection(favoriteListString, mFavoriteList);
         mSpeedSwitcher = prefs.getBoolean(SettingsActivity.PREF_SPEED_SWITCHER, true);
-        mFilterBoot = prefs.getBoolean(SettingsActivity.PREF_APP_FILTER_BOOT, false);
         String filterTimeString = prefs.getString(SettingsActivity.PREF_APP_FILTER_TIME, "0");
         mFilterTime = Integer.valueOf(filterTimeString);
         if (mFilterTime != 0) {
