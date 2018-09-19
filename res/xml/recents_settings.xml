@@ -38,7 +38,7 @@
             android:summary="@string/icon_pack_summary"
             android:title="@string/icon_pack_title" />
 
-        <ListPreference
+        <org.omnirom.omniswitch.ui.IconShapePreference
             android:entries="@array/icon_shape_override_paths_names"
             android:entryValues="@array/icon_shape_override_paths_values"
             android:key="icon_shape"
