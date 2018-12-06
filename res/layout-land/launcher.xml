@@ -73,7 +73,9 @@
                 android:layout_width="@dimen/landscape_launcher_width"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_gravity="center_horizontal">
+                android:layout_gravity="center_horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp" >
 
                 <ImageView
                     android:id="@+id/essentials_button"

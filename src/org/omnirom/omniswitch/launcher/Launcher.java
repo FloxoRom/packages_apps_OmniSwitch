@@ -29,6 +29,7 @@ import android.app.TaskStackBuilder;
 import android.app.WallpaperManager;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -64,6 +65,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.PopupMenu;
 
 import org.omnirom.omniswitch.IEditFavoriteActivity;
@@ -252,7 +254,7 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
         mEssentialsPanel= (ViewGroup) findViewById(R.id.essentials_panel);
         mEssentialsPanel.setAlpha(1f);
 
-        View wallpaperButton = findViewById(R.id.wallpaper_button);
+        ImageView wallpaperButton = getEssentialButtonTemplate(R.drawable.ic_wallpaper);
         wallpaperButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -265,34 +267,30 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
                 startActivity(pickWallpaper);
             }
         });
-        wallpaperButton.setBackgroundResource(R.drawable.ripple_dark);
 
-        View settingsButton = findViewById(R.id.settings_button);
+        ImageView settingsButton = getEssentialButtonTemplate(R.drawable.ic_settings);
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SwitchManager.startSettingsActivity(Launcher.this);
             }
         });
-        settingsButton.setBackgroundResource(R.drawable.ripple_dark);
 
-        View assistButton = findViewById(R.id.assist_button);
+        ImageView assistButton = getEssentialButtonTemplate(R.drawable.ic_assist);
         assistButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 launchAssist();
             }
         });
-        assistButton.setBackgroundResource(R.drawable.ripple_dark);
 
-        View voiceAssistButton = findViewById(R.id.voice_assist_button);
+        ImageView voiceAssistButton = getEssentialButtonTemplate(R.drawable.ic_google_assist);
         voiceAssistButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchVoiceAssist();
+                launchGoogleAssist();
             }
         });
-        voiceAssistButton.setBackgroundResource(R.drawable.ripple_dark);
 
         mFavoriteEditButton = (ImageView)findViewById(R.id.edit_favorite_button);
         mFavoriteEditButton.setOnClickListener(new View.OnClickListener() {
@@ -345,39 +343,37 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
         });
         mEssentialsButton.setBackgroundResource(R.drawable.ripple_dark);
 
-        mPhoneButton = (ImageView)findViewById(R.id.phone_button);
+        mPhoneButton = getEssentialButtonTemplate(R.drawable.ic_phone);
         mPhoneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 launchPhone();
             }
         });
-        mPhoneButton.setBackgroundResource(R.drawable.ripple_dark);
 
-        ImageView cameraButton = (ImageView)findViewById(R.id.camera_button);
+        ImageView cameraButton = getEssentialButtonTemplate(R.drawable.ic_camera);
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 launchCamera();
             }
         });
-        cameraButton.setBackgroundResource(R.drawable.ripple_dark);
+        mEssentialsPanel.addView(mPhoneButton, 0);
+        mEssentialsPanel.addView(cameraButton, 1);
+        mEssentialsPanel.addView(assistButton, 2);
+        mEssentialsPanel.addView(voiceAssistButton, 3);
+        mEssentialsPanel.addView(wallpaperButton, 4);
+        mEssentialsPanel.addView(settingsButton, 5);
 
         if (isPhoneVisible()) {
             mPhoneButton.setVisibility(View.VISIBLE);
-            View phoneSpace = findViewById(R.id.phone_button_space);
-            phoneSpace.setVisibility(View.VISIBLE);
         }
         if (isDeviceProvisioned()) {
             if (canLaunchAssist()) {
                 assistButton.setVisibility(View.VISIBLE);
-                View assistSpace = findViewById(R.id.assist_button_space);
-                assistSpace.setVisibility(View.VISIBLE);
             }
-            if (canLaunchVoiceAssist()) {
+            if (canLaunchGoogleAssist()) {
                 voiceAssistButton.setVisibility(View.VISIBLE);
-                View voiceAssistSpace = findViewById(R.id.voice_assist_button_space);
-                voiceAssistSpace.setVisibility(View.VISIBLE);
             }
         }
 
@@ -857,7 +853,9 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
     }
 
     private void launchVoiceAssist() {
-        startActivity(getVoiceAssistIntent());
+        if (canLaunchVoiceAssist()) {
+            startActivity(getVoiceAssistIntent());
+        }
     }
 
     private boolean canLaunchVoiceAssist() {
@@ -872,11 +870,31 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
     }
 
     private void launchAssist() {
-        startActivity(getAssistIntent());
+        if (canLaunchAssist()) {
+            startActivity(getAssistIntent());
+        }
     }
 
     private boolean canLaunchAssist() {
         return Utils.canResolveIntent(this, getAssistIntent());
+    }
+
+    private Intent getGoogleAssistIntent() {
+        ComponentName gsa = new ComponentName("com.google.android.googlequicksearchbox",
+                "com.google.android.apps.gsa.staticplugins.opa.OpaActivity");
+        final Intent assistIntent = new Intent();
+        assistIntent.setComponent(gsa);
+        return assistIntent;
+    }
+
+    private void launchGoogleAssist() {
+        if (canLaunchGoogleAssist()) {
+            startActivity(getGoogleAssistIntent());
+        }
+    }
+
+    private boolean canLaunchGoogleAssist() {
+        return Utils.canResolveIntent(this, getGoogleAssistIntent());
     }
 
     private boolean isEssentialsExpanded() {
@@ -945,6 +963,18 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
         if (mTopContainer != null) {
             mTopContainer.updateSettings();
         }
+    }
+
+    private ImageView getEssentialButtonTemplate(int imageResource) {
+        ImageView essentialButton = new ImageView(this);
+        essentialButton.setScaleType(ScaleType.CENTER_INSIDE);
+        essentialButton.setLayoutParams(new LinearLayout.LayoutParams(
+                0,
+                getResources().getDimensionPixelSize(R.dimen.action_button_size),
+                (float)(1.0/6.0)));
+        essentialButton.setBackgroundResource(R.drawable.ripple_dark);
+        essentialButton.setImageResource(imageResource);
+        return essentialButton;
     }
 }
 
