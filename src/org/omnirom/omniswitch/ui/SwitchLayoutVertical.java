@@ -207,6 +207,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         mFavoriteListView = (FavoriteViewVertical) mView
                 .findViewById(R.id.favorite_list);
         mFavoriteListView.setVerticalScrollBarEnabled(false);
+        mFavoriteListView.setStackFromBottom(mConfiguration.mBottomFavorites);
         mFavoriteListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -410,6 +411,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
 
         if (mFavoriteListView != null) {
             mFavoriteListView.updatePrefs(prefs, key);
+            mFavoriteListView.setStackFromBottom(mConfiguration.mBottomFavorites);
         }
         buildButtonList();
         if (mConfiguration.mShowRambar) {

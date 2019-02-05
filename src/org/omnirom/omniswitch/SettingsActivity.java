@@ -120,6 +120,7 @@ public class SettingsActivity extends PreferenceActivity implements
     public static final String PREF_HIDDEN_APPS = "hidden_apps";
     public static final String PREF_COLOR_TASK_HEADER = "color_task_header";
     public static final String PREF_ICON_SHAPE = "icon_shape";
+    public static final String PREF_BOTTOM_FAVORITES = "bottom_favorites";
 
     public static final String WEATHER_ICON_PACK_PREFERENCE_KEY = "pref_weatherIconPack";
     public static final String SHOW_ALL_DAY_EVENTS_PREFERENCE_KEY = "pref_allDayEvents";
@@ -181,6 +182,7 @@ public class SettingsActivity extends PreferenceActivity implements
     private SwitchPreference mLaunchStats;
     private Preference mFavoriteAppsConfigStat;
     private CheckBoxPreference mRevertRecents;
+    private CheckBoxPreference mBottomFavorites;
     private Preference mHiddenAppsConfig;
     private CheckBoxPreference mColorTaskHeader;
     private ListPreference mIconShape;
@@ -282,12 +284,14 @@ public class SettingsActivity extends PreferenceActivity implements
         mLaunchStatsDelete = (Preference) findPreference(PREF_LAUNCH_STATS_DELETE);
         mFavoriteAppsConfigStat = (Preference) findPreference(PREF_FAVORITE_APPS_CONFIG_STAT);
         mRevertRecents = (CheckBoxPreference) findPreference(PREF_REVERT_RECENTS);
+        mBottomFavorites = (CheckBoxPreference) findPreference(PREF_BOTTOM_FAVORITES);
         mColorTaskHeader = (CheckBoxPreference) findPreference(PREF_COLOR_TASK_HEADER);
 
         boolean vertical = mLayoutStyle.getValue().equals("1");
         mRevertRecents.setEnabled(vertical);
         mThumbSize.setEnabled(vertical);
         mColorTaskHeader.setEnabled(vertical);
+        mBottomFavorites.setEnabled(vertical);
 
         mIconShape = (ListPreference) findPreference(PREF_ICON_SHAPE);
         mIconShape.setOnPreferenceChangeListener(this);
@@ -484,6 +488,7 @@ public class SettingsActivity extends PreferenceActivity implements
             mRevertRecents.setEnabled(vertical);
             mThumbSize.setEnabled(vertical);
             mColorTaskHeader.setEnabled(vertical);
+            mBottomFavorites.setEnabled(vertical);
             return true;
         } else if (preference == mAppFilterTime) {
             String value = (String) newValue;

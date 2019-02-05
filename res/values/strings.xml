@@ -221,5 +221,7 @@
         <string name="icon_shape_title">Icon shape - needs restart</string>
         <string name="icon_shape_override_progress">Applying icon shape changes</string>
         <string name="category_icons_title">Icons</string>
+        <string name="bottom_favorites_summary">Fill favorite apps list from bottom</string>
+        <string name="bottom_favorites_title">Bottom favorite apps</string>
 
 </resources>

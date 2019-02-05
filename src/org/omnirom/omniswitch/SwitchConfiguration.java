@@ -115,6 +115,7 @@ public class SwitchConfiguration {
     public Set<String> mHiddenAppsList = new HashSet<String>();
     public Launcher mLauncher;
     public boolean mColorfulHeader;
+    public boolean mBottomFavorites;
 
     // old pref slots
     private static final String PREF_DRAG_HANDLE_COLOR = "drag_handle_color";
@@ -295,6 +296,7 @@ public class SwitchConfiguration {
         mFilterRunning = prefs.getBoolean(SettingsActivity.PREF_APP_FILTER_RUNNING, false);
         mLaunchStatsEnabled = prefs.getBoolean(SettingsActivity.PREF_LAUNCH_STATS, false);
         mRevertRecents = prefs.getBoolean(SettingsActivity.PREF_REVERT_RECENTS, false);
+        mBottomFavorites = prefs.getBoolean(SettingsActivity.PREF_BOTTOM_FAVORITES, false);
         mDimActionButton = prefs.getBoolean(SettingsActivity.PREF_DIM_ACTION_BUTTON, false);
         mLockedAppList.clear();
         String lockedAppsListString = prefs.getString(SettingsActivity.PREF_LOCKED_APPS_LIST, "");
