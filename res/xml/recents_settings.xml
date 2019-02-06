@@ -90,6 +90,12 @@
             android:summary="@string/show_app_labels_summary"
             android:title="@string/show_app_labels" />
 
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="button_hide"
+            android:summary="@string/button_hide_summary"
+            android:title="@string/button_hide_title" />
+
         <Preference
             android:key="button_config"
             android:summary="@string/buttons_summary"

@@ -1050,7 +1050,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     }
 
     protected boolean isButtonVisible() {
-        return mButtonListItems.getChildCount() != 0;
+        return mButtonListContainer.getVisibility() == View.VISIBLE;
     }
 
     protected synchronized void preShow() {
@@ -1168,7 +1168,8 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
             View item = nextButton.next();
             mButtonListItems.addView(item);
         }
-        mButtonListContainer.setVisibility(mActionList.size() == 0 ? View.GONE : View.VISIBLE);
+        mButtonListContainer.setVisibility((mConfiguration.mButtonHide || mActionList.size() == 0) ?
+                View.GONE : View.VISIBLE);
     }
 
     protected void buildButtonList() {

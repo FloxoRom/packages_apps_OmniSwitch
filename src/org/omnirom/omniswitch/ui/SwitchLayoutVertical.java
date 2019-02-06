@@ -508,6 +508,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mOpenFavorite.setRotation(getExpandRotation());
+                mFavoriteListView.setScaleX(1f);
             }
 
             @Override
@@ -554,9 +555,11 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         }
         if (!mHasFavorites) {
             mShowFavorites = false;
+        } else if (mConfiguration.mButtonHide) {
+            mShowFavorites = true;
         }
-        mFavoriteListView.setVisibility(mShowFavorites ? View.VISIBLE
-                : View.GONE);
+        storeExpandedFavoritesState();
+        mFavoriteListView.setVisibility(mShowFavorites ? View.VISIBLE : View.GONE);
         buildButtons();
         mButtonsVisible = isButtonVisible();
     }

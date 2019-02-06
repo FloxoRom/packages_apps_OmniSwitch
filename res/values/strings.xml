@@ -223,5 +223,7 @@
         <string name="category_icons_title">Icons</string>
         <string name="bottom_favorites_summary">Fill favorite apps list from bottom</string>
         <string name="bottom_favorites_title">Bottom favorite apps</string>
+        <string name="button_hide_summary">Hide the button area</string>
+        <string name="button_hide_title">Hide buttons</string>
 
 </resources>

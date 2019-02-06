@@ -121,6 +121,7 @@ public class SettingsActivity extends PreferenceActivity implements
     public static final String PREF_COLOR_TASK_HEADER = "color_task_header";
     public static final String PREF_ICON_SHAPE = "icon_shape";
     public static final String PREF_BOTTOM_FAVORITES = "bottom_favorites";
+    public static final String PREF_BUTTON_HIDE = "button_hide";
 
     public static final String WEATHER_ICON_PACK_PREFERENCE_KEY = "pref_weatherIconPack";
     public static final String SHOW_ALL_DAY_EVENTS_PREFERENCE_KEY = "pref_allDayEvents";
@@ -187,6 +188,7 @@ public class SettingsActivity extends PreferenceActivity implements
     private CheckBoxPreference mColorTaskHeader;
     private ListPreference mIconShape;
     private Handler mHandler;
+    private CheckBoxPreference mButtonHide;
 
     @Override
     public void onPause() {
@@ -286,6 +288,10 @@ public class SettingsActivity extends PreferenceActivity implements
         mRevertRecents = (CheckBoxPreference) findPreference(PREF_REVERT_RECENTS);
         mBottomFavorites = (CheckBoxPreference) findPreference(PREF_BOTTOM_FAVORITES);
         mColorTaskHeader = (CheckBoxPreference) findPreference(PREF_COLOR_TASK_HEADER);
+
+        mButtonHide = (CheckBoxPreference) findPreference(PREF_BUTTON_HIDE);
+        mButtonPos.setEnabled(!mButtonHide.isChecked());
+        mButtonConfig.setEnabled(!mButtonHide.isChecked());
 
         boolean vertical = mLayoutStyle.getValue().equals("1");
         mRevertRecents.setEnabled(vertical);
@@ -450,6 +456,10 @@ public class SettingsActivity extends PreferenceActivity implements
         } else if (preference == mLaunchStatsDelete) {
             SwitchStatistics.getInstance(this).clear();
             Toast.makeText(SettingsActivity.this, R.string.launch_stats_delete_notice, Toast.LENGTH_LONG).show();
+            return true;
+        } else if (preference == mButtonHide) {
+            mButtonPos.setEnabled(!mButtonHide.isChecked());
+            mButtonConfig.setEnabled(!mButtonHide.isChecked());
             return true;
         }
         return false;
