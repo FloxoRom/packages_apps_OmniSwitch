@@ -22,6 +22,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ShortcutInfo;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -72,7 +74,11 @@ public class ContextMenuUtils {
                     scMap.put(FIRST_SHORTCUT_MENU + i, sc);
                     MenuItem item = popup.getMenu().add(Menu.NONE, FIRST_SHORTCUT_MENU + i,
                             Menu.NONE, sc.getShortLabel());
-                    item.setIcon(shortcutManager.getShortcutIconDrawable(sc, configuration.mDensityDpi));
+                    Drawable icon = shortcutManager.getShortcutIconDrawable(sc, configuration.mDensityDpi);
+                    if (icon != null) {
+                        icon = resizeShortcutIcon(context, icon, configuration);
+                    }
+                    item.setIcon(icon);
                     i++;
                 }
             }
@@ -139,7 +145,11 @@ public class ContextMenuUtils {
                     scMap.put(FIRST_SHORTCUT_MENU + i, sc);
                     MenuItem item = popup.getMenu().add(Menu.NONE, FIRST_SHORTCUT_MENU + i,
                             Menu.NONE, sc.getShortLabel());
-                    item.setIcon(shortcutManager.getShortcutIconDrawable(sc, configuration.mDensityDpi));
+                    Drawable icon = shortcutManager.getShortcutIconDrawable(sc, configuration.mDensityDpi);
+                    if (icon != null) {
+                        icon = resizeShortcutIcon(context, icon, configuration);
+                    }
+                    item.setIcon(icon);
                     i++;
                 }
             }
@@ -182,5 +192,13 @@ public class ContextMenuUtils {
         } else {
             popup.show();
         }
+    }
+
+    private static Drawable resizeShortcutIcon(Context context, Drawable icon, SwitchConfiguration configuration) {
+        if (icon instanceof LayerDrawable) {
+            icon = BitmapUtils.getBitmapDrawable(context.getResources(), icon);
+        }
+        icon = BitmapUtils.resize(context.getResources(), icon, configuration.mShortcutIconSizeDp, 0, configuration.mDensity);
+        return icon;
     }
 }

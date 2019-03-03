@@ -117,6 +117,7 @@ public class SwitchConfiguration {
     public boolean mColorfulHeader;
     public boolean mBottomFavorites;
     public boolean mButtonHide;
+    public int mShortcutIconSizeDp = 32;
 
     // old pref slots
     private static final String PREF_DRAG_HANDLE_COLOR = "drag_handle_color";
