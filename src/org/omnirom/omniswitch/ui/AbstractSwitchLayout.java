@@ -35,6 +35,7 @@ import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,8 +43,11 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
+import android.telecom.TelecomManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -100,6 +104,10 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     protected View mLockToAppButton;
     protected View mCloseButton;
     protected View mMenuButton;
+    protected View mPhoneButton;
+    protected View mCameraButton;
+    protected View mAssistButton;
+    protected View mGoogleAssistant;
     protected boolean mAutoClose = true;
     protected boolean mVirtualBackKey;
     protected boolean mVirtualMenuKey;
@@ -590,6 +598,80 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
             return mMenuButton;
         }
 
+        if (buttonId == SettingsActivity.BUTTON_PHONE) {
+            mPhoneButton = getActionButtonTemplate(mContext.getResources()
+                    .getDrawable(R.drawable.ic_phone));
+            mPhoneButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    hide(true);
+                    final TelecomManager tm = TelecomManager.from(mContext);
+                    if (tm.isInCall()) {
+                        AsyncTask.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                tm.showInCallScreen(false /* showDialpad */);
+                            }
+                        });
+                    } else {
+                        final Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
+                        phoneIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                            | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                        mContext.startActivity(phoneIntent);
+                    }
+                }
+            });
+            return mPhoneButton;
+        }
+
+        if (buttonId == SettingsActivity.BUTTON_CAMERA) {
+            mCameraButton = getActionButtonTemplate(mContext.getResources()
+                    .getDrawable(R.drawable.ic_camera));
+            mCameraButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    hide(true);
+                    final Intent cameraIntent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
+                    cameraIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                    mContext.startActivity(cameraIntent);
+                }
+            });
+            return mCameraButton;
+        }
+
+        if (buttonId == SettingsActivity.BUTTON_ASSIST) {
+            mAssistButton = getActionButtonTemplate(mContext.getResources()
+                    .getDrawable(R.drawable.ic_assist));
+            mAssistButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    hide(true);
+                    final Intent assistIntent = new Intent(Intent.ACTION_ASSIST);
+                    if (Utils.canResolveIntent(mContext, assistIntent)) {
+                        assistIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                            | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                        mContext.startActivity(assistIntent);
+                    }
+                }
+            });
+            return mAssistButton;
+        }
+
+        if (buttonId == SettingsActivity.BUTTON_GOOGLE_ASSISTANT) {
+            mGoogleAssistant = getActionButtonTemplate(mContext.getResources()
+                    .getDrawable(R.drawable.ic_google_assist));
+            mGoogleAssistant.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    hide(true);
+                    ComponentName gsa = new ComponentName("com.google.android.googlequicksearchbox",
+                        "com.google.android.apps.gsa.staticplugins.opa.OpaActivity");
+                    final Intent assistIntent = new Intent();
+                    assistIntent.setComponent(gsa);
+                    if (Utils.canResolveIntent(mContext, assistIntent)) {
+                        mContext.startActivity(assistIntent);
+                    }
+                }
+            });
+            return mGoogleAssistant;
+        }
         return null;
     }
 
