@@ -393,7 +393,7 @@ public class RecentTasksLoader {
                 if (DEBUG) {
                     Log.d(TAG, "getThumbnail " + taskId);
                 }
-                return Bitmap.createHardwareBitmap(snapshot.getSnapshot());
+                return Bitmap.wrapHardwareBuffer(snapshot.getSnapshot(), snapshot.getColorSpace());
             }
         } catch (RemoteException e) {
             Log.w(TAG, "Failed to retrieve snapshot", e);

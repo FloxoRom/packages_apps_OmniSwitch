@@ -29,10 +29,11 @@ import org.omnirom.omniswitch.ui.SwitchLayout;
 import org.omnirom.omniswitch.ui.SwitchLayoutVertical;
 
 import android.app.ActivityManager;
-import static android.app.ActivityManager.SPLIT_SCREEN_CREATE_MODE_BOTTOM_OR_RIGHT;
-import static android.app.ActivityManager.SPLIT_SCREEN_CREATE_MODE_TOP_OR_LEFT;
+import static android.app.ActivityTaskManager.SPLIT_SCREEN_CREATE_MODE_BOTTOM_OR_RIGHT;
+import static android.app.ActivityTaskManager.SPLIT_SCREEN_CREATE_MODE_TOP_OR_LEFT;
 import android.app.ActivityManagerNative;
 import android.app.ActivityOptions;
+import android.app.ActivityTaskManager;
 import android.app.IActivityManager;
 import android.app.TaskStackBuilder;
 import static android.app.WindowConfiguration.WINDOWING_MODE_SPLIT_SCREEN_PRIMARY;
@@ -504,9 +505,9 @@ public class SwitchManager {
 
     public void lockToApp(TaskDescription ad, boolean close) {
         try {
-            if (!ActivityManagerNative.getDefault().isInLockTaskMode()) {
+            if (!ActivityTaskManager.getService().isInLockTaskMode()) {
                 switchTask(ad, false, false);
-                ActivityManagerNative.getDefault().startSystemLockTaskMode(ad.getPersistentTaskId());
+                ActivityTaskManager.getService().startSystemLockTaskMode(ad.getPersistentTaskId());
                 if (DEBUG){
                     Log.d(TAG, "lock app " + ad.getLabel() + " " + ad.getPersistentTaskId());
                 }
@@ -520,8 +521,8 @@ public class SwitchManager {
 
     public void stopLockToApp(boolean close) {
         try {
-            if (ActivityManagerNative.getDefault().isInLockTaskMode()) {
-                ActivityManagerNative.getDefault().stopSystemLockTaskMode();
+            if (ActivityTaskManager.getService().isInLockTaskMode()) {
+                ActivityTaskManager.getService().stopSystemLockTaskMode();
                 if (DEBUG){
                     Log.d(TAG, "stop lock app");
                 }
@@ -535,7 +536,7 @@ public class SwitchManager {
 
     public void toggleLockToApp(boolean close) {
         try {
-            if (ActivityManagerNative.getDefault().isInLockTaskMode()) {
+            if (ActivityTaskManager.getService().isInLockTaskMode()) {
                 stopLockToApp(false);
             } else {
                 lockToCurrentApp(false);

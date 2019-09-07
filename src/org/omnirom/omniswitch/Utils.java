@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
+import android.app.ActivityTaskManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -208,7 +209,7 @@ public class Utils {
     }
 
     public static boolean isMultiStackEnabled(Context context) {
-        return ActivityManager.supportsMultiWindow(context);
+        return ActivityTaskManager.supportsMultiWindow(context);
     }
 
     public static boolean isDockingActive(Context context) {
