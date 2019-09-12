@@ -38,12 +38,12 @@
             android:summary="@string/icon_pack_summary"
             android:title="@string/icon_pack_title" />
 
-        <org.omnirom.omniswitch.ui.IconShapePreference
+        <!--<org.omnirom.omniswitch.ui.IconShapePreference
             android:entries="@array/icon_shape_override_paths_names"
             android:entryValues="@array/icon_shape_override_paths_values"
             android:key="icon_shape"
             android:summary="@string/icon_shape_system_default"
-            android:title="@string/icon_shape_title" />
+        android:title="@string/icon_shape_title" />-->
     </PreferenceCategory>
 
     <PreferenceCategory

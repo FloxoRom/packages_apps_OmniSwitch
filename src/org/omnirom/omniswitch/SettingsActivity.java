@@ -303,12 +303,12 @@ public class SettingsActivity extends PreferenceActivity implements
         mColorTaskHeader.setEnabled(vertical);
         mBottomFavorites.setEnabled(vertical);
 
-        mIconShape = (ListPreference) findPreference(PREF_ICON_SHAPE);
+        /*mIconShape = (ListPreference) findPreference(PREF_ICON_SHAPE);
         mIconShape.setOnPreferenceChangeListener(this);
         idx = mIconShape.findIndexOfValue(mPrefs.getString(PREF_ICON_SHAPE,
                 mIconShape.getEntryValues()[0].toString()));
         mIconShape.setValueIndex(idx);
-        mIconShape.setSummary(mIconShape.getEntries()[idx]);
+        mIconShape.setSummary(mIconShape.getEntries()[idx]);*/
 
         mHiddenAppsConfig = findPreference(PREF_HIDDEN_APPS_CONFIG);
 

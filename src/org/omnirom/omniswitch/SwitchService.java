@@ -61,6 +61,7 @@ public class SwitchService extends Service {
     private static boolean mIsRunning;
     private static boolean mCommitSuicide;
     private static boolean mPreloadDone;
+    private OverlayMonitor mOverlayMonitor;
 
     public static boolean isRunning() {
         return mIsRunning;
@@ -122,6 +123,9 @@ public class SwitchService extends Service {
             };
 
             mPrefs.registerOnSharedPreferenceChangeListener(mPrefsListener);
+
+            mOverlayMonitor = new OverlayMonitor(this);
+
             if (mConfiguration.mLaunchStatsEnabled) {
                 SwitchStatistics.getInstance(this).loadStatistics();
             }
@@ -143,6 +147,8 @@ public class SwitchService extends Service {
         } catch(IllegalArgumentException e) {
             // ignored on purpose
         }
+        mOverlayMonitor.unregisterReceiver(this);
+
         if (mManager != null) {
             mManager.killManager();
             mManager.shutdownService();
@@ -250,6 +256,31 @@ public class SwitchService extends Service {
             } catch(Exception e) {
                 Log.e(TAG,"onReceive", e);
             }
+        }
+    }
+
+    private class OverlayMonitor extends BroadcastReceiver {
+        private final String ACTION_OVERLAY_CHANGED = "android.intent.action.OVERLAY_CHANGED";
+
+        OverlayMonitor(Context context) {
+            context.registerReceiver(this, Utils.getPackageFilter("android", ACTION_OVERLAY_CHANGED));
+        }
+
+        public void unregisterReceiver(Context context) {
+            try {
+                context.unregisterReceiver(this);
+            } catch (Exception e) {
+            }
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(DEBUG){
+                Log.d(TAG, "onReceive " + action);
+            }
+            PackageManager.getInstance(context).updatePackageIcons();
+            updatePrefs(mPrefs, SettingsActivity.PREF_ICON_SHAPE);
         }
     }
 

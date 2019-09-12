@@ -25,19 +25,20 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class BootReceiver extends BroadcastReceiver {
-    private static final String TAG = "RecentsBootReceiver";
+    private static final String TAG = "OmniSwitch:BootReceiver";
 
     @Override
     public void onReceive(final Context context, Intent intent) {
         try {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             if (prefs.getBoolean(SettingsActivity.PREF_ENABLE, false)) {
+                Log.d(TAG, "onReceive");
                 Intent startIntent = new Intent(context, SwitchService.class);
                 context.startService(startIntent);
             }
 
         } catch (Exception e) {
-            Log.e(TAG, "Can't start load average service", e);
+            Log.e(TAG, "", e);
         }
     }
 }

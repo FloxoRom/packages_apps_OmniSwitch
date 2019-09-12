@@ -27,6 +27,7 @@ import android.app.ActivityTaskManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
@@ -34,6 +35,7 @@ import android.graphics.Color;
 import android.hardware.input.InputManager;
 import android.os.Build;
 import android.os.Handler;
+import android.os.PatternMatcher;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.os.SystemProperties;
@@ -360,5 +362,18 @@ public class Utils {
         float fgL = 0.2126f * fgR + 0.7152f * fgG + 0.0722f * fgB;
 
         return Math.abs((fgL + 0.05f) / (bgL + 0.05f));
+    }
+
+    /**
+     * Creates an intent filter to listen for actions with a specific package in the data field.
+     */
+    public static IntentFilter getPackageFilter(String pkg, String... actions) {
+        IntentFilter packageFilter = new IntentFilter();
+        for (String action : actions) {
+            packageFilter.addAction(action);
+        }
+        packageFilter.addDataScheme("package");
+        packageFilter.addDataSchemeSpecificPart(pkg, PatternMatcher.PATTERN_LITERAL);
+        return packageFilter;
     }
 }

@@ -30,7 +30,7 @@ public class OmniSwitch extends Application {
     public void onCreate() {
         super.onCreate();
 
-        IconShapeOverride.apply(this, PreferenceManager.getDefaultSharedPreferences(this)
-                .getString(SettingsActivity.PREF_ICON_SHAPE, ""));
+        /*IconShapeOverride.apply(this, PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(SettingsActivity.PREF_ICON_SHAPE, ""));*/
     }
 }
