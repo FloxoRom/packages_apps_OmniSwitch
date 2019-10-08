@@ -204,4 +204,6 @@
   <string name="pref_show_today_title">日付を表示</string>
   <string name="pref_show_weather_title">天気を表示</string>
   <string name="pref_show_events_title">今後のイベントを表示</string>
+  <string name="color_task_header_summary">ヘッダー背景としてアプリの優先色を使う</string>
+  <string name="color_task_header_title">タスクヘッダーの色</string>
 </resources>

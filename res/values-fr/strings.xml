@@ -204,4 +204,6 @@
   <string name="pref_show_today_title">Afficher la date</string>
   <string name="pref_show_weather_title">Afficher la météo</string>
   <string name="pref_show_events_title">Afficher les événements à venir</string>
+  <string name="color_task_header_summary">Utiliser la couleur principale de l\'application pour l\'arrière plan de l\'en-tête</string>
+  <string name="color_task_header_title">Couleur de l\'en-tête de la tâche</string>
 </resources>

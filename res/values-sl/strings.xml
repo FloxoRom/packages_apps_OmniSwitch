@@ -167,4 +167,6 @@
   <string name="revert_recents_title">Obrni seznam nedavnih programov</string>
   <string name="dialog_overlay_perms_title">Napaka dovoljenja OmniSwitch</string>
   <string name="dialog_overlay_perms_msg">Omogočite \u0022dovoljenje \u0022za risanje preko drugih programov</string>
+  <string name="weather_icon_pack_title">Paket ikon vremenskih pogojev</string>
+  <string name="pref_show_weather_title">Prikaži vreme</string>
 </resources>

@@ -204,4 +204,6 @@
   <string name="pref_show_today_title">Târihi göster</string>
   <string name="pref_show_weather_title">Hava durumunu göster</string>
   <string name="pref_show_events_title">Yaklaşan hadiseleri göster</string>
+  <string name="color_task_header_summary">Uygulamanın esas rengini başlık arka planı olarak kullanır</string>
+  <string name="color_task_header_title">Görev başlığını renklendir</string>
 </resources>

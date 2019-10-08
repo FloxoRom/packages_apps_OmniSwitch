@@ -204,4 +204,6 @@
   <string name="pref_show_today_title">Mostra la data</string>
   <string name="pref_show_weather_title">Mostra el temps</string>
   <string name="pref_show_events_title">Mostra els esdeveniments propers</string>
+  <string name="color_task_header_summary">Utilitza el color primari de l\'aplicació per al fons de la capçalera</string>
+  <string name="color_task_header_title">Color de la capçalera de la tasca</string>
 </resources>

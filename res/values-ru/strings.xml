@@ -204,4 +204,6 @@
   <string name="pref_show_today_title">Отображать дату</string>
   <string name="pref_show_weather_title">Показывать погоду</string>
   <string name="pref_show_events_title">Отображать предстоящие события</string>
+  <string name="color_task_header_summary">Использовать стандартный цвет приложения для фона заголовка</string>
+  <string name="color_task_header_title">Цвет заголовка задачи</string>
 </resources>

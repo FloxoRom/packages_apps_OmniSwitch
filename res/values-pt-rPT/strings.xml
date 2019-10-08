@@ -204,4 +204,6 @@
   <string name="pref_show_today_title">Mostrar a data</string>
   <string name="pref_show_weather_title">Mostrar meteorologia</string>
   <string name="pref_show_events_title">Mostrar próximos eventos</string>
+  <string name="color_task_header_summary">Usar a cor primária da aplicação como fundo do cabeçalho</string>
+  <string name="color_task_header_title">Cor do cabeçalho</string>
 </resources>

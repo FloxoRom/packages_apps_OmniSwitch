@@ -148,8 +148,10 @@
   <string name="adjust_handle_summary">Position, Größe und Farbe konfigurieren</string>
   <string name="settings_button_text">Einstellungen</string>
   <string name="wallpaper_button_text">Hintergrundbild</string>
+  <string name="category_launcher_title">Launcher</string>
   <string name="launcher_mode_summary">OmniSwitch auch als Startseite verwenden. Nach Aktivierung Home-Taste drücken und OmniSwitch wählen</string>
   <string name="launcher_mode_title">Einschalten</string>
+  <string name="launcher_mode_enable_check">Deaktivieren ist nicht möglich, während der Launcher-Modus aktiv ist</string>
   <string name="welcome_cling_header">Willkommen beim OmniSwitch Startseitenmodus</string>
   <string name="welcome_cling_description">Viel Spaß mit der minimalistischen Startseite, die sich auf das Starten und Umschalten von Apps spezialisiert. Wischen um OmniSwitch zu öffnen.</string>
   <string name="welcome_cling_dismiss">Alles klar</string>
@@ -189,6 +191,7 @@
   <string name="bg_style_system">System</string>
   <string name="omnijaws_current_text">Jetzt</string>
   <string name="calendar_view_status_perms">Zum Einrichten berühren</string>
+  <string name="launcher_settings">Launcher-Einstellungen</string>
   <string name="calendar_event_no_title_label">Kein Titel</string>
   <string name="weather_icon_pack_title">Wetter-Symbolpaket</string>
   <string name="hotseat_category_title">Dock</string>
@@ -199,5 +202,8 @@
   <string name="one_month">1 Monat</string>
   <string name="three_months">3 Monate</string>
   <string name="pref_show_today_title">Datum anzeigen</string>
+  <string name="pref_show_weather_title">Wetter anzeigen</string>
   <string name="pref_show_events_title">Bevorstehende Ereignisse anzeigen</string>
+  <string name="color_task_header_summary">Verwende die Primärfarbe der Anwendung als Header-Hintergrund</string>
+  <string name="color_task_header_title">Farbe der Kopfzeile</string>
 </resources>

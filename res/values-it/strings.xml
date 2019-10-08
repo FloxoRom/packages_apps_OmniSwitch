@@ -204,4 +204,6 @@
   <string name="pref_show_today_title">Mostra data</string>
   <string name="pref_show_weather_title">Mostra meteo</string>
   <string name="pref_show_events_title">Mostra i prossimi eventi</string>
+  <string name="color_task_header_summary">Utilizza il colore primario dell\'applicazione come sfondo dell\'intestazione</string>
+  <string name="color_task_header_title">Colore intestazione delle attività</string>
 </resources>

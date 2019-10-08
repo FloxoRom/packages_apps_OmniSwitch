@@ -24,8 +24,8 @@
   <string name="opacity_title">Läbipaistvus</string>
   <string name="opacity_summary">Ülekatte vaate tausta läbipaistvus</string>
   <string name="animate_title">Animeeri</string>
-  <string name="animate_title_summary">Animeeri ülekatte vaate kuvamist ja peitmist</string>
-  <string name="adjust_handle_help">Liiguta ja muuda sikutushoova suurust</string>
+  <string name="animate_title_summary">Animeeri ülekatte kuvamine ja peitmine</string>
+  <string name="adjust_handle_help">Liiguta sikutushooba ja muuda selle suurust</string>
   <string name="icon_size_normal">Tavaline</string>
   <string name="icon_size_small">Väike</string>
   <string name="icon_size_large">Suur</string>
@@ -36,10 +36,10 @@
   <string name="drag_handle_color_dialog_title">Värv</string>
   <string name="service_background_processes"><xliff:g id="memory">%1$s</xliff:g> vaba</string>
   <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> kasutusel</string>
-  <string name="show_rambar_title">Näita mälukasutust</string>
-  <string name="show_rambar_summary">Kuva vaba ja kasutatud mälu</string>
-  <string name="show_app_labels">Kuva rakenduse nime</string>
-  <string name="show_app_labels_summary">Rakenduse nime kuvatakse ikooni juures</string>
+  <string name="show_rambar_title">Kuva mälukasutus</string>
+  <string name="show_rambar_summary">Näita vaba ja kasutusel oleva mälu suurust</string>
+  <string name="show_app_labels">Kuva rakenduse nimi</string>
+  <string name="show_app_labels_summary">Rakenduse nime kuvatakse selle ikooni juures</string>
   <string name="category_overlay_title">Ülekate</string>
   <string name="category_drag_handle_title">Sikutushoob</string>
   <string name="category_favorite_title">Lemmikud</string>
@@ -47,8 +47,8 @@
   <string name="favorite_apps_config_summary">Vali lemmikute vaates kuvatavad rakendused</string>
   <string name="favorite_apps_add_dialog_title">Lisa rakendused</string>
   <string name="favorite_add">Lisa\u2026</string>
-  <string name="location_left">Vasak</string>
-  <string name="location_right">Parem</string>
+  <string name="location_left">Vasakul</string>
+  <string name="location_right">Paremal</string>
   <string name="reset">Vaikimisi</string>
   <string name="toggle_last_app">Viimane rakendus</string>
   <string name="toggle_last_app_help">Vaheta viimasele rakendusele</string>
@@ -61,9 +61,9 @@
   <string name="settings">Seaded</string>
   <string name="home">Kodu</string>
   <string name="buttons_title">Nupud</string>
-  <string name="buttons_summary">Seadista tegevusnupud ülevaate vaates</string>
+  <string name="buttons_summary">Seadista ülevaate vaate tegevusnuppe</string>
   <string name="auto_hide_handle">Peida automaatselt</string>
-  <string name="auto_hide_handle_summary">Kaks viibet ülevaate vaate jaoks</string>
+  <string name="auto_hide_handle_summary">Viipa kaks korda, et kuvada ülekatte vaade</string>
   <string name="no_recent_apps_title">Hiljutisi rakendusi pole</string>
   <string name="drag_handle_opacity_title">Läbipaistvus</string>
   <string name="drag_handle_enable_title">Luba</string>
@@ -88,8 +88,8 @@
   <string name="back_help">Tagasi</string>
   <string name="kill_current">Sundsulge praegused</string>
   <string name="kill_current_help">Sundsulge praegune rakendus</string>
-  <string name="speed_switch_color_summary">Sinine - viimatised rakendused. Roheline - lemmikud. Punane - tegevused</string>
-  <string name="speed_switch_color">Tasanda taustavärvid</string>
+  <string name="speed_switch_color_summary">Sinine - viimatised rakendused. Roheline - lemmikud. Punane - tegevused.</string>
+  <string name="speed_switch_color">Tasemetega taustavärvid</string>
   <string name="speed_switch_limit_summary">Piira tasememuutuste ala</string>
   <string name="speed_switch_limit">Tasememuutuse ala</string>
   <string name="speed_switch_button_title">Nupud</string>
@@ -148,12 +148,12 @@
   <string name="adjust_handle_summary">Seadista positsiooni suurust ja värvi</string>
   <string name="settings_button_text">Seaded</string>
   <string name="wallpaper_button_text">Taustapilt</string>
-  <string name="category_launcher_title">Käivitaja</string>
-  <string name="launcher_mode_summary">Kasuta OmniSwitchi ka oma käivitajana. Peale lubamist vajuta kodunuppu ja vali OmniSwitch</string>
+  <string name="category_launcher_title">Avaekraan</string>
+  <string name="launcher_mode_summary">Kasuta OmniSwitchi ka oma avaekraanina. Peale lubamist vajuta kodunuppu ja vali OmniSwitch</string>
   <string name="launcher_mode_title">Luba</string>
-  <string name="launcher_mode_enable_check">Keelamine ei ole võimalik, kui käivitajarežiim on aktiivne</string>
-  <string name="welcome_cling_header">Tere tulemast OmniSwitchi käivitajarežiimi</string>
-  <string name="welcome_cling_description">Naudi minimalistlikku käivitajat, mis keskendub rakenduste käivitamisele ja vahetamisele. Viipa mistahes kohas, et avada OmniSwitch.</string>
+  <string name="launcher_mode_enable_check">Keelamine ei ole võimalik, kui avaekraani režiim on aktiivne</string>
+  <string name="welcome_cling_header">Tere tulemast OmniSwitchi avaekraani režiimi</string>
+  <string name="welcome_cling_description">Naudi minimalistlikku avaekraani, mis keskendub rakenduste käivitamisele ja vahetamisele. Viipa mistahes kohas, et avada OmniSwitch.</string>
   <string name="welcome_cling_dismiss">Sain aru</string>
   <string name="launch_stats_title">Käivitusstatistika</string>
   <string name="launch_stats_summary">Kogu statistikat käivitatud rakenduste kohta. Andmeid ei jagata ja säilitatakse vaid kohalikult</string>
@@ -181,7 +181,7 @@
   <string name="dock_non_resizeble_failed_to_dock_text">Rakendus ei toeta poolitatud ekraani</string>
   <string name="block_apps_on_splitscreen_summary">Keela poolitatud ekraani režiimis mittetoetatud rakendusele vahetamine</string>
   <string name="block_apps_on_splitscreen_title">Blokeeri mittedokitavad rakendused</string>
-  <string name="use_power_hint_summary">Kasuta kiirendamiseks jõudlus-HAL vihjet. Sõltub seadmest!</string>
+  <string name="use_power_hint_summary">Kasuta kiirendamiseks \"power HAL\" vihjet. Sõltub seadmest!</string>
   <string name="use_power_hint_title">Kasuta toitenupu vihjet</string>
   <string name="hidden_apps_config_summary">Vali rakendused, mida peidetakse rakendustesahtli vaatest</string>
   <string name="hidden_apps_config_title">Peidetud rakendused</string>
@@ -191,7 +191,7 @@
   <string name="bg_style_system">Süsteem</string>
   <string name="omnijaws_current_text">Nüüd</string>
   <string name="calendar_view_status_perms">Koputa seadistamiseks</string>
-  <string name="launcher_settings">Käivitaja seaded</string>
+  <string name="launcher_settings">Avaekraani seaded</string>
   <string name="calendar_event_no_title_label">Pealkirja pole</string>
   <string name="weather_icon_pack_title">Ilmateate ikoonipakk</string>
   <string name="hotseat_category_title">Dokk</string>
@@ -204,4 +204,6 @@
   <string name="pref_show_today_title">Näita kuupäeva</string>
   <string name="pref_show_weather_title">Kuva ilma</string>
   <string name="pref_show_events_title">Näita tulevaid sündmusi</string>
+  <string name="color_task_header_summary">Kasuta rakenduse põhivärvi päise taustana</string>
+  <string name="color_task_header_title">Värvi tegumi päis</string>
 </resources>

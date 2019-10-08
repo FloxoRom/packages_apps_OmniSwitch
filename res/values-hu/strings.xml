@@ -204,4 +204,6 @@
   <string name="pref_show_today_title">Dátum megjelenítése</string>
   <string name="pref_show_weather_title">Időjárás megjelenítése</string>
   <string name="pref_show_events_title">Közelgő események megjelenítése</string>
+  <string name="color_task_header_summary">Az alkalmazás elsődleges színét használja a fejléc háttereként</string>
+  <string name="color_task_header_title">Színes tevékenység fejléc</string>
 </resources>

@@ -204,4 +204,6 @@
   <string name="pref_show_today_title">显示日期</string>
   <string name="pref_show_weather_title">显示天气</string>
   <string name="pref_show_events_title">显示即将发生事件</string>
+  <string name="color_task_header_summary">使用应用程序主颜色作为页眉背景</string>
+  <string name="color_task_header_title">颜色任务页眉</string>
 </resources>

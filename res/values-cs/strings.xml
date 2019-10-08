@@ -204,4 +204,23 @@
   <string name="pref_show_today_title">Zobrazit datum</string>
   <string name="pref_show_weather_title">Zobrazit počasí</string>
   <string name="pref_show_events_title">Zobrazit nadcházející události</string>
+  <string name="color_task_header_summary">Použít hlavní barvu aplikace jako pozadí záhlaví</string>
+  <string name="color_task_header_title">Barva záhlaví úloh</string>
+  <string name="icon_shape_system_default">Použít výchozí nastavení systému</string>
+  <string name="icon_shape_square">Čtverec</string>
+  <string name="icon_shape_squircle">Superelipsa</string>
+  <string name="icon_shape_circle">Kruh</string>
+  <string name="icon_shape_teardrop">Slza</string>
+  <string name="icon_shape_rounded_square">Zaoblený čtverec</string>
+  <string name="icon_shape_title">Tvar ikony — vyžaduje restart</string>
+  <string name="icon_shape_override_progress">Tvar ikony se mění</string>
+  <string name="category_icons_title">Ikony</string>
+  <string name="bottom_favorites_summary">Vyplnit seznam oblíbených aplikací odspodu</string>
+  <string name="bottom_favorites_title">Oblíbené aplikace vespodu</string>
+  <string name="button_hide_summary">Skrýt oblast tlačítek</string>
+  <string name="button_hide_title">Skrýt tlačítka</string>
+  <string name="phone">Telefon</string>
+  <string name="camera">Fotoaparát</string>
+  <string name="assist">Asistence</string>
+  <string name="google_assistant">Asistent Google</string>
 </resources>

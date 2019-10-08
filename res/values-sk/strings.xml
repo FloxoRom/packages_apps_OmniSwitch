@@ -204,4 +204,6 @@
   <string name="pref_show_today_title">Zobraziť dátum</string>
   <string name="pref_show_weather_title">Zobraziť počasie</string>
   <string name="pref_show_events_title">Zobraziť nadchádzajúce udalosti</string>
+  <string name="color_task_header_summary">Použiť hlavnú farbu aplikácie ako pozadie záhlavia</string>
+  <string name="color_task_header_title">Farba záhlavia úloh</string>
 </resources>
