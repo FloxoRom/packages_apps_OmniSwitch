@@ -454,11 +454,11 @@ public class SwitchConfiguration {
     }
 
     public int getSystemPrimaryColor() {
-        return getAttrColor(mThemeContext, android.R.attr.colorPrimary);
+        return mContext.getResources().getColor(R.color.system_default_primary);
     }
 
     public int getSystemPrimaryDarkColor() {
-        return getAttrColor(mThemeContext, android.R.attr.colorPrimaryDark);
+        return mContext.getResources().getColor(R.color.system_default_primary_dark);
     }
 
     public int getSystemAccentColor() {
@@ -482,12 +482,12 @@ public class SwitchConfiguration {
     }
 
     public int getButtonBackgroundColor() {
-        if (mBgStyle != SwitchConfiguration.BgStyle.TRANSPARENT) {
-            if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_SYSTEM) {
-                return getSystemPrimaryDarkColor();
-            } else {
-                return mContext.getResources().getColor(R.color.button_bg_flat_color);
-            }
+        if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT) {
+            return mContext.getResources().getColor(R.color.button_bg_flat_color);
+        } else if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_DARK) {
+            return mContext.getResources().getColor(R.color.button_bg_flat_color_dark);
+        } else if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_SYSTEM) {
+            return getSystemPrimaryDarkColor();
         }
         return mContext.getResources().getColor(R.color.bg_transparent);
     }
