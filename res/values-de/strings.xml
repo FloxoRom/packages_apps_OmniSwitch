@@ -206,4 +206,21 @@
   <string name="pref_show_events_title">Bevorstehende Ereignisse anzeigen</string>
   <string name="color_task_header_summary">Verwende die Primärfarbe der Anwendung als Header-Hintergrund</string>
   <string name="color_task_header_title">Farbe der Kopfzeile</string>
+  <string name="icon_shape_system_default">Systemeinstellungen verwenden</string>
+  <string name="icon_shape_square">Quadrat</string>
+  <string name="icon_shape_squircle">Abgerundetes Quadrat</string>
+  <string name="icon_shape_circle">Kreis</string>
+  <string name="icon_shape_teardrop">Träne</string>
+  <string name="icon_shape_rounded_square">Abgerundetes Quadrat</string>
+  <string name="icon_shape_title">Symbol Form - Neustart erforderlich</string>
+  <string name="icon_shape_override_progress">Änderungen an der Form des Symbols werden übernommen</string>
+  <string name="category_icons_title">Symbole</string>
+  <string name="bottom_favorites_summary">App Favoritenliste von unten ausfüllen</string>
+  <string name="bottom_favorites_title">Untere Favoriten-Apps</string>
+  <string name="button_hide_summary">Tasten Bereich ausblenden</string>
+  <string name="button_hide_title">Tasten ausblenden</string>
+  <string name="phone">Telefon</string>
+  <string name="camera">Kamera</string>
+  <string name="assist">Assistent</string>
+  <string name="google_assistant">Google-Assistent</string>
 </resources>
