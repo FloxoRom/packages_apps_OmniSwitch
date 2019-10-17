@@ -206,4 +206,21 @@
   <string name="pref_show_events_title">Näita tulevaid sündmusi</string>
   <string name="color_task_header_summary">Kasuta rakenduse põhivärvi päise taustana</string>
   <string name="color_task_header_title">Värvi tegumi päis</string>
+  <string name="icon_shape_system_default">Kasuta süsteemi vaikeväärtust</string>
+  <string name="icon_shape_square">Ruut</string>
+  <string name="icon_shape_squircle">Ümarruut</string>
+  <string name="icon_shape_circle">Ring</string>
+  <string name="icon_shape_teardrop">Veetilk</string>
+  <string name="icon_shape_rounded_square">Ümardatud nurkadega ruut</string>
+  <string name="icon_shape_title">Ikooni kuju - vajab taaskäivitust</string>
+  <string name="icon_shape_override_progress">Ikooni kuju muutuste rakendamine</string>
+  <string name="category_icons_title">Ikoonid</string>
+  <string name="bottom_favorites_summary">Täida lemmikrakendused altpoolt</string>
+  <string name="bottom_favorites_title">Alumised lemmikrakendused</string>
+  <string name="button_hide_summary">Peida nupuala</string>
+  <string name="button_hide_title">Peida nupud</string>
+  <string name="phone">Telefon</string>
+  <string name="camera">Kaamera</string>
+  <string name="assist">Abirakendus</string>
+  <string name="google_assistant">Google assistent</string>
 </resources>

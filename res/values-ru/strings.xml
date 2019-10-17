@@ -206,4 +206,21 @@
   <string name="pref_show_events_title">Отображать предстоящие события</string>
   <string name="color_task_header_summary">Использовать стандартный цвет приложения для фона заголовка</string>
   <string name="color_task_header_title">Цвет заголовка задачи</string>
+  <string name="icon_shape_system_default">Оставить без изменения</string>
+  <string name="icon_shape_square">Квадрат</string>
+  <string name="icon_shape_squircle">Квадрат с закругленными краями</string>
+  <string name="icon_shape_circle">Круг</string>
+  <string name="icon_shape_teardrop">Капля</string>
+  <string name="icon_shape_rounded_square">Скругленный квадрат</string>
+  <string name="icon_shape_title">Форма значка - требуется перезапуск</string>
+  <string name="icon_shape_override_progress">Применение изменений формы значка</string>
+  <string name="category_icons_title">Значки</string>
+  <string name="bottom_favorites_summary">Заполнить список избранных приложений снизу</string>
+  <string name="bottom_favorites_title">Нижние избранные приложения</string>
+  <string name="button_hide_summary">Скрыть область кнопок</string>
+  <string name="button_hide_title">Скрыть кнопки</string>
+  <string name="phone">Телефон</string>
+  <string name="camera">Камера</string>
+  <string name="assist">Помощь</string>
+  <string name="google_assistant">Google Ассистент</string>
 </resources>
