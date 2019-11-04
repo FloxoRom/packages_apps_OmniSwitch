@@ -47,7 +47,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.telecom.TelecomManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -599,25 +598,15 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         }
 
         if (buttonId == SettingsActivity.BUTTON_PHONE) {
+            if (!Utils.isPhoneVisible(mContext)) {
+                return null;
+            }
             mPhoneButton = getActionButtonTemplate(mContext.getResources()
                     .getDrawable(R.drawable.ic_phone));
             mPhoneButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     hide(true);
-                    final TelecomManager tm = TelecomManager.from(mContext);
-                    if (tm.isInCall()) {
-                        AsyncTask.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                tm.showInCallScreen(false /* showDialpad */);
-                            }
-                        });
-                    } else {
-                        final Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
-                        phoneIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                            | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                        mContext.startActivity(phoneIntent);
-                    }
+                    Utils.openPhone(mContext);
                 }
             });
             return mPhoneButton;

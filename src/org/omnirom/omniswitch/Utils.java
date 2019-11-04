@@ -33,6 +33,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.hardware.input.InputManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.PatternMatcher;
@@ -42,6 +43,7 @@ import android.os.SystemProperties;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
+import android.telecom.TelecomManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.InputDevice;
@@ -375,5 +377,36 @@ public class Utils {
         packageFilter.addDataScheme("package");
         packageFilter.addDataSchemeSpecificPart(pkg, PatternMatcher.PATTERN_LITERAL);
         return packageFilter;
+    }
+
+    public static boolean isPhoneVisible(Context context) {
+        final Intent PHONE_INTENT = new Intent(Intent.ACTION_DIAL);
+        android.content.pm.PackageManager pm = context.getPackageManager();
+        return pm.hasSystemFeature(android.content.pm.PackageManager.FEATURE_TELEPHONY)
+                && pm.resolveActivity(PHONE_INTENT, 0) != null;
+    }
+
+    public static void openPhone(Context context) {
+        if (!isPhoneVisible(context)) {
+            return;
+        }
+        final TelecomManager tm = TelecomManager.from(context);
+        if (tm.isInCall()) {
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    tm.showInCallScreen(false /* showDialpad */);
+                }
+            });
+        } else {
+            String dialer = tm.getDefaultDialerPackage();
+            if (TextUtils.isEmpty(dialer)) {
+                dialer = "com.android.dialer";
+            }
+            final Intent phoneIntent = context.getPackageManager().getLaunchIntentForPackage(dialer);
+            phoneIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                    | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            context.startActivity(phoneIntent);
+        }
     }
 }

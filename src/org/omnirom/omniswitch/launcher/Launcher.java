@@ -49,7 +49,6 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import android.telecom.TelecomManager;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -99,7 +98,6 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
     public static final String STATE_PANEL_SHOWN = "state_panel_shown";
     private static final int REQUEST_PERMISSION_CALENDAR = 1;
 
-    private static final Intent PHONE_INTENT = new Intent(Intent.ACTION_DIAL);
     private static final float ROTATE_0_DEGREE = 0f;
     private static final float ROTATE_180_DEGREE = 180f;
     private static final float DIM_AMOUNT = 0.2f;
@@ -347,7 +345,7 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
         mPhoneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchPhone();
+                Utils.openPhone(Launcher.this);
             }
         });
 
@@ -365,7 +363,7 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
         mEssentialsPanel.addView(wallpaperButton, 4);
         mEssentialsPanel.addView(settingsButton, 5);
 
-        if (isPhoneVisible()) {
+        if (Utils.isPhoneVisible(this)) {
             mPhoneButton.setVisibility(View.VISIBLE);
         }
         if (isDeviceProvisioned()) {
@@ -811,29 +809,6 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
     private void hideOverlays() {
         hideAppDrawerPanel(true, true);
         hideFavoritePanel(true, true);
-    }
-
-    private boolean isPhoneVisible() {
-        android.content.pm.PackageManager pm = getPackageManager();
-        return pm.hasSystemFeature(android.content.pm.PackageManager.FEATURE_TELEPHONY)
-                && pm.resolveActivity(PHONE_INTENT, 0) != null;
-    }
-
-    private void launchPhone() {
-        final TelecomManager tm = TelecomManager.from(this);
-        if (tm.isInCall()) {
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    tm.showInCallScreen(false /* showDialpad */);
-                }
-            });
-        } else {
-            final Intent phoneIntent = new Intent(PHONE_INTENT);
-            phoneIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                    | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            startActivity(phoneIntent);
-        }
     }
 
     private void launchCamera() {
