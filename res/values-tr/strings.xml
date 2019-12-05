@@ -52,12 +52,12 @@
   <string name="reset">Standart</string>
   <string name="toggle_last_app">Son uygulama</string>
   <string name="toggle_last_app_help">Son uygulamaya geç</string>
-  <string name="kill_all_apps_help">Bütün uygulamaları sonlandır</string>
-  <string name="kill_other_apps_help">Diğer uygulamaları sonlandır</string>
+  <string name="kill_all_apps_help">Bütün uygulamaları sona erdirir</string>
+  <string name="kill_other_apps_help">Diğer uygulamaları sona erdirir</string>
   <string name="settings_help">Ayarlar</string>
   <string name="home_help">Ana ekran</string>
-  <string name="kill_all_apps">Hepsini sonlandır</string>
-  <string name="kill_other_apps">Diğerlerini sonlandır</string>
+  <string name="kill_all_apps">Hepsini sona erdir</string>
+  <string name="kill_other_apps">Diğerlerini sona erdir</string>
   <string name="settings">Ayarlar</string>
   <string name="home">Ana ekran tuşu</string>
   <string name="buttons_title">Düğmeler</string>
@@ -86,8 +86,8 @@
   <string name="speed_switcher_enable_title">Devreye sok</string>
   <string name="back">Geri tuşu</string>
   <string name="back_help">Geri tuşu</string>
-  <string name="kill_current">Mevcûd olanı sonlandır</string>
-  <string name="kill_current_help">Mevcûd uygulamayı sonlandır</string>
+  <string name="kill_current">Mevcûd olanı sona erdir</string>
+  <string name="kill_current_help">Mevcûd uygulamayı sona erdirir</string>
   <string name="speed_switch_color_summary">Mavi - son uygulamalar. Yeşil - en sevilenler. Kırmızı - eylemler</string>
   <string name="speed_switch_color">Arka plan renklerini eşit seviyeye getir</string>
   <string name="speed_switch_limit_summary">Seviye değişiklikleri için yeri sınırla</string>
