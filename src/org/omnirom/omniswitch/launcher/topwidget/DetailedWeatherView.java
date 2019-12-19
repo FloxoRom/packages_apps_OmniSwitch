@@ -219,8 +219,11 @@ public class DetailedWeatherView extends FrameLayout {
         textPaint.getTextBounds(str, 0, str.length(), bounds);
         canvas.drawText(str, width / 2 - bounds.width() / 2, height - textSize / 2, textPaint);
 
-        BitmapDrawable d = shadow(resources, bmp);
-        return d;
+        if (needsShadow()) {
+            return shadow(resources, bmp);
+        } else {
+            return new BitmapDrawable(resources, bmp);
+        }
     }
 
     private Drawable applyTint(Drawable icon) {
@@ -230,21 +233,34 @@ public class DetailedWeatherView extends FrameLayout {
     }
 
     private int getTintColor() {
-        return Color.WHITE;
-        /*TypedArray array = mContext.obtainStyledAttributes(new int[]{android.R.attr.colorControlNormal});
+        TypedArray array = mContext.obtainStyledAttributes(new int[]{R.attr.workspaceTextColor});
         int color = array.getColor(0, 0);
         array.recycle();
-        return color;*/
+        return color;
     }
 
-    public static BitmapDrawable shadow(Resources resources, Bitmap b) {
+    private boolean needsShadow() {
+        TypedArray ta = mContext.obtainStyledAttributes(new int[] {R.attr.isWorkspaceDarkText});
+        boolean isDark = ta.getBoolean(0, false);
+        ta.recycle();
+        return !isDark;
+    }
+
+    private int getShadowColor() {
+        TypedArray array = mContext.obtainStyledAttributes(new int[]{R.attr.workspaceShadowColor});
+        int color = array.getColor(0, 0);
+        array.recycle();
+        return color;
+    }
+
+    private BitmapDrawable shadow(Resources resources, Bitmap b) {
         final Canvas canvas = new Canvas();
         canvas.setDrawFilter(new PaintFlagsDrawFilter(Paint.ANTI_ALIAS_FLAG,
                 Paint.FILTER_BITMAP_FLAG));
 
-        BlurMaskFilter blurFilter = new BlurMaskFilter(5, BlurMaskFilter.Blur.OUTER);
+        BlurMaskFilter blurFilter = new BlurMaskFilter(8, BlurMaskFilter.Blur.OUTER);
         Paint shadowPaint = new Paint();
-        shadowPaint.setColor(resources.getColor(R.color.default_shadow_color_no_alpha));
+        shadowPaint.setColor(getShadowColor());
         shadowPaint.setMaskFilter(blurFilter);
 
         int[] offsetXY = new int[2];

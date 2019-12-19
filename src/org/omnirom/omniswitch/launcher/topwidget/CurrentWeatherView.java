@@ -175,6 +175,7 @@ public class CurrentWeatherView extends FrameLayout implements OmniJawsClient.Om
             } else {
                 mEmptyViewImage.setImageResource(R.drawable.ic_qs_weather_default_off);
             }
+            mEmptyViewImage.setColorFilter(getTintColor());
             return;
         }
         mEmptyView.setVisibility(View.GONE);
@@ -221,8 +222,11 @@ public class CurrentWeatherView extends FrameLayout implements OmniJawsClient.Om
         textPaint.getTextBounds(str, 0, str.length(), bounds);
         canvas.drawText(str, width / 2 - bounds.width() / 2, height - textSize / 2, textPaint);
 
-        BitmapDrawable d = shadow(resources, bmp);
-        return d;
+        if (needsShadow()) {
+            return shadow(resources, bmp);
+        } else {
+            return new BitmapDrawable(resources, bmp);
+        }
     }
 
     private Drawable applyTint(Drawable icon) {
@@ -232,11 +236,24 @@ public class CurrentWeatherView extends FrameLayout implements OmniJawsClient.Om
     }
 
     private int getTintColor() {
-        return Color.WHITE;
-        /*TypedArray array = mContext.obtainStyledAttributes(new int[]{android.R.attr.colorControlNormal});
+        TypedArray array = mContext.obtainStyledAttributes(new int[]{R.attr.workspaceTextColor});
         int color = array.getColor(0, 0);
         array.recycle();
-        return color;*/
+        return color;
+    }
+
+    private boolean needsShadow() {
+        TypedArray ta = mContext.obtainStyledAttributes(new int[] {R.attr.isWorkspaceDarkText});
+        boolean isDark = ta.getBoolean(0, false);
+        ta.recycle();
+        return !isDark;
+    }
+
+    private int getShadowColor() {
+        TypedArray array = mContext.obtainStyledAttributes(new int[]{R.attr.workspaceShadowColor});
+        int color = array.getColor(0, 0);
+        array.recycle();
+        return color;
     }
 
     private void forceRefreshWeatherSettings() {
@@ -292,14 +309,14 @@ public class CurrentWeatherView extends FrameLayout implements OmniJawsClient.Om
         }
     }
 
-    public static BitmapDrawable shadow(Resources resources, Bitmap b) {
+    private BitmapDrawable shadow(Resources resources, Bitmap b) {
         final Canvas canvas = new Canvas();
         canvas.setDrawFilter(new PaintFlagsDrawFilter(Paint.ANTI_ALIAS_FLAG,
                 Paint.FILTER_BITMAP_FLAG));
 
-        BlurMaskFilter blurFilter = new BlurMaskFilter(5, BlurMaskFilter.Blur.OUTER);
+        BlurMaskFilter blurFilter = new BlurMaskFilter(8, BlurMaskFilter.Blur.OUTER);
         Paint shadowPaint = new Paint();
-        shadowPaint.setColor(resources.getColor(R.color.default_shadow_color_no_alpha));
+        shadowPaint.setColor(getShadowColor());
         shadowPaint.setMaskFilter(blurFilter);
 
         int[] offsetXY = new int[2];

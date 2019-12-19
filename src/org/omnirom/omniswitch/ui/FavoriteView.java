@@ -59,12 +59,12 @@ public class FavoriteView extends GridView {
     private static final String TAG = "FavoriteView";
     private static final boolean DEBUG = false;
 
-    private SwitchConfiguration mConfiguration;
+    protected SwitchConfiguration mConfiguration;
     private FavoriteListAdapter mFavoriteListAdapter;
     private boolean mTransparent;
     protected List<String> mFavoriteList;
     private SwitchManager mRecentsManager;
-    private Typeface mLabelFont;
+    protected Typeface mLabelFont;
 
     public class FavoriteListAdapter extends ArrayAdapter<String> {
 

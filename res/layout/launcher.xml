@@ -45,11 +45,11 @@
             android:layout_weight="1"
             android:orientation="vertical" >
 
-            <include layout="@layout/app_drawer_panel"
+            <include layout="@layout/launcher_app_drawer_panel"
                 android:id="@+id/app_drawer_panel"
                 android:visibility="gone" />
 
-            <include layout="@layout/favorite_panel"
+            <include layout="@layout/launcher_favorite_panel"
                 android:id="@+id/favorite_panel"
                 android:visibility="gone"/>
 
@@ -60,8 +60,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:fitsSystemWindows="true"
-            android:layout_gravity="bottom"
-            android:background="@drawable/root_bottom_bg" >
+            android:layout_gravity="bottom" >
 
             <include layout="@layout/essentials_panel"
                 android:id="@+id/essentials_panel"
@@ -80,7 +79,8 @@
                     android:layout_height="@dimen/action_button_size"
                     android:layout_width="@dimen/action_button_size"
                     android:src="@drawable/ic_essentials"
-                    android:scaleType="centerInside" />
+                    android:scaleType="centerInside"
+                    android:tint="?attr/workspaceTextColor" />
 
                 <Space
                     android:layout_width="0dp"
@@ -93,7 +93,8 @@
                     android:layout_width="@dimen/action_button_size"
                     android:src="@drawable/ic_favorite_edit"
                     android:scaleType="centerInside"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:tint="?attr/workspaceTextColor" />
 
                 <Space
                     android:id="@+id/edit_favorite_button_space"
@@ -107,7 +108,8 @@
                     android:layout_height="@dimen/action_button_size"
                     android:layout_width="@dimen/action_button_size"
                     android:src="@drawable/ic_favorite"
-                    android:scaleType="centerInside" />
+                    android:scaleType="centerInside"
+                    android:tint="?attr/workspaceTextColor" />
 
                 <Space
                     android:layout_width="0dp"
@@ -119,7 +121,8 @@
                     android:layout_height="@dimen/action_button_size"
                     android:layout_width="@dimen/action_button_size"
                     android:src="@drawable/ic_apps"
-                    android:scaleType="centerInside" />
+                    android:scaleType="centerInside"
+                    android:tint="?attr/workspaceTextColor" />
 
             </LinearLayout>
         </LinearLayout>

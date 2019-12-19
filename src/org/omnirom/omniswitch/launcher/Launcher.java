@@ -27,6 +27,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.TaskStackBuilder;
 import android.app.WallpaperManager;
+import android.app.WallpaperColors;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -37,6 +38,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
@@ -88,7 +90,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-public class Launcher extends Activity implements IEditFavoriteActivity {
+public class Launcher extends Activity implements IEditFavoriteActivity,
+        WallpaperManager.OnColorsChangedListener {
     private static final String TAG = "Launcher";
     private static final boolean DEBUG = false;
     public static final String WECLOME_SCREEN_DISMISSED = "weclome_screen_dismissed";
@@ -100,12 +103,12 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
 
     private static final float ROTATE_0_DEGREE = 0f;
     private static final float ROTATE_180_DEGREE = 180f;
-    private static final float DIM_AMOUNT = 0.2f;
+    private static final float DIM_AMOUNT = 0f;
 
     private boolean mAttached;
     private View mRootView;
     private ViewGroup mAppDrawerPanel;
-    private AppDrawerView mAppDrawer;
+    private LauncherAppDrawerView mAppDrawer;
     private boolean mAppDrawerPanelVisibile;
     private SharedPreferences mPrefs;
     private List<String> mFavoriteList;
@@ -127,13 +130,15 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
     private ViewGroup mFavoritePanel;
     private ImageView mFavoriteEditButton;
     private View mFavoriteEditButtonSpace;
-    private FavoriteView mFavoriteGrid;
+    private LauncherFavoriteView mFavoriteGrid;
     private ImageView mPhoneButton;
     private ViewGroup mEssentialsPanel;
     private ImageView mEssentialsButton;
     private boolean mEssentialsPanelVisibile;
     private ImageView mCameraButton;
     private TopWidgetView mTopContainer;
+    private int mThemeRes = R.style.LauncherTheme;
+    private WallpaperManager mWallpaperManager;
 
     private Runnable mLongPressRunnable = new Runnable(){
     @Override
@@ -212,6 +217,19 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
         mGestureDetector = new GestureDetector(this, mGestureListener);
         mGestureDetector.setIsLongpressEnabled(false);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mWallpaperManager = (WallpaperManager) getSystemService(Context.WALLPAPER_SERVICE);
+        mWallpaperManager.addOnColorsChangedListener(this, mHandler);
+        WallpaperColors wallpaperColors = mWallpaperManager.getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
+
+        boolean supportsDarkText = wallpaperColors != null
+                ? (wallpaperColors.getColorHints()
+                & WallpaperColors.HINT_SUPPORTS_DARK_TEXT) > 0 : false;
+        int themeRes = getActivityThemeRes(supportsDarkText);
+        if (themeRes != mThemeRes) {
+            mThemeRes = themeRes;
+            setTheme(themeRes);
+        }
 
         mEssentialsPanelVisibile = isEssentialsExpanded();
         final int activePanel = getActivePanel();
@@ -492,11 +510,11 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
             }
         });
 
-        mAppDrawer = (AppDrawerView) findViewById(R.id.app_drawer);
+        mAppDrawer = (LauncherAppDrawerView) findViewById(R.id.app_drawer);
         mAppDrawer.setTransparentMode(true);
         mAppDrawer.init();
 
-        mFavoriteGrid = (FavoriteView) findViewById(R.id.favorite_grid);
+        mFavoriteGrid = (LauncherFavoriteView) findViewById(R.id.favorite_grid);
         mFavoriteGrid.setTransparentMode(true);
         mFavoriteGrid.init();
 
@@ -949,7 +967,32 @@ public class Launcher extends Activity implements IEditFavoriteActivity {
                 (float)(1.0/6.0)));
         essentialButton.setBackgroundResource(R.drawable.ripple_dark);
         essentialButton.setImageResource(imageResource);
+        essentialButton.setColorFilter(getTintColor());
         return essentialButton;
+    }
+
+    private int getActivityThemeRes(boolean supportsDarkText) {
+        return supportsDarkText ?
+                R.style.LauncherTheme_DarkText : R.style.LauncherTheme;
+    }
+
+    @Override
+    public void onColorsChanged(WallpaperColors wallpaperColors, int which) {
+        if (DEBUG) Log.d(TAG, "onColorsChanged");
+        boolean supportsDarkText = wallpaperColors != null
+            ? (wallpaperColors.getColorHints()
+            & WallpaperColors.HINT_SUPPORTS_DARK_TEXT) > 0 : false;
+        int themeRes = getActivityThemeRes(supportsDarkText);
+        if (themeRes != mThemeRes) {
+            recreate();
+        }
+    }
+
+    private int getTintColor() {
+        TypedArray array = this.obtainStyledAttributes(new int[]{R.attr.workspaceTextColor});
+        int color = array.getColor(0, 0);
+        array.recycle();
+        return color;
     }
 }
 

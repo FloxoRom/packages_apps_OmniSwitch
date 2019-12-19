@@ -34,4 +34,7 @@
     <declare-styleable name="CustomTheme">
         <attr name="showcaseViewStyle" format="reference" />
     </declare-styleable>
+    <attr name="isWorkspaceDarkText" format="boolean" />
+    <attr name="workspaceTextColor" format="color" />
+    <attr name="workspaceShadowColor" format="color" />
 </resources>

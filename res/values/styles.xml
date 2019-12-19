@@ -43,15 +43,28 @@
         <item name="android:windowShowWallpaper">true</item>
         <!-- misc -->
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@color/launcher_navigaton_bar</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="workspaceTextColor">@android:color/white</item>
+        <item name="workspaceShadowColor">#B0000000</item>
+        <item name="isWorkspaceDarkText">false</item>
+    </style>
+
+    <style name="LauncherTheme.DarkText" parent="@style/LauncherTheme">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="workspaceTextColor">#99000000</item>
+        <item name="workspaceShadowColor">@android:color/transparent</item>
+        <item name="isWorkspaceDarkText">true</item>
     </style>
 
     <style name="Calendar">
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">#ffffff</item>
-        <item name="android:shadowColor">@color/default_shadow_color_no_alpha</item>
+        <item name="android:textColor">?attr/workspaceTextColor</item>
+        <item name="android:shadowColor">?attr/workspaceShadowColor</item>
         <item name="android:shadowDx">0.0</item>
         <item name="android:shadowDy">1.0</item>
         <item name="android:shadowRadius">4.0</item>
@@ -73,8 +86,8 @@
     <style name="WeatherDetailed">
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">#ffffff</item>
-        <item name="android:shadowColor">@color/default_shadow_color_no_alpha</item>
+        <item name="android:textColor">?attr/workspaceTextColor</item>
+        <item name="android:shadowColor">?attr/workspaceShadowColor</item>
         <item name="android:shadowDx">0.0</item>
         <item name="android:shadowDy">1.0</item>
         <item name="android:shadowRadius">4.0</item>

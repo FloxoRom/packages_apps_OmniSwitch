@@ -60,11 +60,11 @@ public class AppDrawerView extends GridView {
     private static final String TAG = "AppDrawerView";
     private static final boolean DEBUG = false;
 
-    private SwitchConfiguration mConfiguration;
+    protected SwitchConfiguration mConfiguration;
     private AppDrawerListAdapter mAppDrawerListAdapter;
     private boolean mTransparent;
     private SwitchManager mRecentsManager;
-    private Typeface mLabelFont;
+    protected Typeface mLabelFont;
     private List<PackageManager.PackageItem> mFilteredPackagesList;
 
     public class AppDrawerListAdapter extends
