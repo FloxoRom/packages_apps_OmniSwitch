@@ -206,4 +206,21 @@
   <string name="pref_show_events_title">Afficher les événements à venir</string>
   <string name="color_task_header_summary">Utiliser la couleur principale de l\'application pour l\'arrière plan de l\'en-tête</string>
   <string name="color_task_header_title">Couleur de l\'en-tête de la tâche</string>
+  <string name="icon_shape_system_default">Utiliser les paramètres par défaut</string>
+  <string name="icon_shape_square">Carré</string>
+  <string name="icon_shape_squircle">Circulaire</string>
+  <string name="icon_shape_circle">Cercle</string>
+  <string name="icon_shape_teardrop">Goutte</string>
+  <string name="icon_shape_rounded_square">Carré arrondi</string>
+  <string name="icon_shape_title">Forme de l\'icône - redémarrage nécessaire</string>
+  <string name="icon_shape_override_progress">Application des modifications de forme des icônes</string>
+  <string name="category_icons_title">Icônes</string>
+  <string name="bottom_favorites_summary">Remplir la liste des applications favorites à partir du bas</string>
+  <string name="bottom_favorites_title">Applications en bas de page favorites</string>
+  <string name="button_hide_summary">Masquer la zone des boutons</string>
+  <string name="button_hide_title">Masquer les boutons</string>
+  <string name="phone">Téléphone</string>
+  <string name="camera">Caméra</string>
+  <string name="assist">Assistance</string>
+  <string name="google_assistant">Assistant Google</string>
 </resources>
