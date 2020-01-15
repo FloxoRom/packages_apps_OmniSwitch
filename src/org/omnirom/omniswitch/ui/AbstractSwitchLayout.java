@@ -325,7 +325,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                 .getSystemService(Context.WINDOW_SERVICE);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         mConfiguration = SwitchConfiguration.getInstance(mContext);
-        mLabelFont = Typeface.create("sans-serif-condensed", Typeface.NORMAL);
+        mLabelFont = Utils.getAppLabelFont(mContext);
         mInflater = (LayoutInflater) mContext
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ViewConfiguration vc = ViewConfiguration.get(context);
@@ -695,11 +695,12 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         if (DEBUG) {
             Log.d(TAG, "updatePrefs " + key);
         }
-
+        if (key != null && key.equals(SettingsActivity.PREF_SYSTEM_FONT)) {
+            mLabelFont = Utils.getAppLabelFont(mContext);
+        }
         if (key != null && key.equals(SettingsActivity.PREF_FAVORITE_APPS)) {
             updateFavoritesList();
         }
-
         if (mAppDrawer != null) {
             mAppDrawer.updatePrefs(prefs, key);
         }

@@ -31,7 +31,9 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
+import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.hardware.input.InputManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -55,12 +57,25 @@ import static android.view.WindowManager.DOCKED_INVALID;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 import org.omnirom.omniswitch.launcher.Launcher;
 
 public class Utils {
+
+    private static final HashSet<String> mForceUpdateKeys = new HashSet<>();
+    static {
+        mForceUpdateKeys.add(SettingsActivity.PREF_BG_STYLE);
+        mForceUpdateKeys.add(SettingsActivity.PREF_SHOW_LABELS);
+        mForceUpdateKeys.add(SettingsActivity.PREF_ICON_SIZE);
+        mForceUpdateKeys.add(SettingsActivity.PREF_ICONPACK);
+        mForceUpdateKeys.add(SettingsActivity.PREF_THUMB_SIZE);
+        mForceUpdateKeys.add(SwitchService.DPI_CHANGE);
+        mForceUpdateKeys.add(SettingsActivity.PREF_ICON_SHAPE);
+        mForceUpdateKeys.add(SettingsActivity.PREF_SYSTEM_FONT);
+    }
 
     public static void parseCollection(String listString,
             Collection<String> list) {
@@ -244,16 +259,7 @@ public class Utils {
     }
 
     public static boolean isPrefKeyForForceUpdate(String key) {
-        if (key.equals(SettingsActivity.PREF_BG_STYLE) ||
-                key.equals(SettingsActivity.PREF_SHOW_LABELS) ||
-                key.equals(SettingsActivity.PREF_ICON_SIZE) ||
-                key.equals(SettingsActivity.PREF_ICONPACK) ||
-                key.equals(SettingsActivity.PREF_THUMB_SIZE) ||
-                key.equals(SwitchService.DPI_CHANGE) ||
-                key.equals(SettingsActivity.PREF_ICON_SHAPE)) {
-            return true;
-        }
-        return false;
+        return mForceUpdateKeys.contains(key);
     }
 
     public static void enableLauncherMode(Context context, boolean value) {
@@ -407,6 +413,26 @@ public class Utils {
             phoneIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                     | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             context.startActivity(phoneIntent);
+        }
+    }
+
+    public static Typeface getAppLabelFont() {
+        return Typeface.create("sans-serif-condensed", Typeface.NORMAL);
+    }
+
+    public static String getDefaultBodyFont(Context context) {
+        TypedArray ta = context.obtainStyledAttributes(android.R.style.TextAppearance_DeviceDefault,
+                new int[]{ android.R.attr.fontFamily });
+        String value = ta.getString(0);
+        ta.recycle();
+        return value;
+    }
+
+    public static Typeface getAppLabelFont(Context context) {
+        if (SwitchConfiguration.getInstance(context).mSystemFont) {
+            return Typeface.create(getDefaultBodyFont(context), Typeface.NORMAL);
+        } else {
+            return getAppLabelFont();
         }
     }
 }

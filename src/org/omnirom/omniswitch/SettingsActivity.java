@@ -122,6 +122,7 @@ public class SettingsActivity extends PreferenceActivity implements
     public static final String PREF_ICON_SHAPE = "icon_shape";
     public static final String PREF_BOTTOM_FAVORITES = "bottom_favorites";
     public static final String PREF_BUTTON_HIDE = "button_hide";
+    public static final String PREF_SYSTEM_FONT = "system_font";
 
     public static final String WEATHER_ICON_PACK_PREFERENCE_KEY = "pref_weatherIconPack";
     public static final String SHOW_ALL_DAY_EVENTS_PREFERENCE_KEY = "pref_allDayEvents";

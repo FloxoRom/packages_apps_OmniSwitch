@@ -19,6 +19,7 @@ package org.omnirom.omniswitch.ui;
 
 import org.omnirom.omniswitch.R;
 import org.omnirom.omniswitch.SwitchConfiguration;
+import org.omnirom.omniswitch.Utils;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -47,10 +48,10 @@ public class BitmapUtils {
     private static Paint sDockedAppsPaint;
     private static Paint sDefaultBgPaint;
 
-    public static TextPaint getLabelTextPaint(Resources resources) {
+    public static TextPaint getLabelTextPaint(Context context) {
         if (sTextPaint == null) {
             sTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-            Typeface font = Typeface.create("sans-serif-condensed", Typeface.NORMAL);
+            Typeface font = Utils.getAppLabelFont(context);
             sTextPaint.setTypeface(font);
             sTextPaint.setTextAlign(Paint.Align.LEFT);
         }
@@ -204,7 +205,7 @@ public class BitmapUtils {
         canvas.setBitmap(bmp);
 
         final TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        Typeface font = Typeface.create("sans-serif-condensed", Typeface.NORMAL);
+        Typeface font = Utils.getAppLabelFont();
         textPaint.setTypeface(font);
         textPaint.setColor(tintColor);
         textPaint.setTextAlign(Paint.Align.LEFT);

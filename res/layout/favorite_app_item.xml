@@ -50,6 +50,6 @@
         android:focusable="false"
         android:singleLine="true"
         android:textAlignment="viewStart"
-        android:textAppearance="?android:attr/textAppearanceListItem" />
+        android:textAppearance="@*android:style/TextAppearance.DeviceDefault.ListItem" />
 
 </LinearLayout>

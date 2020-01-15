@@ -333,6 +333,8 @@ public class CurrentWeatherView extends FrameLayout implements OmniJawsClient.Om
     }
 
     public void updateSettings() {
+        mDetailedWeatherView.updateSettings();
+
         if (mWeatherClient != null) {
             mWeatherClient.loadCustomIconPackage();
             queryAndUpdateWeather();

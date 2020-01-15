@@ -706,7 +706,7 @@ public class SwitchGestureView {
         item.setTextColor(Color.WHITE);
         item.setShadowLayer(5, 0, 0, Color.BLACK);
         item.setTextSize(20f);
-        Typeface font = Typeface.create("sans-serif-condensed", Typeface.NORMAL);
+        Typeface font = Utils.getAppLabelFont(mContext);
         item.setTypeface(font);
         item.setEllipsize(TextUtils.TruncateAt.END);
         item.setGravity(Gravity.CENTER_HORIZONTAL);

@@ -43,7 +43,7 @@
         android:focusable="false"
         android:singleLine="true"
         android:textAlignment="viewStart"
-        android:textAppearance="?android:attr/textAppearanceListItem" />
+        android:textAppearance="@*android:style/TextAppearance.DeviceDefault.ListItem" />
     <CheckBox
         android:id="@+id/app_check"
         android:layout_width="wrap_content"

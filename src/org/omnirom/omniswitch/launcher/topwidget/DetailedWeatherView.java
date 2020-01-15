@@ -48,6 +48,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.omnirom.omniswitch.R;
+import org.omnirom.omniswitch.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -119,6 +120,7 @@ public class DetailedWeatherView extends FrameLayout {
                 mTopWidget.showDetailedWeather(false);
             }
         });
+        updateSettings();
     }
 
     public void updateWeatherData(OmniJawsClient weatherClient, OmniJawsClient.WeatherInfo weatherData) {
@@ -274,5 +276,14 @@ public class DetailedWeatherView extends FrameLayout {
         canvas.drawBitmap(b, 0, 0, null);
 
         return new BitmapDrawable(resources, bmResult);
+    }
+
+    public void updateSettings() {
+        mCurrentText.setTypeface(Utils.getAppLabelFont(getContext()));
+        mForecastText0.setTypeface(Utils.getAppLabelFont(getContext()));
+        mForecastText1.setTypeface(Utils.getAppLabelFont(getContext()));
+        mForecastText2.setTypeface(Utils.getAppLabelFont(getContext()));
+        mForecastText3.setTypeface(Utils.getAppLabelFont(getContext()));
+        mForecastText4.setTypeface(Utils.getAppLabelFont(getContext()));
     }
 }

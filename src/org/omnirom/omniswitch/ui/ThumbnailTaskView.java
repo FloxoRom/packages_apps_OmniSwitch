@@ -214,7 +214,7 @@ public class ThumbnailTaskView extends View implements TaskDescription.ThumbChan
                 width + (sideHeader ? iconBorderSizePx : 0), height + (sideHeader ? 0 : iconBorderSizePx));
         canvas.drawBitmap(taskThumb, src, dest, null);
 
-        final TextPaint textPaint = BitmapUtils.getLabelTextPaint(resources);
+        final TextPaint textPaint = BitmapUtils.getLabelTextPaint(getContext());
         final int startTextPx = iconBorderSizePx + textInsetPx;
         final int textSize = Math.round(14 * mConfiguration.mDensity);
         textPaint.setTextSize(textSize);

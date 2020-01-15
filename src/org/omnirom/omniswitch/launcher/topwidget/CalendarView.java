@@ -43,6 +43,7 @@ import android.widget.TextView;
 
 import org.omnirom.omniswitch.R;
 import org.omnirom.omniswitch.SwitchConfiguration;
+import org.omnirom.omniswitch.Utils;
 import org.omnirom.omniswitch.launcher.Launcher;
 
 import java.text.SimpleDateFormat;
@@ -85,6 +86,8 @@ public class CalendarView extends FrameLayout implements CalendarClient.Calendar
             eventWhen = (TextView) convertView.findViewById(R.id.event_when);
             eventTitle.setText(event.title);
             eventWhen.setText(event.when);
+            eventTitle.setTypeface(Utils.getAppLabelFont(getContext()));
+            eventWhen.setTypeface(Utils.getAppLabelFont(getContext()));
 
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -256,6 +259,9 @@ public class CalendarView extends FrameLayout implements CalendarClient.Calendar
             startProgress();
             mCalendarClient.load();
         }
+
+        mCalendarStatusText.setTypeface(Utils.getAppLabelFont(getContext()));
+        mCalendarTodayText.setTypeface(Utils.getAppLabelFont(getContext()));
     }
 
     private void showCalendarAtToday() {

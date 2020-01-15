@@ -101,7 +101,7 @@ public class FavoriteView extends GridView {
     public FavoriteView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mConfiguration = SwitchConfiguration.getInstance(mContext);
-        mLabelFont = Typeface.create("sans-serif-condensed", Typeface.NORMAL);
+        mLabelFont = Utils.getAppLabelFont(mContext);
         mFavoriteList = new ArrayList<String>();
         mFavoriteListAdapter = new FavoriteListAdapter(mContext,
                 android.R.layout.simple_list_item_single_choice, mFavoriteList);
@@ -163,6 +163,9 @@ public class FavoriteView extends GridView {
     public void updatePrefs(SharedPreferences prefs, String key) {
         if (DEBUG) {
             Log.d(TAG, "updatePrefs " + key);
+        }
+        if (key != null && key.equals(SettingsActivity.PREF_SYSTEM_FONT)) {
+            mLabelFont = Utils.getAppLabelFont(mContext);
         }
         if (key != null && key.equals(SettingsActivity.PREF_FAVORITE_APPS)) {
             updateFavoritesList();

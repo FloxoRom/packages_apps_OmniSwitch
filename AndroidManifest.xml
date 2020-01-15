@@ -46,7 +46,7 @@
         android:allowBackup="true" >
         <service
             android:name="org.omnirom.omniswitch.SwitchService"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize|uiMode" />
         <receiver android:name="org.omnirom.omniswitch.SwitchService$RecentsReceiver" >
             <intent-filter>
                 <action android:name="org.omnirom.omniswitch.ACTION_TOGGLE_OVERLAY" />

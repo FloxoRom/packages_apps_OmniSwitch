@@ -28,11 +28,11 @@
         <item name="android:textAppearanceSmallPopupMenu">@style/TextAppearancePopupMenuCondensed</item>
     </style>
     <style name="SettingsTheme" parent="@android:style/Theme.DeviceDefault.Settings"></style>
-    <style name="AppTheme" parent="@android:style/Theme.Material"></style>
-    <style name="AppThemeSystem" parent="@android:style/Theme.DeviceDefault.Light.Dialog"></style>
+    <style name="AppTheme" parent="@android:style/Theme.Material" />
+    <style name="AppThemeSystem" parent="@android:style/Theme.DeviceDefault.Light.Dialog" />
     <style name="PlaceholderTheme" parent="@android:style/Theme.Translucent.NoTitleBar"></style>
     <style name="TextAppearancePopupMenuCondensed" parent="@android:style/TextAppearance.Material.Menu" >
-        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:fontFamily">@*android:string/config_bodyFontFamily</item>
     </style>
     <style name="LauncherTheme" parent="@android:style/Theme.DeviceDefault.Light.NoActionBar">
         <!-- NoTitle -->
@@ -60,7 +60,7 @@
         <item name="isWorkspaceDarkText">true</item>
     </style>
 
-    <style name="Calendar">
+    <style name="Calendar" parent="@android:style/TextAppearance.DeviceDefault" >
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">?attr/workspaceTextColor</item>
@@ -68,7 +68,6 @@
         <item name="android:shadowDx">0.0</item>
         <item name="android:shadowDy">1.0</item>
         <item name="android:shadowRadius">4.0</item>
-        <item name="android:fontFamily">sans-serif-condensed</item>
     </style>
 
     <style name="CalendarSmall" parent="@style/Calendar" >
@@ -83,14 +82,13 @@
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="WeatherDetailed">
-        <item name="android:textSize">12sp</item>
+    <style name="WeatherDetailed" parent="@android:style/TextAppearance.DeviceDefault" >
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">?attr/workspaceTextColor</item>
         <item name="android:shadowColor">?attr/workspaceShadowColor</item>
         <item name="android:shadowDx">0.0</item>
         <item name="android:shadowDy">1.0</item>
         <item name="android:shadowRadius">4.0</item>
-        <item name="android:fontFamily">sans-serif-condensed</item>
     </style>
 </resources>
