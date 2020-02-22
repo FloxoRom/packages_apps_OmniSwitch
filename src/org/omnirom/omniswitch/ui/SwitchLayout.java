@@ -245,6 +245,21 @@ public class SwitchLayout extends AbstractSwitchLayout {
         mRecentsOrAppDrawer = (LinearLayout) mView.findViewById(R.id.recents_or_appdrawer);
 
         mPopupView = new FrameLayout(mContext);
+        mPopupView.setLayoutParams(new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+        mPopupView.setBackgroundColor(Color.BLACK);
+        mPopupView.getBackground().setAlpha(0);
+
+        ViewGroup.MarginLayoutParams lp = new ViewGroup.MarginLayoutParams (
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = mConfiguration.getCurrentOffsetStart()
+                + mConfiguration.mDragHandleHeight / 2
+                - mConfiguration.getItemMaxHeight() / 2
+                - (mButtonsVisible ? mConfiguration.mActionSizePx : 0);
+        mView.setLayoutParams(lp);
+    
         mPopupView.addView(mView);
 
         mView.setOnTouchListener(mDragHandleListener);
@@ -385,24 +400,21 @@ public class SwitchLayout extends AbstractSwitchLayout {
     }
 
     @Override
-    protected WindowManager.LayoutParams getParams(float dimAmount) {
+    protected WindowManager.LayoutParams getParams() {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 getCurrentOverlayWidth(),
-                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_PHONE,
-                mConfiguration.mDimBehind ? WindowManager.LayoutParams.FLAG_DIM_BEHIND
-                        : 0, PixelFormat.TRANSLUCENT);
+                0, PixelFormat.TRANSLUCENT);
 
         if (mConfiguration.mDimBehind) {
-            params.dimAmount = dimAmount;
+            mPopupView.getBackground().setAlpha(
+                        (int) (255 * mConfiguration.mBackgroundOpacity));
+        } else {
+            mPopupView.getBackground().setAlpha(0);
         }
 
-        params.gravity = Gravity.TOP | getHorizontalGravity();
-        params.y = mConfiguration.getCurrentOffsetStart()
-                + mConfiguration.mDragHandleHeight / 2
-                - mConfiguration.getItemMaxHeight() / 2
-                - (mButtonsVisible ? mConfiguration.mActionSizePx : 0);
-
+        params.gravity = getHorizontalGravity();
         return params;
     }
 
@@ -573,6 +585,11 @@ public class SwitchLayout extends AbstractSwitchLayout {
 
     @Override
     protected int getCurrentOverlayWidth() {
+        return mConfiguration.getCurrentOverlayWidth();
+    }
+
+    @Override
+    protected int getSlideEndValue() {
         return mConfiguration.getCurrentOverlayWidth();
     }
 

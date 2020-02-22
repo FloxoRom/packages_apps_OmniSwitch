@@ -237,6 +237,17 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         mRecentsOrAppDrawer = (LinearLayout) mView.findViewById(R.id.recents_or_appdrawer);
 
         mPopupView = new FrameLayout(mContext);
+        mPopupView.setLayoutParams(new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+        mPopupView.setBackgroundColor(Color.BLACK);
+        mPopupView.getBackground().setAlpha(0);
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        lp.gravity = getHorizontalGravity();
+        mView.setLayoutParams(lp);
         mPopupView.addView(mView);
 
         mView.setOnTouchListener(mDragHandleListener);
@@ -373,20 +384,20 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
     }
 
     @Override
-    protected WindowManager.LayoutParams getParams(float dimAmount) {
+    protected WindowManager.LayoutParams getParams() {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_PHONE,
-                mConfiguration.mDimBehind ? WindowManager.LayoutParams.FLAG_DIM_BEHIND
-                        : 0, PixelFormat.TRANSLUCENT);
+                0, PixelFormat.TRANSLUCENT);
 
         if (mConfiguration.mDimBehind) {
-            params.dimAmount = dimAmount;
+            mPopupView.getBackground().setAlpha(
+                        (int) (255 * mConfiguration.mBackgroundOpacity));
+        } else {
+            mPopupView.getBackground().setAlpha(0);
         }
-
         params.gravity = getHorizontalGravity();
-
         return params;
     }
 
@@ -445,6 +456,9 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
 
     @Override
     protected void flipToAppDrawerNew() {
+        if (mConfiguration.mLocation == 0) {
+            mView.setTranslationX(getCurrentOverlayWidth() - getSlideEndValue());
+        }
         mRecentsOrAppDrawer.addView(mAppDrawer);
         mAppDrawer.setLayoutParams(getAppDrawerParams());
         mAppDrawer.requestLayout();
@@ -455,6 +469,9 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
 
     @Override
     protected void flipToRecentsNew() {
+        if (mConfiguration.mLocation == 0) {
+            mView.setTranslationX(getCurrentOverlayWidth() - getSlideEndValue());
+        }
         mRecentsOrAppDrawer.removeView(mAppDrawer);
         mAppDrawer.setVisibility(View.GONE);
         mRecents.setVisibility(View.VISIBLE);
@@ -464,6 +481,9 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
     @Override
     protected void toggleFavorites() {
         mShowFavorites = !mShowFavorites;
+        if (mConfiguration.mLocation == 0) {
+            mView.setTranslationX(getCurrentOverlayWidth() - getSlideEndValue());
+        }
         storeExpandedFavoritesState();
 
         if (mShowFavAnim != null) {
@@ -573,6 +593,11 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
 
     @Override
     protected int getCurrentOverlayWidth() {
+        return mConfiguration.getCurrentDisplayWidth();
+    }
+
+    @Override
+    protected int getSlideEndValue() {
         if (mShowAppDrawer) {
             return getAppDrawerParams().width
                     + (isButtonVisible() ? mConfiguration.mActionSizePx : 0);

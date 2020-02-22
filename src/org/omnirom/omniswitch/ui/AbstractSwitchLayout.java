@@ -346,8 +346,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                 mAppDrawer.setLayoutParams(getAppDrawerParams());
             }
             if (mPopupView != null) {
-                mWindowManager.updateViewLayout(mPopupView,
-                        getParams(mConfiguration.mBackgroundOpacity));
+                mWindowManager.updateViewLayout(mPopupView, getParams());
             }
         } catch (Exception e) {
             // ignored
@@ -742,7 +741,11 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
             Log.d(TAG, "slideLayoutHide " + distanceX);
         }
         mCurrentDistance = Math.abs(distanceX);
-        mCurrentSlideWidth = distanceX;
+        if (mConfiguration.mLocation == 0) {
+            mCurrentSlideWidth = getSlideEndPoint() + distanceX;
+        } else {
+            mCurrentSlideWidth = distanceX;
+        }
         mView.setTranslationX(mCurrentSlideWidth);
         if (DEBUG) {
             Log.d(TAG, "slideLayoutHide " + mCurrentSlideWidth);
@@ -750,6 +753,24 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     }
 
     protected abstract int getCurrentOverlayWidth();
+
+    protected abstract int getSlideEndValue();
+
+    private int getSlideEndPoint() {
+        if (mConfiguration.mLocation == 0) {
+            return getCurrentOverlayWidth() - getSlideEndValue();
+        } else {
+            return 0;
+        }
+    }
+
+    private int getSlideStartPoint() {
+        if (mConfiguration.mLocation == 0) {
+            return getCurrentOverlayWidth();
+        } else {
+            return -getSlideEndValue();
+        }
+    }
 
     public void finishSlideLayoutHide() {
         if (DEBUG) {
@@ -785,19 +806,19 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
 
     public void slideLayout(float distanceX) {
         if (DEBUG) {
-            Log.d(TAG, "slideLayout " + distanceX);
+            Log.d(TAG, "slideLayout " + distanceX + " " + mView.getTranslationX());
         }
         mCurrentDistance = Math.abs(distanceX);
         if (mConfiguration.mLocation == 0) {
-            mCurrentSlideWidth = getCurrentOverlayWidth() - distanceX;
-            if (mCurrentSlideWidth > 0) {
+            mCurrentSlideWidth = getSlideStartPoint() - distanceX;
+            if (mCurrentSlideWidth > getSlideEndPoint()) {
                 mView.setTranslationX(mCurrentSlideWidth);
             } else {
-                mCurrentSlideWidth = 0;
+                mCurrentSlideWidth = getSlideEndPoint();
                 mView.setTranslationX(mCurrentSlideWidth);
             }
         } else {
-            mCurrentSlideWidth = -getCurrentOverlayWidth() + distanceX;
+            mCurrentSlideWidth = getSlideStartPoint() - distanceX;
             if (mCurrentSlideWidth < 0) {
                 mView.setTranslationX(mCurrentSlideWidth);
             } else {
@@ -824,18 +845,16 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         mEnabled = false;
 
         if (show) {
+            int endValue = getSlideEndPoint();
+
             mToggleOverlayAnim = start(interpolator(
                     mDecelerateInterpolator,
                     ObjectAnimator.ofFloat(mView, View.TRANSLATION_X,
-                            mCurrentSlideWidth, 0)).setDuration(
+                            mCurrentSlideWidth, endValue)).setDuration(
                     fromFling ? SHOW_DURATION_FAST : SHOW_DURATION));
         } else {
-            int endValue = 0;
-            if (mConfiguration.mLocation == 0) {
-                endValue = getCurrentOverlayWidth();
-            } else {
-                endValue = -getCurrentOverlayWidth();
-            }
+            int endValue = getSlideStartPoint();
+
             mToggleOverlayAnim = start(interpolator(
                     mAccelerateInterpolator,
                     ObjectAnimator.ofFloat(mView, View.TRANSLATION_X,
@@ -974,7 +993,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
 
     protected abstract void createView();
 
-    protected abstract WindowManager.LayoutParams getParams(float dimAmount);
+    protected abstract WindowManager.LayoutParams getParams();
 
     protected void toggleOverlay(final boolean show) {
         if (mToggleOverlayAnim != null) {
@@ -982,28 +1001,22 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         }
 
         if (show) {
-            int startValue = 0;
-            if (mConfiguration.mLocation == 0) {
-                startValue = getCurrentOverlayWidth();
-            } else {
-                startValue = -getCurrentOverlayWidth();
-            }
+            int endValue = getSlideEndPoint();
+            int startValue = getSlideStartPoint();
+
             mView.setTranslationX(startValue);
             mToggleOverlayAnim = start(interpolator(
                     mDecelerateInterpolator,
                     ObjectAnimator.ofFloat(mView, View.TRANSLATION_X,
-                            startValue, 0)).setDuration(SHOW_DURATION));
+                            startValue, endValue)).setDuration(SHOW_DURATION));
         } else {
-            int endValue = 0;
-            if (mConfiguration.mLocation == 0) {
-                endValue = getCurrentOverlayWidth();
-            } else {
-                endValue = -getCurrentOverlayWidth();
-            }
-            mView.setTranslationX(0);
+            int endValue = getSlideStartPoint();
+            int startValue = getSlideEndPoint();
+
+            mView.setTranslationX(startValue);
             mToggleOverlayAnim = start(interpolator(
                     mAccelerateInterpolator,
-                    ObjectAnimator.ofFloat(mView, View.TRANSLATION_X, 0,
+                    ObjectAnimator.ofFloat(mView, View.TRANSLATION_X, startValue,
                             endValue)).setDuration(HIDE_DURATION));
         }
 
@@ -1086,14 +1099,14 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         // to prevent any reentering
         mShowing = false;
 
-        try {
+        /*try {
             if (mConfiguration.mDimBehind) {
                 // TODO workaround for flicker on launcher screen
-                mWindowManager.updateViewLayout(mPopupView, getParams(0));
+                mWindowManager.updateViewLayout(mPopupView, getParams());
             }
         } catch (Exception e) {
             // ignored
-        }
+        }*/
     }
 
     @Override
@@ -1136,13 +1149,11 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         }
 
         try {
-            mWindowManager.addView(mPopupView,
-                    getParams(mConfiguration.mBackgroundOpacity));
+            mWindowManager.addView(mPopupView, getParams());
         } catch (Exception e) {
             // something went wrong - try to recover here
             mWindowManager.removeView(mPopupView);
-            mWindowManager.addView(mPopupView,
-                    getParams(mConfiguration.mBackgroundOpacity));
+            mWindowManager.addView(mPopupView, getParams());
         }
     }
 
@@ -1158,7 +1169,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         if (mConfiguration.mLocation == 0) {
             startValue = getCurrentOverlayWidth();
         } else {
-            startValue = -getCurrentOverlayWidth();
+            startValue = -getSlideEndValue();
         }
         mView.setTranslationX(startValue);
 
