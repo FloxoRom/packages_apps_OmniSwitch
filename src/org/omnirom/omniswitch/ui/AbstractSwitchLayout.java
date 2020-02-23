@@ -74,6 +74,7 @@ import android.widget.Toast;
 
 public abstract class AbstractSwitchLayout implements ISwitchLayout {
     protected static final int FAVORITE_DURATION = 200;
+    protected static final int APPDRAWER_DURATION = 400;
     protected static final int SHOW_DURATION = 300;
     protected static final int SHOW_DURATION_FAST = 200;
     protected static final int HIDE_DURATION = 200;
@@ -756,7 +757,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
 
     protected abstract int getSlideEndValue();
 
-    private int getSlideEndPoint() {
+    protected int getSlideEndPoint() {
         if (mConfiguration.mLocation == 0) {
             return getCurrentOverlayWidth() - getSlideEndValue();
         } else {
@@ -764,7 +765,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         }
     }
 
-    private int getSlideStartPoint() {
+    protected int getSlideStartPoint() {
         if (mConfiguration.mLocation == 0) {
             return getCurrentOverlayWidth();
         } else {
@@ -1273,7 +1274,11 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     protected abstract void toggleFavorites();
 
     protected void enableOpenFavoriteButton(boolean visible) {
-        mOpenFavorite.setVisibility(mHasFavorites && visible ? View.VISIBLE : View.GONE);
+        if (!mHasFavorites) {
+            mOpenFavorite.setVisibility(View.GONE);
+        } else {
+            mOpenFavorite.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        }
     }
 
     private void updateFavoritesList() {
@@ -1311,6 +1316,12 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
             mButtonListContainerBottom.setVisibility(View.VISIBLE);
             mButtonListContainer = mButtonListContainerBottom;
         }
+        mButtonListContainer.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
     }
 
     /* if quick switcher was triggerd update() will be called
@@ -1320,7 +1331,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         mUpdateNoRecentsTasksDone = false;
     }
 
-    protected abstract LinearLayout.LayoutParams getAppDrawerParams();
+    protected abstract FrameLayout.LayoutParams getAppDrawerParams();
 
     protected void updatePinAppButton() {
         if (mLockToAppButton != null) {

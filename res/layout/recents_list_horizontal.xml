@@ -45,10 +45,10 @@
 
     <include layout="@layout/recents_rambar" />
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/recents_or_appdrawer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:id="@+id/recents"
@@ -98,7 +98,7 @@
             android:stretchMode="spacingWidthUniform"
             android:visibility="gone"
             android:paddingBottom="4dp" />
-    </LinearLayout>
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/button_list_container_bottom"

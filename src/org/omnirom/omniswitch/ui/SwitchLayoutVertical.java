@@ -31,6 +31,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
@@ -69,7 +70,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
     private Runnable mUpdateRamBarTask;
     private ImageView mRamDisplay;
     private View mRamDisplayContainer;
-    private LinearLayout mRecentsOrAppDrawer;
+    private FrameLayout mRecentsOrAppDrawer;
 
     private class RecentListAdapter extends ArrayAdapter<TaskDescription> {
 
@@ -234,7 +235,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         mAppDrawer = (AppDrawerView) mView.findViewById(R.id.app_drawer);
         mAppDrawer.setRecentsManager(mRecentsManager);
 
-        mRecentsOrAppDrawer = (LinearLayout) mView.findViewById(R.id.recents_or_appdrawer);
+        mRecentsOrAppDrawer = (FrameLayout) mView.findViewById(R.id.recents_or_appdrawer);
 
         mPopupView = new FrameLayout(mContext);
         mPopupView.setLayoutParams(new FrameLayout.LayoutParams(
@@ -319,13 +320,32 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
 
     @Override
     protected synchronized void initView() {
-        mRecentsOrAppDrawer.removeView(mAppDrawer);
-
+        if (DEBUG) {
+            Log.d(TAG, "initView");
+        }
         mFavoriteListView.setLayoutParams(getListParams());
         mFavoriteListView.setSelection(0);
         mRecentList.setLayoutParams(getRecentListParams());
         mNoRecentApps.setLayoutParams(getRecentListParams());
+
+        final boolean resizeUpfront = mConfiguration.mLocation == 0 ?
+                mConfiguration.mButtonPos == 1 :
+                mConfiguration.mButtonPos == 0;
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.MATCH_PARENT);
+        if (resizeUpfront) {
+            lp.gravity = getHorizontalGravity();
+        } else {
+            if (mConfiguration.mLocation == 0) {
+                lp.gravity = Gravity.LEFT;
+            } else {
+                lp.gravity = Gravity.RIGHT;
+            }
+        }
+        mRecents.setLayoutParams(lp);
         mRecents.setVisibility(View.VISIBLE);
+    
         mShowAppDrawer = false;
         mAppDrawer.setVisibility(View.GONE);
         mAppDrawer.post(new Runnable() {
@@ -334,7 +354,11 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
                 mAppDrawer.setSelection(0);
             }
         });
-        mView.setTranslationX(0);
+
+        ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
+        layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        mRecentsOrAppDrawer.setLayoutParams(layoutParams);
+
         mVirtualBackKey = false;
         enableOpenFavoriteButton(true);
         mOpenFavorite.setRotation(getExpandRotation());
@@ -377,10 +401,12 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
     }
 
     @Override
-    protected LinearLayout.LayoutParams getAppDrawerParams() {
-        return new LinearLayout.LayoutParams(getAppDrawerColumns()
-                * (mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx),
-                LinearLayout.LayoutParams.MATCH_PARENT);
+    protected FrameLayout.LayoutParams getAppDrawerParams() {
+        int appDrawerWidth = getAppDrawerWidth();
+        int recentsWith = getRecentsWidth();
+        appDrawerWidth = Math.max(appDrawerWidth, recentsWith);
+        return new FrameLayout.LayoutParams(appDrawerWidth,
+                FrameLayout.LayoutParams.MATCH_PARENT);
     }
 
     @Override
@@ -454,72 +480,205 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         return item;
     }
 
-    @Override
+    /*@Override
     protected void flipToAppDrawerNew() {
         if (mConfiguration.mLocation == 0) {
-            mView.setTranslationX(getCurrentOverlayWidth() - getSlideEndValue());
+            mView.setTranslationX(getSlideEndPoint());
         }
-        mRecentsOrAppDrawer.addView(mAppDrawer);
-        mAppDrawer.setLayoutParams(getAppDrawerParams());
-        mAppDrawer.requestLayout();
         mRecents.setVisibility(View.GONE);
         mAppDrawer.setVisibility(View.VISIBLE);
+        mAppDrawer.setLayoutParams(getAppDrawerParams());
+        mAppDrawer.requestLayout();
+        mRecentsOrAppDrawer.requestLayout();
         enableOpenFavoriteButton(false);
+    }*/
+
+    /*@Override
+    protected void flipToRecentsNew() {
+        if (mConfiguration.mLocation == 0) {
+            mView.setTranslationX(getSlideEndPoint());
+        }
+        mAppDrawer.setVisibility(View.GONE);
+        mRecents.setVisibility(View.VISIBLE);
+        mRecentsOrAppDrawer.requestLayout();
+        enableOpenFavoriteButton(true);
+    }*/
+
+    @Override
+    protected void flipToAppDrawerNew() {
+        enableOpenFavoriteButton(false);
+
+        int appDrawerWidth = getAppDrawerParams().width;
+        int recentsWidth = getDefaultViewWidth();
+
+        mAppDrawer.setLayoutParams(getAppDrawerParams());
+        mAppDrawer.setTranslationX(mConfiguration.mLocation == 0 ? appDrawerWidth : -appDrawerWidth);
+        mAppDrawer.setVisibility(View.VISIBLE);
+
+        final boolean resizeUpfront = mConfiguration.mLocation == 0 ?
+                mConfiguration.mButtonPos == 1 :
+                mConfiguration.mButtonPos == 0;
+        Log.d(TAG, "resizeUpfront = " + resizeUpfront);
+        if (resizeUpfront) {
+            ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
+            layoutParams.width = appDrawerWidth;
+            mRecentsOrAppDrawer.setLayoutParams(layoutParams);
+            mView.setTranslationX(getSlideEndPoint());
+        }
+
+        ValueAnimator expandAnimator = ValueAnimator.ofInt(appDrawerWidth, 0);
+        expandAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                mAppDrawer.setTranslationX(mConfiguration.mLocation == 0 ? val : -val);
+                int slideWidth = appDrawerWidth - val + (isButtonVisible() ? mConfiguration.mActionSizePx : 0);
+                if (slideWidth > recentsWidth) {
+                    if (!resizeUpfront) {
+                        if (mConfiguration.mLocation == 0) {
+                            mView.setTranslationX(getCurrentOverlayWidth() - slideWidth);
+                        }
+                    }
+                }
+            }
+        });
+        expandAnimator.addListener(new AnimatorListener() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (!resizeUpfront) {
+                    mView.setTranslationX(getSlideEndPoint());
+                }
+            }
+            @Override
+            public void onAnimationStart(Animator animation) {
+            }
+            @Override
+            public void onAnimationCancel(Animator animation) {
+            }
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+            }
+        });
+        expandAnimator.setDuration(APPDRAWER_DURATION);
+        expandAnimator.start();
     }
 
     @Override
     protected void flipToRecentsNew() {
-        if (mConfiguration.mLocation == 0) {
-            mView.setTranslationX(getCurrentOverlayWidth() - getSlideEndValue());
-        }
-        mRecentsOrAppDrawer.removeView(mAppDrawer);
-        mAppDrawer.setVisibility(View.GONE);
-        mRecents.setVisibility(View.VISIBLE);
         enableOpenFavoriteButton(true);
+
+        int appDrawerWidth = getAppDrawerParams().width;
+        final int recentsWidth = getDefaultViewWidth();
+
+        final boolean resizeUpfront = mConfiguration.mLocation == 0 ?
+                mConfiguration.mButtonPos == 1 :
+                mConfiguration.mButtonPos == 0;
+
+        ValueAnimator collapseAnimator = ValueAnimator.ofInt(0, appDrawerWidth);
+        collapseAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                mAppDrawer.setTranslationX(mConfiguration.mLocation == 0 ? val : -val);
+                int slideWidth = appDrawerWidth - val + (isButtonVisible() ? mConfiguration.mActionSizePx : 0);
+                if (slideWidth < recentsWidth) {
+                    if (!resizeUpfront) {
+                        if (mConfiguration.mLocation == 0) {
+                            mView.setTranslationX(getCurrentOverlayWidth() - recentsWidth);
+                        }
+                    }
+                } else {
+                    if (!resizeUpfront) {
+                        if (mConfiguration.mLocation == 0) {
+                            mView.setTranslationX(getCurrentOverlayWidth() - slideWidth);
+                        }
+                    }
+                }
+            }
+        });
+        collapseAnimator.addListener(new AnimatorListener() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mAppDrawer.setVisibility(View.GONE);
+                if (resizeUpfront) {
+                    ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
+                    layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    mRecentsOrAppDrawer.setLayoutParams(layoutParams);
+                }
+                mView.setTranslationX(getSlideEndPoint());
+            }
+            @Override
+            public void onAnimationStart(Animator animation) {
+            }
+            @Override
+            public void onAnimationCancel(Animator animation) {
+            }
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+            }
+        });
+        collapseAnimator.setDuration(APPDRAWER_DURATION);
+        collapseAnimator.start();
     }
 
     @Override
     protected void toggleFavorites() {
         mShowFavorites = !mShowFavorites;
-        if (mConfiguration.mLocation == 0) {
-            mView.setTranslationX(getCurrentOverlayWidth() - getSlideEndValue());
-        }
         storeExpandedFavoritesState();
 
         if (mShowFavAnim != null) {
             mShowFavAnim.cancel();
         }
-
+        final int favoriteWidth = mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx;
         if (mShowFavorites) {
-            mFavoriteListView.setScaleX(0f);
-            mFavoriteListView.setPivotX(0f);
+            ViewGroup.LayoutParams layoutParams = mFavoriteListView.getLayoutParams();
+            layoutParams.width = 0;
+            mFavoriteListView.setLayoutParams(layoutParams);
             mFavoriteListView.setVisibility(View.VISIBLE);
-            Animator expandAnimator = interpolator(
-                    mLinearInterpolator,
-                    ObjectAnimator.ofFloat(mFavoriteListView, View.SCALE_X, 0f, 1f));
+
+            ValueAnimator expandAnimator = ValueAnimator.ofInt(0, favoriteWidth);
+            expandAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    int val = (Integer) valueAnimator.getAnimatedValue();
+                    ViewGroup.LayoutParams layoutParams = mFavoriteListView.getLayoutParams();
+                    layoutParams.width = val;
+                    mFavoriteListView.setLayoutParams(layoutParams);
+                    if (mConfiguration.mLocation == 0) {
+                        mView.setTranslationX(getCurrentOverlayWidth() - getCurrentFavoritesWidth(val));
+                    }
+                }
+            });
             Animator rotateAnimator = interpolator(
                     mLinearInterpolator,
                     ObjectAnimator.ofFloat(mOpenFavorite, View.ROTATION,
                     mConfiguration.mLocation != 0 ? ROTATE_270_DEGREE : ROTATE_90_DEGREE,
                     mConfiguration.mLocation != 0 ? ROTATE_90_DEGREE : ROTATE_270_DEGREE));
             mShowFavAnim = new AnimatorSet();
-            mShowFavAnim.playTogether(expandAnimator, rotateAnimator);
+            mShowFavAnim.playTogether(rotateAnimator, expandAnimator);
             mShowFavAnim.setDuration(FAVORITE_DURATION);
             mShowFavAnim.start();
         } else {
-            mFavoriteListView.setScaleX(1f);
-            mFavoriteListView.setPivotX(0f);
-            Animator collapseAnimator = setVisibilityWhenDone(interpolator(
-                    mLinearInterpolator,
-                    ObjectAnimator.ofFloat(mFavoriteListView, View.SCALE_X, 1f, 0f)),
-                    mFavoriteListView, View.GONE);
+            ValueAnimator collapseAnimator = ValueAnimator.ofInt(favoriteWidth, 0);
+            collapseAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    int val = (Integer) valueAnimator.getAnimatedValue();
+                    ViewGroup.LayoutParams layoutParams = mFavoriteListView.getLayoutParams();
+                    layoutParams.width = val;
+                    mFavoriteListView.setLayoutParams(layoutParams);
+                    if (mConfiguration.mLocation == 0) {
+                        mView.setTranslationX(getCurrentOverlayWidth() - getCurrentFavoritesWidth(val));
+                    }
+                }
+            });
             Animator rotateAnimator = interpolator(
                     mLinearInterpolator,
                     ObjectAnimator.ofFloat(mOpenFavorite, View.ROTATION,
                     mConfiguration.mLocation != 0 ? ROTATE_90_DEGREE : ROTATE_270_DEGREE,
                     mConfiguration.mLocation != 0 ? ROTATE_270_DEGREE : ROTATE_90_DEGREE));
             mShowFavAnim = new AnimatorSet();
-            mShowFavAnim.playTogether(collapseAnimator, rotateAnimator);
+            mShowFavAnim.playTogether(rotateAnimator, collapseAnimator);
             mShowFavAnim.setDuration(FAVORITE_DURATION);
             mShowFavAnim.start();
         }
@@ -528,7 +687,9 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mOpenFavorite.setRotation(getExpandRotation());
-                mFavoriteListView.setScaleX(1f);
+                if (!mShowFavorites) {
+                    mFavoriteListView.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -564,7 +725,8 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
                 mButtonListContainer.setBackground(null);
             }
         }
-        mView.setBackgroundColor(mConfiguration.getViewBackgroundColor());
+        mRecents.setBackgroundColor(mConfiguration.getViewBackgroundColor());
+        mAppDrawer.setBackgroundColor(mConfiguration.getViewBackgroundColor());
         if (mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.TRANSPARENT) {
             if (!mConfiguration.mDimBehind) {
                 mView.getBackground().setAlpha(
@@ -602,9 +764,37 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             return getAppDrawerParams().width
                     + (isButtonVisible() ? mConfiguration.mActionSizePx : 0);
         }
+        return getDefaultViewWidth();
+    }
+
+    private int getSlideEndValue(boolean showAppDrawer) {
+        if (showAppDrawer) {
+            return getAppDrawerParams().width
+                    + (isButtonVisible() ? mConfiguration.mActionSizePx : 0);
+        }
+        return getDefaultViewWidth();
+    }
+ 
+    private int getRecentsWidth() {
         return getCurrentThumbWidth()
-                + (mShowFavorites ? mConfiguration.mMaxWidth : 0)
+                + (mShowFavorites ? (mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx) : 0);
+    }
+
+    private int getAppDrawerWidth() {
+        return getAppDrawerColumns()
+                * (mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx);
+    }
+
+    private int getDefaultViewWidth() {
+        return getCurrentThumbWidth()
+                + (mShowFavorites ? (mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx) : 0)
                 + (isButtonVisible() ? mConfiguration.mActionSizePx : 0);
+    }
+
+    private int getCurrentFavoritesWidth(int favoritesWidth) {
+        return getCurrentThumbWidth()
+            + favoritesWidth
+            + (isButtonVisible() ? mConfiguration.mActionSizePx : 0);
     }
 
     private int getCurrentThumbWidth() {

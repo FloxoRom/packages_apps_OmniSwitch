@@ -24,8 +24,7 @@
         android:id="@+id/button_list_container_top"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:visibility="gone"
-        android:layout_marginEnd="3dp" >
+        android:visibility="gone" >
 
         <ScrollView
             android:id="@+id/button_list_top"
@@ -43,7 +42,7 @@
         </ScrollView>
     </LinearLayout>
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/recents_or_appdrawer"
         android:layout_width="wrap_content"
         android:layout_height="match_parent" >
@@ -83,7 +82,7 @@
 
         <org.omnirom.omniswitch.ui.AppDrawerView
             android:id="@+id/app_drawer"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:numColumns="auto_fit"
@@ -93,7 +92,7 @@
             android:visibility="gone"
             android:gravity="center_horizontal"
             android:paddingBottom="4dp" />
-    </LinearLayout>
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/button_list_container_bottom"
