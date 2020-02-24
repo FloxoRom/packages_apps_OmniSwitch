@@ -44,6 +44,7 @@ import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
@@ -251,7 +252,12 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         mView.setLayoutParams(lp);
         mPopupView.addView(mView);
 
-        mView.setOnTouchListener(mDragHandleListener);
+        mView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
         mPopupView.setOnTouchListener(mDragHandleListener);
         mPopupView.setOnKeyListener(new PopupKeyListener());
 
@@ -360,7 +366,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         mRecentsOrAppDrawer.setLayoutParams(layoutParams);
 
         mVirtualBackKey = false;
-        enableOpenFavoriteButton(true);
+        showOpenFavoriteButton();
         mOpenFavorite.setRotation(getExpandRotation());
         if (Utils.isLockToAppEnabled(mContext)) {
             updatePinAppButton();
@@ -391,13 +397,14 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
     }
 
     private int getAppDrawerColumns() {
+        int columns = getRecentsWidth() / (mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx);
         if (mConfiguration.mIconSizeDesc == SwitchConfiguration.IconSize.SMALL) {
-            return 4;
+            return Math.max(4, columns);
         }
         if (mConfiguration.mIconSizeDesc == SwitchConfiguration.IconSize.NORMAL) {
-            return 3;
+            return Math.max(3, columns);
         }
-        return 2;
+        return Math.max(2, columns);
     }
 
     @Override
@@ -508,6 +515,9 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
     protected void flipToAppDrawerNew() {
         enableOpenFavoriteButton(false);
 
+        if (mAppDrawerAnim != null) {
+            mAppDrawerAnim.cancel();
+        }
         int appDrawerWidth = getAppDrawerParams().width;
         int recentsWidth = getDefaultViewWidth();
 
@@ -542,7 +552,16 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
                 }
             }
         });
-        expandAnimator.addListener(new AnimatorListener() {
+        Animator rotateAnimator = interpolator(
+                mLinearInterpolator,
+                ObjectAnimator.ofFloat(mAllappsButton, View.ROTATION,
+                mConfiguration.mLocation != 0 ? ROTATE_90_DEGREE : ROTATE_270_DEGREE,
+                mConfiguration.mLocation != 0 ? ROTATE_270_DEGREE : ROTATE_90_DEGREE));
+
+        mAppDrawerAnim = new AnimatorSet();
+        mAppDrawerAnim.playTogether(rotateAnimator, expandAnimator);
+        mAppDrawerAnim.setDuration(APPDRAWER_DURATION);
+        mAppDrawerAnim.addListener(new AnimatorListener() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 if (!resizeUpfront) {
@@ -559,14 +578,16 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             public void onAnimationRepeat(Animator animation) {
             }
         });
-        expandAnimator.setDuration(APPDRAWER_DURATION);
-        expandAnimator.start();
+        mAppDrawerAnim.start();
     }
 
     @Override
     protected void flipToRecentsNew() {
         enableOpenFavoriteButton(true);
 
+        if (mAppDrawerAnim != null) {
+            mAppDrawerAnim.cancel();
+        }
         int appDrawerWidth = getAppDrawerParams().width;
         final int recentsWidth = getDefaultViewWidth();
 
@@ -596,7 +617,16 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
                 }
             }
         });
-        collapseAnimator.addListener(new AnimatorListener() {
+        Animator rotateAnimator = interpolator(
+                mLinearInterpolator,
+                ObjectAnimator.ofFloat(mAllappsButton, View.ROTATION,
+                mConfiguration.mLocation != 0 ? ROTATE_270_DEGREE : ROTATE_90_DEGREE,
+                mConfiguration.mLocation != 0 ? ROTATE_90_DEGREE : ROTATE_270_DEGREE));
+
+        mAppDrawerAnim = new AnimatorSet();
+        mAppDrawerAnim.playTogether(rotateAnimator, collapseAnimator);
+        mAppDrawerAnim.setDuration(APPDRAWER_DURATION);
+        mAppDrawerAnim.addListener(new AnimatorListener() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mAppDrawer.setVisibility(View.GONE);
@@ -617,8 +647,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             public void onAnimationRepeat(Animator animation) {
             }
         });
-        collapseAnimator.setDuration(APPDRAWER_DURATION);
-        collapseAnimator.start();
+        mAppDrawerAnim.start();
     }
 
     @Override
@@ -680,7 +709,6 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             mShowFavAnim = new AnimatorSet();
             mShowFavAnim.playTogether(rotateAnimator, collapseAnimator);
             mShowFavAnim.setDuration(FAVORITE_DURATION);
-            mShowFavAnim.start();
         }
 
         mShowFavAnim.addListener(new AnimatorListener() {
@@ -704,6 +732,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             public void onAnimationRepeat(Animator animation) {
             }
         });
+        mShowFavAnim.start();
     }
 
     private void addOpenFavoriteButton() {
@@ -720,19 +749,24 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         mButtonListContainer.setBackgroundColor(mConfiguration.getButtonBackgroundColor());
         if (mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.TRANSPARENT) {
             if (mConfiguration.mDimActionButton) {
-                mButtonListContainer.getBackground().setAlpha(50);
+                mButtonListContainer.getBackground().setAlpha(200);
             } else {
-                mButtonListContainer.setBackground(null);
+                if (!mConfiguration.mDimBehind) {
+                    mButtonListContainer.getBackground().setAlpha(
+                            (int) (255 * mConfiguration.mBackgroundOpacity));
+                } else {
+                    mButtonListContainer.getBackground().setAlpha(0);
+                }
             }
         }
         mRecents.setBackgroundColor(mConfiguration.getViewBackgroundColor());
         mAppDrawer.setBackgroundColor(mConfiguration.getViewBackgroundColor());
         if (mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.TRANSPARENT) {
             if (!mConfiguration.mDimBehind) {
-                mView.getBackground().setAlpha(
+                mRecents.getBackground().setAlpha(
                         (int) (255 * mConfiguration.mBackgroundOpacity));
             } else {
-                mView.getBackground().setAlpha(0);
+                mRecents.getBackground().setAlpha(0);
             }
         }
         if (!mHasFavorites) {

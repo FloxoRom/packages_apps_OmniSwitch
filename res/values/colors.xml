@@ -24,6 +24,7 @@
     <color name="button_bg_flat_color_dark">@*android:color/primary_dark_device_default_settings</color>
     <color name="ripple_material_light">#40000000</color>
     <color name="ripple_material_dark">#40ffffff</color>
+    <color name="ripple_material_system">@color/ripple_material_light</color>
     <color name="fake_window_shade_color">#40424242</color>
     <color name="rambar_left_color">#ff4caf50</color>
     <color name="rambar_middle_color">#ff4caf50</color>

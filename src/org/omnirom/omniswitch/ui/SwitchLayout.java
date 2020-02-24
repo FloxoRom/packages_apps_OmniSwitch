@@ -43,6 +43,7 @@ import android.graphics.drawable.Drawable;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
@@ -72,6 +73,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
     private HorizontalScrollView mButtonList;
     protected Runnable mUpdateRamBarTask;
     private FrameLayout mRecentsOrAppDrawer;
+    private int mCurrentHeight;
 
     private class RecentListAdapter extends ArrayAdapter<TaskDescription> {
 
@@ -255,15 +257,17 @@ public class SwitchLayout extends AbstractSwitchLayout {
         ViewGroup.MarginLayoutParams lp = new ViewGroup.MarginLayoutParams (
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.topMargin = mConfiguration.getCurrentOffsetStart()
-                + mConfiguration.mDragHandleHeight / 2
-                - mConfiguration.getItemMaxHeight() / 2
-                - (mButtonsVisible ? mConfiguration.mActionSizePx : 0);
         mView.setLayoutParams(lp);
+        setViewTopMargin();
     
         mPopupView.addView(mView);
 
-        mView.setOnTouchListener(mDragHandleListener);
+        mView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
         mPopupView.setOnTouchListener(mDragHandleListener);
         mPopupView.setOnKeyListener(new PopupKeyListener());
 
@@ -328,16 +332,21 @@ public class SwitchLayout extends AbstractSwitchLayout {
         mRecents.setVisibility(View.VISIBLE);
         mShowAppDrawer = false;
         mAppDrawer.setVisibility(View.GONE);
-        mAppDrawer.setScaleY(1f);
+        mAppDrawer.setTranslationY(0);
         mAppDrawer.post(new Runnable() {
             @Override
             public void run() {
                 mAppDrawer.setSelection(0);
             }
         });
-        mView.setTranslationX(0);
+
+        ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
+        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        mRecentsOrAppDrawer.setLayoutParams(layoutParams);
+        mCurrentHeight = mRecentsOrAppDrawer.getHeight();
+
         mVirtualBackKey = false;
-        enableOpenFavoriteButton(true);
+        showOpenFavoriteButton();
         mOpenFavorite.setRotation(getExpandRotation());
         if (Utils.isLockToAppEnabled(mContext)) {
             updatePinAppButton();
@@ -435,11 +444,24 @@ public class SwitchLayout extends AbstractSwitchLayout {
         }
         buildButtonList();
         if (mView != null) {
-            if (key != null && key.equals(SettingsActivity.PREF_BUTTON_POS)) {
-                selectButtonContainer();
+            if (key != null) {
+                if (key.equals(SettingsActivity.PREF_BUTTON_POS)) {
+                    selectButtonContainer();
+                } else if (key.equals(SettingsActivity.PREF_HANDLE_POS_START_RELATIVE)) {
+                    setViewTopMargin();
+                }
             }
             updateStyle();
         }
+    }
+
+    private void setViewTopMargin() {
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mView.getLayoutParams();
+        lp.topMargin = mConfiguration.getCurrentOffsetStart()
+                + mConfiguration.mDragHandleHeight / 2
+                - mConfiguration.getItemMaxHeight() / 2
+                - (mButtonsVisible ? mConfiguration.mActionSizePx : 0);
+        mView.setLayoutParams(lp);
     }
 
     @Override
@@ -454,16 +476,47 @@ public class SwitchLayout extends AbstractSwitchLayout {
 
     @Override
     protected void flipToAppDrawerNew() {
+        if (mAppDrawerAnim != null) {
+            mAppDrawerAnim.cancel();
+        }
         mAppDrawer.setLayoutParams(getAppDrawerParams());
-        mAppDrawer.setScaleY(0f);
-        mAppDrawer.setPivotY(0f);
+        mCurrentHeight = mRecentsOrAppDrawer.getHeight();
+        int recentsHeight = mCurrentHeight;
+        int appDrawerHeight = getAppDrawerParams().height;
+
+        mAppDrawer.setTranslationY(-appDrawerHeight);
         mAppDrawer.setVisibility(View.VISIBLE);
 
-        Animator expandAnimator = interpolator(
-                mLinearInterpolator,
-                ObjectAnimator.ofFloat(mAppDrawer, View.SCALE_Y, 0f, 1f));
+        ValueAnimator expandAnimator = ValueAnimator.ofInt(appDrawerHeight, 0);
+        expandAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                mAppDrawer.setTranslationY(-val);
+                if (mConfiguration.mButtonPos == 1) {
+                    int slideHeight = appDrawerHeight - val;
+                    if (slideHeight > recentsHeight) {
+                        ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
+                        layoutParams.height = slideHeight;
+                        mRecentsOrAppDrawer.setLayoutParams(layoutParams);
+                    } else {
+                        ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
+                        layoutParams.height = recentsHeight;
+                        mRecentsOrAppDrawer.setLayoutParams(layoutParams);
+                    }
+                }
+            }
+        });
 
-        expandAnimator.addListener(new AnimatorListener() {
+        Animator rotateAnimator = interpolator(
+                mLinearInterpolator,
+                ObjectAnimator.ofFloat(mAllappsButton, View.ROTATION,
+                ROTATE_180_DEGREE, ROTATE_0_DEGREE));
+
+        mAppDrawerAnim = new AnimatorSet();
+        mAppDrawerAnim.playTogether(rotateAnimator, expandAnimator);
+        mAppDrawerAnim.setDuration(APPDRAWER_DURATION);
+        mAppDrawerAnim.addListener(new AnimatorListener() {
             @Override
             public void onAnimationEnd(Animator animation) {
             }
@@ -477,21 +530,56 @@ public class SwitchLayout extends AbstractSwitchLayout {
             public void onAnimationRepeat(Animator animation) {
             }
         });
-        expandAnimator.setDuration(APPDRAWER_DURATION);
-        expandAnimator.start();
+        mAppDrawerAnim.start();
     }
 
     @Override
     protected void flipToRecentsNew() {
-        Animator collapseAnimator = interpolator(
-                mLinearInterpolator,
-                ObjectAnimator.ofFloat(mAppDrawer, View.SCALE_Y, 1f, 0f));
+        if (mShowFavAnim != null) {
+            mShowFavAnim.cancel();
+        }
+        int appDrawerHeight = getAppDrawerParams().height;
+        int recentsHeight = mCurrentHeight;
 
-        collapseAnimator.addListener(new AnimatorListener() {
+        ValueAnimator collapseAnimator = ValueAnimator.ofInt(0, appDrawerHeight);
+        collapseAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                mAppDrawer.setTranslationY(-val);
+                if (mConfiguration.mButtonPos == 1) {
+                    int slideHeight = appDrawerHeight - val;
+                    if (slideHeight > recentsHeight) {
+                        ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
+                        layoutParams.height = slideHeight;
+                        mRecentsOrAppDrawer.setLayoutParams(layoutParams);
+                    } else {
+                        ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
+                        layoutParams.height = recentsHeight;
+                        mRecentsOrAppDrawer.setLayoutParams(layoutParams);
+                    }
+                }
+            }
+        });
+
+        Animator rotateAnimator = interpolator(
+                mLinearInterpolator,
+                ObjectAnimator.ofFloat(mAllappsButton, View.ROTATION,
+                ROTATE_0_DEGREE, ROTATE_180_DEGREE));
+
+        mAppDrawerAnim = new AnimatorSet();
+        mAppDrawerAnim.playTogether(rotateAnimator, collapseAnimator);
+        mAppDrawerAnim.setDuration(APPDRAWER_DURATION);
+        mAppDrawerAnim.addListener(new AnimatorListener() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mAppDrawer.setVisibility(View.GONE);
-                mAppDrawer.setScaleY(1f);
+                mAppDrawer.setTranslationY(0);
+
+                ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
+                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                mRecentsOrAppDrawer.setLayoutParams(layoutParams);
+                mCurrentHeight = mRecentsOrAppDrawer.getLayoutParams().height;
             }
             @Override
             public void onAnimationStart(Animator animation) {
@@ -503,8 +591,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
             public void onAnimationRepeat(Animator animation) {
             }
         });
-        collapseAnimator.setDuration(APPDRAWER_DURATION);
-        collapseAnimator.start();
+        mAppDrawerAnim.start();
     }
 
     @Override
@@ -521,7 +608,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
             layoutParams.height = 0;
             mFavoriteListHorizontal.setLayoutParams(layoutParams);
             mFavoriteListHorizontal.setVisibility(View.VISIBLE);
-            
+
             ValueAnimator expandAnimator = ValueAnimator.ofInt(0, mConfiguration.getItemMaxHeight());
             expandAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
@@ -566,7 +653,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
             public void onAnimationEnd(Animator animation) {
                 mOpenFavorite.setRotation(getExpandRotation());
                 if (!mShowFavorites) {
-                    mFavoriteListHorizontal.setVisibility(View.VISIBLE);
+                    mFavoriteListHorizontal.setVisibility(View.GONE);
                 }
             }
 
@@ -591,37 +678,31 @@ public class SwitchLayout extends AbstractSwitchLayout {
         if (mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT) {
             mForegroundProcessText.setShadowLayer(0, 0, 0, Color.BLACK);
             mBackgroundProcessText.setShadowLayer(0, 0, 0, Color.BLACK);
-
-            ((ImageView) mOpenFavorite).setImageDrawable(BitmapUtils.colorize(
-                    mContext.getResources(),
-                    mContext.getResources().getColor(
-                            R.color.button_bg_flat_color),
-                    mContext.getResources().getDrawable(
-                            R.drawable.ic_expand)));
         } else {
             mForegroundProcessText.setShadowLayer(5, 0, 0, Color.BLACK);
             mBackgroundProcessText.setShadowLayer(5, 0, 0, Color.BLACK);
-            ((ImageView) mOpenFavorite).setImageDrawable(BitmapUtils.shadow(
-                    mContext.getResources(),
-                    mContext.getResources().getDrawable(
-                            R.drawable.ic_expand)));
         }
         mButtonListContainer.setBackgroundColor(mConfiguration.getButtonBackgroundColor());
         if (mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.TRANSPARENT) {
             if (mConfiguration.mDimActionButton) {
-                mButtonListContainer.getBackground().setAlpha(50);
+                mButtonListContainer.getBackground().setAlpha(200);
             } else {
-                mButtonListContainer.setBackground(null);
+                if (!mConfiguration.mDimBehind) {
+                    mButtonListContainer.getBackground().setAlpha(
+                            (int) (255 * mConfiguration.mBackgroundOpacity));
+                } else {
+                    mButtonListContainer.getBackground().setAlpha(0);
+                }
             }
         }
         mRecents.setBackgroundColor(mConfiguration.getViewBackgroundColor());
         mAppDrawer.setBackgroundColor(mConfiguration.getViewBackgroundColor());
         if (mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.TRANSPARENT) {
             if (!mConfiguration.mDimBehind) {
-                mView.getBackground().setAlpha(
+                mRecents.getBackground().setAlpha(
                         (int) (255 * mConfiguration.mBackgroundOpacity));
             } else {
-                mView.getBackground().setAlpha(0);
+                mRecents.getBackground().setAlpha(0);
             }
         }
         mRamUsageBarContainer
@@ -632,9 +713,12 @@ public class SwitchLayout extends AbstractSwitchLayout {
         }
         mFavoriteListHorizontal.setVisibility(mShowFavorites ? View.VISIBLE
                 : View.GONE);
-        mOpenFavorite
-                .setBackgroundResource(mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT
-                        ? R.drawable.ripple_dark  : R.drawable.ripple_light);
+
+        ((ImageView) mOpenFavorite).setImageDrawable(BitmapUtils.colorize(mContext.getResources(),
+                mConfiguration.getCurrentButtonTint(
+                mConfiguration.getButtonBackgroundColor()),
+                mContext.getResources().getDrawable(R.drawable.ic_expand)));
+        mOpenFavorite.setBackgroundResource(mConfiguration.getBackgroundRipple());
 
         buildButtons();
         mButtonsVisible = isButtonVisible();
@@ -668,14 +752,6 @@ public class SwitchLayout extends AbstractSwitchLayout {
     @Override
     protected View getButtonList() {
         return mButtonList;
-    }
-
-    @Override
-    protected View getActionButtonTemplate(Drawable image) {
-        View v = mInflater.inflate(R.layout.action_button_horizontal, null, false);
-        ImageView item = (ImageView) v.findViewById(R.id.action_button_image);
-        item.setImageDrawable(image);
-        return v;
     }
 
     @Override

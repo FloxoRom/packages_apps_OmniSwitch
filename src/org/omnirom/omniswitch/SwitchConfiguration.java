@@ -494,6 +494,17 @@ public class SwitchConfiguration {
         return mContext.getResources().getColor(R.color.bg_transparent);
     }
 
+    public int getBackgroundRipple() {
+        if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT) {
+            return R.drawable.ripple_dark;
+        } else if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_DARK) {
+            return R.drawable.ripple_light;
+        } else if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_SYSTEM) {
+            return R.drawable.ripple_system;
+        }
+        return R.drawable.ripple_light;
+    }
+
     public int getViewBackgroundColor() {
         if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT) {
             return mContext.getResources().getColor(R.color.bg_flat_color);

@@ -147,6 +147,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     protected LinearLayout mRecents;
     protected View mOpenFavorite;
     protected AnimatorSet mShowFavAnim;
+    protected AnimatorSet mAppDrawerAnim;
     private Typeface mLabelFont;
 
     protected GestureDetector.OnGestureListener mGestureListener = new GestureDetector.OnGestureListener() {
@@ -360,6 +361,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         BitmapUtils.colorize(mContext.getResources(), mConfiguration.getCurrentButtonTint(
                 mConfiguration.getButtonBackgroundColor()), image);
         item.setImageDrawable(image);
+        item.setBackgroundResource(mConfiguration.getBackgroundRipple());
         return v;
     }
 
@@ -1273,12 +1275,17 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
 
     protected abstract void toggleFavorites();
 
-    protected void enableOpenFavoriteButton(boolean visible) {
+    protected void showOpenFavoriteButton() {
         if (!mHasFavorites) {
             mOpenFavorite.setVisibility(View.GONE);
         } else {
-            mOpenFavorite.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+            mOpenFavorite.setVisibility(View.VISIBLE);
         }
+    }
+
+    protected void enableOpenFavoriteButton(boolean enable) {
+        mOpenFavorite.setEnabled(enable ? true : false);
+        mOpenFavorite.setAlpha(enable ? 1f : .5f);
     }
 
     private void updateFavoritesList() {

@@ -48,15 +48,15 @@
     <FrameLayout
         android:id="@+id/recents_or_appdrawer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content" >
 
         <LinearLayout
             android:id="@+id/recents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="2dp"
-            android:paddingBottom="4dp" >
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp" >
 
             <org.omnirom.omniswitch.ui.HorizontalListView
                 android:id="@+id/recent_list_horizontal"
@@ -91,12 +91,13 @@
         <org.omnirom.omniswitch.ui.AppDrawerView
             android:id="@+id/app_drawer"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="@dimen/app_drawer_height_horizontal"
             android:clipToPadding="false"
             android:numColumns="auto_fit"
             android:smoothScrollbar="true"
             android:stretchMode="spacingWidthUniform"
             android:visibility="gone"
+            android:paddingTop="4dp"
             android:paddingBottom="4dp" />
     </FrameLayout>
 

@@ -19,8 +19,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:gravity="center"
-    android:background="?android:attr/selectableItemBackgroundBorderless" >
+    android:gravity="center" >
     <ImageView
         android:id="@+id/action_button_image"
         android:layout_width="@dimen/action_button_size"
