@@ -367,6 +367,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
 
         mVirtualBackKey = false;
         showOpenFavoriteButton();
+        enableOpenFavoriteButton(true);
         mOpenFavorite.setRotation(getExpandRotation());
         if (Utils.isLockToAppEnabled(mContext)) {
             updatePinAppButton();
