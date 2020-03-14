@@ -1124,6 +1124,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         if (mConfiguration.mAnimate && !fast) {
             toggleOverlay(false);
         } else {
+            mView.setTranslationX(getSlideStartPoint());
             hideDone();
         }
     }
@@ -1192,6 +1193,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         if (mConfiguration.mAnimate) {
             toggleOverlay(true);
         } else {
+            mView.setTranslationX(getSlideEndPoint());
             showDone();
         }
     }
