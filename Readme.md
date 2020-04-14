@@ -2,7 +2,7 @@ About
 -----
 
 **OmniSwitch** is a recent apps switcher for Android
-It also supports favorite apps
+It also supports favorite apps and has as HOME mode to use it as launcher
 
 
 License
