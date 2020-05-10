@@ -176,7 +176,7 @@
   <string name="package_unlock_app_title">アプリをアンロック</string>
   <string name="locked_apps_sort_summary">ロックされたアプリはリストの最初に表示されます</string>
   <string name="locked_apps_sort_title">ロックされたアプリをソート</string>
-  <string name="drag_handle_dynamic_color_title">アクセントカラーを使用</string>
+  <string name="drag_handle_dynamic_color_title">アクセント色を使用</string>
   <string name="dock_non_resizeble_failed_to_dock_text">アプリは画面分割をサポートしていません</string>
   <string name="block_apps_on_splitscreen_summary">分割画面モードでサポートされていないアプリへの切り替えは無効となります</string>
   <string name="block_apps_on_splitscreen_title">画面分割表示できないアプリをブロック</string>

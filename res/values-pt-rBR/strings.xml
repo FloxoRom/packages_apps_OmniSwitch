@@ -203,4 +203,25 @@
   <string name="pref_show_today_title">Mostrar a data</string>
   <string name="pref_show_weather_title">Mostrar meteorologia</string>
   <string name="pref_show_events_title">Mostrar próximos eventos</string>
+  <string name="color_task_header_summary">Usar a cor primária da aplicação como fundo do cabeçalho</string>
+  <string name="color_task_header_title">Cabeçalho de tarefa colorido</string>
+  <string name="icon_shape_system_default">Usar o padrão do sistema</string>
+  <string name="icon_shape_square">Quadrado</string>
+  <string name="icon_shape_squircle">Quadrado arredondado</string>
+  <string name="icon_shape_circle">Círculo</string>
+  <string name="icon_shape_teardrop">Lágrima</string>
+  <string name="icon_shape_rounded_square">Quadrado arredondado</string>
+  <string name="icon_shape_title">Formato dos ícones - requer reinicialização</string>
+  <string name="icon_shape_override_progress">Alterando formato dos ícones</string>
+  <string name="category_icons_title">Ícones</string>
+  <string name="bottom_favorites_summary">Preencha a lista de aplicativos favoritos da parte inferior</string>
+  <string name="bottom_favorites_title">Aplicativos favoritos inferiores</string>
+  <string name="button_hide_summary">Ocultar a área do botão</string>
+  <string name="button_hide_title">Ocultar Botões</string>
+  <string name="phone">Telefone</string>
+  <string name="camera">Câmera</string>
+  <string name="assist">Assistência</string>
+  <string name="google_assistant">Google Assistente</string>
+  <string name="system_font_summary">Siga a família de fontes do sistema</string>
+  <string name="system_font_title">Usar fonte do sistema</string>
 </resources>
