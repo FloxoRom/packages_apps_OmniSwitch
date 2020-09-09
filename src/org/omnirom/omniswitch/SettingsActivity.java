@@ -83,7 +83,7 @@ public class SettingsActivity extends PreferenceActivity implements
     public static final String PREF_HANDLE_HEIGHT = "handle_height";
     public static final String PREF_BUTTON_CONFIG = "button_config";
     public static final String PREF_BUTTONS_NEW = "buttons_new";
-    public static final String PREF_BUTTON_DEFAULT_NEW = "0:1,1:1,2:1,3:0,4:1,5:1,6:0,7:1,8:1,9:0,10:0,11:0,12:0,13:0";
+    public static final String PREF_BUTTON_DEFAULT_NEW = "0:1,1:1,2:1,3:0,4:1,5:1,6:0,7:1,8:1,9:0,10:0,11:0,12:0,13:0,14:0";
     public static final String PREF_AUTO_HIDE_HANDLE = "auto_hide_handle";
     public static final String PREF_DRAG_HANDLE_ENABLE = "drag_handle_enable";
     public static final String PREF_ENABLE = "enable";
@@ -148,6 +148,7 @@ public class SettingsActivity extends PreferenceActivity implements
     public static int BUTTON_CAMERA = 11;
     public static int BUTTON_ASSIST = 12;
     public static int BUTTON_GOOGLE_ASSISTANT = 13;
+    public static int BUTTON_FLASHLIGHT = 14;
 
     public static int BUTTON_SPEED_SWITCH_HOME = 0;
     public static int BUTTON_SPEED_SWITCH_BACK = 1;
@@ -572,6 +573,7 @@ public class SettingsActivity extends PreferenceActivity implements
         mButtonImages[11]=BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_camera));
         mButtonImages[12]=BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_assist));
         mButtonImages[13]=BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_google_assist));
+        mButtonImages[14]=BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_qs_flashlight));
 
         mSpeedSwitchButtonEntries = getResources().getStringArray(R.array.speed_switch_button_entries);
         mSpeedSwitchButtonImages = new Drawable[mSpeedSwitchButtonEntries.length];
