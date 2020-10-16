@@ -40,6 +40,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.PatternMatcher;
 import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.preference.PreferenceManager;
@@ -54,6 +55,7 @@ import android.view.KeyEvent;
 import android.view.WindowManagerGlobal;
 import android.view.WindowManager;
 import static android.view.WindowManager.DOCKED_INVALID;
+import com.android.internal.statusbar.IStatusBarService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -433,6 +435,17 @@ public class Utils {
             return Typeface.create(getDefaultBodyFont(context), Typeface.NORMAL);
         } else {
             return getAppLabelFont();
+        }
+    }
+
+    public static  void toggleTorch(Context context) {
+        IStatusBarService service = IStatusBarService.Stub.asInterface(ServiceManager.getService("statusbar"));
+        if (service != null) {
+            try {
+                service.toggleCameraFlash();
+            } catch (RemoteException e) {
+                // do nothing.
+            }
         }
     }
 }

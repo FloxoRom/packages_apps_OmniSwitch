@@ -108,6 +108,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     protected View mCameraButton;
     protected View mAssistButton;
     protected View mGoogleAssistant;
+    protected View mFlashlight;
     protected boolean mAutoClose = true;
     protected boolean mVirtualBackKey;
     protected boolean mVirtualMenuKey;
@@ -662,6 +663,18 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                 }
             });
             return mGoogleAssistant;
+        }
+
+        if (buttonId == SettingsActivity.BUTTON_FLASHLIGHT) {
+            mFlashlight = getActionButtonTemplate(mContext.getResources()
+                    .getDrawable(R.drawable.ic_qs_flashlight));
+            mFlashlight.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    hide(true);
+                    Utils.toggleTorch(mContext);
+                }
+            });
+            return mFlashlight;
         }
         return null;
     }
