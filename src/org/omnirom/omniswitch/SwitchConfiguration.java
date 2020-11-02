@@ -55,8 +55,8 @@ public class SwitchConfiguration {
     public int mOverlayIconSizePx = 30;
     public int mOverlayIconBorderDp = 2;
     public int mOverlayIconBorderPx = 2;
-    public int mIconBorderDp = 4; // in dp
-    public int mIconBorderPx = 4;
+    public int mIconBorderDp = 8; // in dp
+    public int mIconBorderPx;
     public float mDensity;
     public int mDensityDpi;
     public int mMaxWidth;
@@ -99,7 +99,7 @@ public class SwitchConfiguration {
     public float mThumbRatio = 1.0f;
     public IconSize mIconSizeDesc = IconSize.NORMAL;
     public int mIconBorderHorizontalDp = 8; // in dp
-    public int mIconBorderHorizontalPx = 8; // in px
+    public int mIconBorderHorizontalPx; // in px
     public BgStyle mBgStyle = BgStyle.SOLID_LIGHT;
     public boolean mLaunchStatsEnabled;
     public boolean mRevertRecents;
