@@ -233,14 +233,13 @@ public class Utils {
         return ActivityTaskManager.supportsMultiWindow(context);
     }
 
-    public static boolean isDockingActive(Context context) {
-        if (isMultiStackEnabled(context)) {
-            try {
-                return WindowManagerGlobal.getWindowManagerService().getDockedStackSide() != DOCKED_INVALID;
-            } catch(RemoteException e) {
+    public static boolean isDockingAvailable(Context context, final List<TaskDescription> tasks) {
+        for (TaskDescription ad : tasks){
+            if (ad.isMultiWindowMode()) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     public static void updateFavoritesList(Context context, SwitchConfiguration config, List<String> favoriteList) {

@@ -902,7 +902,8 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         });
     }
 
-    protected void handleLongPressRecent(final TaskDescription ad, final View view) {
+    protected void handleLongPressRecent(final List<TaskDescription> tasks,
+            final TaskDescription ad, final View view) {
         final Context wrapper = new ContextThemeWrapper(mContext,
                 mConfiguration.getPopupMenuStyle());
         final String intentStr = getRecentsItemIntent(ad);
@@ -916,7 +917,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         if (!Utils.isLockToAppEnabled(mContext)) {
             popup.getMenu().removeItem(R.id.package_lock_task);
         }
-        if (!Utils.isMultiStackEnabled(mContext) || Utils.isDockingActive(mContext)) {
+        if (!Utils.isMultiStackEnabled(mContext) || !Utils.isDockingAvailable(mContext, tasks)) {
             popup.getMenu().removeItem(R.id.package_dock_task);
         }
         String packageName = ad.getPackageName();

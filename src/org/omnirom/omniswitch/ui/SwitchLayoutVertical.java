@@ -164,7 +164,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                     int position, long id) {
                 TaskDescription task = mRecentsManager.getTasks().get(getTaskPosition(position));
-                handleLongPressRecent(task, view);
+                handleLongPressRecent(mRecentsManager.getTasks(), task, view);
                 return true;
             }
         });

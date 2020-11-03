@@ -169,7 +169,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
                             View view, int position, long id) {
                         TaskDescription task = mRecentsManager.getTasks().get(
                                 position);
-                        handleLongPressRecent(task, view);
+                        handleLongPressRecent(mRecentsManager.getTasks(), task, view);
                         return true;
                     }
                 });

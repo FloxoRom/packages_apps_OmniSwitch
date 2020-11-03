@@ -47,6 +47,7 @@ public final class TaskDescription {
     private int mActivityPrimaryColor;
     private int mActivityBackgroundColor;
     private boolean mUseLightOnPrimaryColor;
+    private boolean mMultiWindowMode;
 
     public static interface ThumbChangeListener {
         public void thumbChanged(int pesistentTaskId, Bitmap thumb);
@@ -55,13 +56,14 @@ public final class TaskDescription {
 
     public TaskDescription(int _taskId, int _persistentTaskId,
             ResolveInfo _resolveInfo, Intent _intent,
-            int _stackId, boolean supportsSplitScreen) {
+            int _stackId, boolean supportsSplitScreen, boolean multiWindowMode) {
         resolveInfo = _resolveInfo;
         intent = _intent;
         taskId = _taskId;
         persistentTaskId = _persistentTaskId;
         stackId = _stackId;
         mSupportsSplitScreen = supportsSplitScreen;
+        mMultiWindowMode = multiWindowMode;
     }
 
     public Drawable getIcon() {
@@ -188,5 +190,9 @@ public final class TaskDescription {
 
     public boolean useLightOnPrimaryColor() {
         return mUseLightOnPrimaryColor;
+    }
+
+    public boolean isMultiWindowMode() {
+        return mMultiWindowMode;
     }
 }

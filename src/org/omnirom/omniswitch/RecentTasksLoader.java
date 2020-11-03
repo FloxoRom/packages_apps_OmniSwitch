@@ -126,7 +126,8 @@ public class RecentTasksLoader {
 
     // Create an TaskDescription, returning null if the title or icon is null
     TaskDescription createTaskDescription(int taskId, int persistentTaskId, int stackId,
-            Intent baseIntent, ComponentName origActivity, boolean supportsSplitScreenMultiWindow) {
+            Intent baseIntent, ComponentName origActivity, boolean supportsSplitScreenMultiWindow,
+            boolean multiWindowMode) {
         // clear source bounds to find matching package intent
         baseIntent.setSourceBounds(null);
         Intent intent = new Intent(baseIntent);
@@ -141,7 +142,7 @@ public class RecentTasksLoader {
                 Log.v(TAG, "creating activity desc for id=" + persistentTaskId);
             TaskDescription ad = new TaskDescription(taskId,
                     persistentTaskId, resolveInfo, baseIntent, stackId,
-                    supportsSplitScreenMultiWindow);
+                    supportsSplitScreenMultiWindow, multiWindowMode);
             return ad;
         }
         return null;
@@ -277,7 +278,9 @@ public class RecentTasksLoader {
                     TaskDescription item = createTaskDescription(recentInfo.id,
                             recentInfo.persistentId, recentInfo.stackId,
                             recentInfo.baseIntent, recentInfo.origActivity,
-                            recentInfo.supportsSplitScreenMultiWindow);
+                            recentInfo.supportsSplitScreenMultiWindow,
+                            android.app.WindowConfiguration.inMultiWindowMode(
+                                    recentInfo.configuration.windowConfiguration.getWindowingMode()));
 
                     if (item == null) {
                         continue;
