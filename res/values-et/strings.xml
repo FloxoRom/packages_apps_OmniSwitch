@@ -222,4 +222,6 @@
   <string name="camera">Kaamera</string>
   <string name="assist">Abirakendus</string>
   <string name="google_assistant">Google assistent</string>
+  <string name="system_font_summary">Kasuta süsteemi fondiperekonda</string>
+  <string name="system_font_title">Kasuta süsteemifonti</string>
 </resources>

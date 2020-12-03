@@ -205,4 +205,23 @@
   <string name="pref_show_events_title">顯示即將到來的活動</string>
   <string name="color_task_header_summary">使用應用程式主色調作為頁面標題的背景</string>
   <string name="color_task_header_title">彩色任務頁面標題</string>
+  <string name="icon_shape_system_default">使用系統預設值</string>
+  <string name="icon_shape_square">方型</string>
+  <string name="icon_shape_squircle">方圓形</string>
+  <string name="icon_shape_circle">圓型</string>
+  <string name="icon_shape_teardrop">淚珠型</string>
+  <string name="icon_shape_rounded_square">圓角方形</string>
+  <string name="icon_shape_title">圖示形狀-需要重新啟動</string>
+  <string name="icon_shape_override_progress">正在套用圖示形狀變更</string>
+  <string name="category_icons_title">圖示</string>
+  <string name="bottom_favorites_summary">從底部填充收藏的應用程式列表</string>
+  <string name="bottom_favorites_title">最不喜歡的應用程式</string>
+  <string name="button_hide_summary">隱藏按鈕區域</string>
+  <string name="button_hide_title">隱藏按鈕</string>
+  <string name="phone">電話</string>
+  <string name="camera">相機</string>
+  <string name="assist">輔助</string>
+  <string name="google_assistant">Google 語音助理</string>
+  <string name="system_font_summary">遵循系統的字體系列</string>
+  <string name="system_font_title">使用系統字體</string>
 </resources>
