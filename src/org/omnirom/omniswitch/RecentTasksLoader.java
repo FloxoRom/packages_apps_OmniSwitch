@@ -17,6 +17,8 @@
  */
 package org.omnirom.omniswitch;
 
+import static android.graphics.Bitmap.Config.ARGB_8888;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +39,11 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.GraphicBuffer;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.hardware.HardwareBuffer;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
@@ -69,14 +75,6 @@ public class RecentTasksLoader {
     private Drawable mDefaultAppIcon;
     private Set<String> mLockedAppsList;
 
-    final static BitmapFactory.Options sBitmapOptions;
-
-    static {
-        sBitmapOptions = new BitmapFactory.Options();
-        sBitmapOptions.inMutable = true;
-        sBitmapOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-    }
-
     private enum State {
         LOADING, IDLE
     };
@@ -105,7 +103,7 @@ public class RecentTasksLoader {
         mActivityManager = (ActivityManager)
                 mContext.getSystemService(Context.ACTIVITY_SERVICE);
         mPackageManager = mContext.getPackageManager();
-        mDefaultThumbnail = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        mDefaultThumbnail = Bitmap.createBitmap(1, 1, ARGB_8888);
         mDefaultThumbnail.setHasAlpha(true);
         mDefaultThumbnail.eraseColor(0x00ffffff);
         mHasThumbPermissions = hasSystemPermission(context);
@@ -396,7 +394,17 @@ public class RecentTasksLoader {
                 if (DEBUG) {
                     Log.d(TAG, "getThumbnail " + taskId);
                 }
-                return Bitmap.wrapHardwareBuffer(snapshot.getSnapshot(), snapshot.getColorSpace());
+                Bitmap thumbnail = null;
+                final GraphicBuffer buffer = snapshot.getSnapshot();
+                if (buffer == null || (buffer.getUsage() & HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE) == 0) {
+                    // TODO(b/157562905): Workaround for a crash when we get a snapshot without this state
+                    Point taskSize = snapshot.getTaskSize();
+                    thumbnail = Bitmap.createBitmap(taskSize.x, taskSize.y, ARGB_8888);
+                    thumbnail.eraseColor(Color.BLACK);
+                } else {
+                    thumbnail = Bitmap.wrapHardwareBuffer(buffer, snapshot.getColorSpace());
+                }
+                return thumbnail;
             }
         } catch (RemoteException e) {
             Log.w(TAG, "Failed to retrieve snapshot", e);
