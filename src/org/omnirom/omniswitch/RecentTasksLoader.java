@@ -213,9 +213,6 @@ public class RecentTasksLoader {
         mState = State.LOADING;
         mLoadedTasks.clear();
         mLoadedTasksOriginal.clear();
-        if (withThumbs) {
-            BitmapCache.getInstance(mContext).clearThumbs();
-        }
 
         final long currentTime = SystemClock.elapsedRealtime();
         mLockedAppsList.clear();
@@ -365,7 +362,7 @@ public class RecentTasksLoader {
                             item.setLabel(label);
                         }
                         if (withThumbs) {
-                            Bitmap b = getThumbnail(item.persistentTaskId, true, preloadTaskNum == 0);
+                            ThumbnailData b = getThumbnail(item.persistentTaskId);
                             if (b != null) {
                                 item.setThumb(b, false);
                             }
@@ -387,24 +384,15 @@ public class RecentTasksLoader {
         mTaskLoader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    public Bitmap getThumbnail(int taskId, boolean reducedResolution, boolean firstThumb) {
+    private ThumbnailData getThumbnail(int taskId) {
         try {
-            ActivityManager.TaskSnapshot snapshot = ActivityManager.getService().getTaskSnapshot(taskId, reducedResolution);
+            ActivityManager.TaskSnapshot snapshot = ActivityManager.getService().getTaskSnapshot(taskId, true);
             if (snapshot != null) {
                 if (DEBUG) {
                     Log.d(TAG, "getThumbnail " + taskId);
                 }
-                Bitmap thumbnail = null;
-                final GraphicBuffer buffer = snapshot.getSnapshot();
-                if (buffer == null || (buffer.getUsage() & HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE) == 0) {
-                    // TODO(b/157562905): Workaround for a crash when we get a snapshot without this state
-                    Point taskSize = snapshot.getTaskSize();
-                    thumbnail = Bitmap.createBitmap(taskSize.x, taskSize.y, ARGB_8888);
-                    thumbnail.eraseColor(Color.BLACK);
-                } else {
-                    thumbnail = Bitmap.wrapHardwareBuffer(buffer, snapshot.getColorSpace());
-                }
-                return thumbnail;
+                ThumbnailData data = new ThumbnailData(snapshot);
+                return data;
             }
         } catch (RemoteException e) {
             Log.w(TAG, "Failed to retrieve snapshot", e);
@@ -478,7 +466,7 @@ public class RecentTasksLoader {
                     Log.d(TAG, "late load thumb " + td + " " + td.persistentTaskId);
                 }
                 td.setThumbLoading(true);
-                Bitmap b = getThumbnail(td.persistentTaskId, true, false);
+                ThumbnailData b = getThumbnail(td.persistentTaskId);
                 if (b != null) {
                     td.setThumbLoading(false);
                     td.setThumb(b, true);
