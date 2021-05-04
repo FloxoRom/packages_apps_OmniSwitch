@@ -35,7 +35,7 @@
   <string name="drag_handle_color_dialog_title">色</string>
   <string name="service_background_processes"><xliff:g id="MEMORY">%1$s</xliff:g>空き</string>
   <string name="service_foreground_processes"><xliff:g id="MEMORY">%1$s</xliff:g>使用中</string>
-  <string name="show_rambar_title">メモリ使用量を表示する</string>
+  <string name="show_rambar_title">メモリ使用量を表示</string>
   <string name="show_rambar_summary">使用メモリと未使用メモリの量を表示する</string>
   <string name="show_app_labels">アプリ名を表示</string>
   <string name="show_app_labels_summary">アイコンとアプリケーション名を表示する</string>
@@ -148,7 +148,7 @@
   <string name="settings_button_text">設定</string>
   <string name="wallpaper_button_text">壁紙</string>
   <string name="category_launcher_title">ランチャー</string>
-  <string name="launcher_mode_summary">OmniSwitchをホームアプリとして使用します。有効にしたあとホームボタンを押してOmniSwitchを選択して下さい。</string>
+  <string name="launcher_mode_summary">OmniSwitch をホームアプリとして使用します。有効にした後にホームボタンを押して OmniSwitch を選択して下さい。</string>
   <string name="launcher_mode_title">有効にする</string>
   <string name="launcher_mode_enable_check">ランチャーモードがアクティブな間は無効にすることはできません</string>
   <string name="welcome_cling_header">OmniSwitch ランチャー モードへようこそ</string>
@@ -162,12 +162,12 @@
   <string name="favorite_apps_config_stat_summary">収集した起動アプリの統計に基づきお気に入りリストを作成します</string>
   <string name="launch_stats_delete_notice">起動アプリの統計を削除しました</string>
   <string name="launch_stats_low_title">お気に入りを管理</string>
-  <string name="launch_stats_low_notice">お気に入りリストを作るにはデータが不十分です。続行しますか？</string>
+  <string name="launch_stats_low_notice">お気に入りリストを作るにはデータが不十分です。続行しますか?</string>
   <string name="revert_recents_summary">最も最近開いたアプリを下にする</string>
   <string name="revert_recents_title">アプリのリストを反転させる</string>
   <string name="dialog_overlay_perms_title">OmniSwitch パーミッションエラー</string>
   <string name="dialog_overlay_perms_msg">他のアプリの上への描画を許可する</string>
-  <string name="package_dock_task_title">分割表示する</string>
+  <string name="package_dock_task_title">分割表示</string>
   <string name="package_undock_task_title">分割表示を解除する</string>
   <string name="dim_action_buttons_summary">アクションボタンに薄暗い背景を追加する</string>
   <string name="dim_action_buttons_title">アクションボタンの薄暗い背景</string>
@@ -187,7 +187,7 @@
   <string name="category_allapps_title">アプリドロワー</string>
   <string name="hidden_apps_dialog_title">非表示のアプリ</string>
   <string name="package_add_hidden_app_title">アプリを隠す</string>
-  <string name="bg_style_system">System</string>
+  <string name="bg_style_system">システム</string>
   <string name="omnijaws_current_text">現在</string>
   <string name="calendar_view_status_perms">タップしてセットアップする</string>
   <string name="launcher_settings">ランチャー設定</string>
