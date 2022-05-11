@@ -425,6 +425,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
         }
 
         params.gravity = getHorizontalGravity();
+        params.setTrustedOverlay();
         return params;
     }
 

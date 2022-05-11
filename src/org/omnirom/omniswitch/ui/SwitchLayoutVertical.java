@@ -432,6 +432,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             mPopupView.getBackground().setAlpha(0);
         }
         params.gravity = getHorizontalGravity();
+        params.setTrustedOverlay();
         return params;
     }
 

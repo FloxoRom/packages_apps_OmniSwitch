@@ -424,6 +424,7 @@ public class SwitchGestureView {
 
         lp.gravity = getGravity();
         lp.y = mConfiguration.getCurrentOffsetStart();
+        lp.setTrustedOverlay();
         return lp;
     }
 
@@ -450,6 +451,7 @@ public class SwitchGestureView {
                 PixelFormat.TRANSLUCENT);
         lp.gravity = Gravity.CENTER;
         lp.dimAmount = mConfiguration.mBackgroundOpacity;
+        lp.setTrustedOverlay();
         return lp;
     }
 
