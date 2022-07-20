@@ -366,7 +366,7 @@ public class SwitchService extends Service {
         PendingIntent settingsIntent = PendingIntent.getActivity(this, START_PERMISSION_SETTINGS_ID,
                 new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_USER_ACTION),
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         final Notification notifyDetails = new Notification.Builder(this)
                 .setContentTitle(getResources().getString(R.string.dialog_overlay_perms_title))
