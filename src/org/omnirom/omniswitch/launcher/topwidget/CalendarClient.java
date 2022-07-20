@@ -324,7 +324,7 @@ public class CalendarClient {
             Intent intent = new Intent(UPDATE_BROADCAST);
             intent.setDataAndType(CalendarContract.CONTENT_URI, UPDATE_DATA_TYPE);
             return PendingIntent.getBroadcast(context, 0 /* no requestCode */, intent,
-                    0 /* no flags */);
+                    PendingIntent.FLAG_IMMUTABLE);
         }
 
         private void register() {
