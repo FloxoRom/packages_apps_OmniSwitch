@@ -198,7 +198,7 @@ public class ThumbnailTaskView extends View implements TaskDescription.ThumbChan
         final int iconBorderSizePx = mConfiguration.getOverlayHeaderWidth();
         Resources resources = getContext().getResources();
 
-        canvas.setHwBitmapsInSwModeEnabled(true);
+        canvas.setHwFeaturesInSwModeEnabled(true);
         Bitmap taskThumb = getThumb();
         taskThumb.prepareToDraw();
         Drawable taskIcon = getIcon();
