@@ -23,6 +23,7 @@ import org.omnirom.omniswitch.ui.BitmapUtils;
 import org.omnirom.omniswitch.ui.IconPackHelper;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -49,6 +50,8 @@ public class SwitchService extends Service {
 
     private static final int START_SERVICE_ERROR_ID = 0;
     private static final int START_PERMISSION_SETTINGS_ID = 1;
+    private static final String NOTIFICATION_CHANNEL_ID = "omniswitch";
+
     public static final String DPI_CHANGE = "dpi_change";
 
     private RecentsReceiver mReceiver;
@@ -73,6 +76,8 @@ public class SwitchService extends Service {
             super.onCreate();
             mConfiguration = SwitchConfiguration.getInstance(this);
             mConfiguration.initDefaults(this);
+
+            createNotificationChannel();
 
             if (!canDrawOverlayViews()) {
                 createOverlayNotification();
@@ -147,7 +152,10 @@ public class SwitchService extends Service {
         } catch(IllegalArgumentException e) {
             // ignored on purpose
         }
-        mOverlayMonitor.unregisterReceiver(this);
+
+        if (mOverlayMonitor != null) {
+            mOverlayMonitor.unregisterReceiver(this);
+        }
 
         if (mManager != null) {
             mManager.killManager();
@@ -327,7 +335,7 @@ public class SwitchService extends Service {
 
     private void createErrorNotification() {
         final NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        final Notification notifyDetails = new Notification.Builder(this)
+        final Notification notifyDetails = new Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle("OmniSwitch restricted mode")
                 .setContentText("Failed to gain system permissions")
                 .setSmallIcon(android.R.drawable.ic_dialog_alert)
@@ -368,7 +376,7 @@ public class SwitchService extends Service {
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_USER_ACTION),
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        final Notification notifyDetails = new Notification.Builder(this)
+        final Notification notifyDetails = new Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(getResources().getString(R.string.dialog_overlay_perms_title))
                 .setContentText(getResources().getString(R.string.dialog_overlay_perms_msg))
                 .setSmallIcon(android.R.drawable.ic_dialog_alert)
@@ -382,5 +390,16 @@ public class SwitchService extends Service {
 
     private boolean canDrawOverlayViews() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this);
+    }
+
+    private void createNotificationChannel() {
+        final NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+        CharSequence name = getString(R.string.notification_channel_name);
+        String description = getString(R.string.notification_channel_description);
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+        NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
+        channel.setDescription(description);
+        notificationManager.createNotificationChannel(channel);
     }
 }

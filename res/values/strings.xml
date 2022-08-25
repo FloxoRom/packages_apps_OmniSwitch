@@ -232,5 +232,6 @@
         <string name="system_font_summary">Follow the font family of system</string>
         <string name="system_font_title">Use system font</string>
         <string name="flashlight">Flashlight</string>
-
+        <string name="notification_channel_name">OmniSwitch status</string>
+        <string name="notification_channel_description"></string>
 </resources>
