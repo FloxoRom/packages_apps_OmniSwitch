@@ -230,7 +230,9 @@ public class Utils {
     }
 
     public static boolean isMultiStackEnabled(Context context) {
-        return ActivityTaskManager.supportsMultiWindow(context);
+        //return ActivityTaskManager.supportsMultiWindow(context);
+        // TODO
+        return false;
     }
 
     public static boolean isDockingAvailable(Context context, final List<TaskDescription> tasks) {
