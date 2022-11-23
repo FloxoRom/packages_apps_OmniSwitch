@@ -16,11 +16,28 @@
 
 android_app {
     name: "OmniSwitch",
-    resource_dirs: ["res"],
-    manifest: "AndroidManifest.xml",
-    srcs: ["src/**/*.java"],
-    static_libs: ["androidx.core_core"],
+    manifest: "app/src/main/AndroidManifest.xml",
     platform_apis: true,
     certificate: "platform",
     privileged: true,
+    srcs: [
+        "app/src/main/**/*.kt",
+        "app/src/main/**/*.java",
+    ],
+    resource_dirs: [
+        "app/src/main/res/",
+    ],
+    static_libs: [
+        "androidx.core_core",
+        "androidx.appcompat_appcompat",
+        "androidx.preference_preference",
+        "androidx.lifecycle_lifecycle-runtime",
+        "androidx.lifecycle_lifecycle-runtime-ktx",
+        "com.google.android.material_material",
+        "OmniPreferenceTheme"
+    ],
+    kotlincflags: ["-Xjvm-default=enable"],
+    optimize: {
+        proguard_flags_files: ["app/proguard-rules.pro"],
+    },
 }
