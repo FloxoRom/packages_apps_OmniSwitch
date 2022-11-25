@@ -25,6 +25,7 @@ import android.content.pm.ShortcutInfo;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Process;
 import android.os.UserHandle;
 import android.util.Log;
 
@@ -121,7 +122,7 @@ public class DeepShortcutManager {
             }
             List<ShortcutInfo> shortcutInfos = null;
             try {
-                shortcutInfos = mLauncherApps.getShortcuts(q, android.os.Process.myUserHandle());
+                shortcutInfos = mLauncherApps.getShortcuts(q, Process.myUserHandle());
             } catch (Exception e) {
                 Log.e(TAG, "Failed to query for shortcuts", e);
             }

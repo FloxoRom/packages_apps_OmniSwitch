@@ -23,12 +23,10 @@ import java.util.List;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 
 public final class TaskDescription {
-    final ResolveInfo resolveInfo;
     final int taskId; // application task id for curating apps
     final int persistentTaskId; // persistent id
     final Intent intent; // launch intent for application
@@ -46,18 +44,18 @@ public final class TaskDescription {
     private int mActivityBackgroundColor;
     private boolean mUseLightOnPrimaryColor;
     private boolean mMultiWindowMode;
+    private String mPackageName;
 
     public static interface ThumbChangeListener {
         public void thumbChanged(int pesistentTaskId);
         public int getPersistentTaskId();
     }
 
-    public TaskDescription(int _taskId, int _persistentTaskId,
-            ResolveInfo _resolveInfo, Intent _intent,
-            boolean supportsSplitScreen, boolean multiWindowMode) {
-        resolveInfo = _resolveInfo;
+    public TaskDescription(int _taskId, int _persistentTaskId, String packageName,
+            Intent _intent, boolean supportsSplitScreen, boolean multiWindowMode) {
         intent = _intent;
         taskId = _taskId;
+        mPackageName = packageName;
         persistentTaskId = _persistentTaskId;
         mSupportsSplitScreen = supportsSplitScreen;
         mMultiWindowMode = multiWindowMode;
@@ -92,7 +90,7 @@ public final class TaskDescription {
     }
 
     public String getPackageName() {
-        return resolveInfo.activityInfo.packageName;
+        return mPackageName;
     }
 
     public boolean isKilled() {
@@ -101,10 +99,6 @@ public final class TaskDescription {
 
     public void setKilled() {
         this.mKilled = true;
-    }
-
-    public ActivityInfo getActivityInfo() {
-        return resolveInfo.activityInfo;
     }
 
     @Override

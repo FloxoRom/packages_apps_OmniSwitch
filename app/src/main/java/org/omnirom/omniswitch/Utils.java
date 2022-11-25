@@ -108,20 +108,6 @@ public class Utils {
         return buffer.toString();
     }
 
-    public static String getActivityLabel(android.content.pm.PackageManager pm, Intent intent) {
-        ActivityInfo ai = intent.resolveActivityInfo(pm,
-                android.content.pm.PackageManager.GET_ACTIVITIES);
-        String label = null;
-
-        if (ai != null) {
-            label = ai.loadLabel(pm).toString();
-            if (label == null) {
-                label = ai.name;
-            }
-        }
-        return label;
-    }
-
     public static Map<Integer, Boolean> buttonStringToMap(String buttonString, String defaultButtonString){
         Map<Integer, Boolean> buttons = new LinkedHashMap<Integer, Boolean>();
         String[] splitParts = buttonString.split(",");

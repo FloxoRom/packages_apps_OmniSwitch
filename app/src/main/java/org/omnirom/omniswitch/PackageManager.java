@@ -37,10 +37,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.LauncherApps;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.BitmapDrawable;
+import android.icu.text.MessagePattern;
+import android.os.Process;
+import android.os.UserHandle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -54,6 +58,7 @@ public class PackageManager {
     private Context mContext;
     private boolean mInitDone;
     private static PackageManager sInstance;
+    private LauncherApps mLauncherApps;
 
     public static final String PACKAGES_UPDATED_TAG = "PACKAGES_UPDATED";
 
@@ -108,6 +113,7 @@ public class PackageManager {
 
     private void setContext(Context context) {
         mContext = context;
+        mLauncherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
     }
 
     public synchronized List<PackageItem> getPackageList() {
@@ -130,28 +136,6 @@ public class PackageManager {
         mInitDone = false;
     }
 
-    public Drawable getPackageIcon(PackageItem item) {
-        final android.content.pm.PackageManager pm = mContext.getPackageManager();
-
-        Drawable icon = null;
-        if (IconPackHelper.getInstance(mContext).isIconPackLoaded()){
-            int iconId = IconPackHelper.getInstance(mContext).getResourceIdForActivityIcon(item.activity);
-            if (iconId != 0) {
-                icon = IconPackHelper.getInstance(mContext).getIconPackResources().getDrawable(iconId);
-            }
-        }
-        if (icon == null || !IconPackHelper.getInstance(mContext).isIconPackLoaded()){
-            try {
-                icon = pm.getActivityIcon(item.intent);
-            } catch (NameNotFoundException e) {
-            }
-        }
-        if (icon == null) {
-            icon = BitmapUtils.getDefaultActivityIcon(mContext);
-        }
-        return icon;
-    }
-
     public synchronized void reloadPackageList() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         boolean old = prefs.getBoolean(PackageManager.PACKAGES_UPDATED_TAG, false);
@@ -170,7 +154,7 @@ public class PackageManager {
         final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> installedAppsInfo = pm.queryIntentActivities(
-                mainIntent, 0);
+                mainIntent, android.content.pm.PackageManager.ResolveInfoFlags.of(0));
 
         for (ResolveInfo info : installedAppsInfo) {
             ApplicationInfo appInfo = info.activityInfo.applicationInfo;
@@ -190,10 +174,7 @@ public class PackageManager {
             intent.setComponent(name);
             item.intent = intent;
 
-            item.title = Utils.getActivityLabel(pm, intent);
-            if (item.title == null) {
-                item.title = appInfo.loadLabel(pm);
-            }
+            item.title = appInfo.loadLabel(mContext.getPackageManager());
             mInstalledPackages.put(item.getIntent(), item);
             mInstalledPackagesList.add(item);
         }
@@ -208,6 +189,7 @@ public class PackageManager {
 
     public synchronized void updatePackageIcons() {
         BitmapCache.getInstance(mContext).clear();
+        RecentTasksLoader.getInstance(mContext).clearTaskInfoCache();
     }
 
     public synchronized CharSequence getTitle(String intent) {
@@ -327,5 +309,31 @@ public class PackageManager {
                     .putString(SettingsActivity.PREF_HIDDEN_APPS, Utils.flattenCollection(newHiddenAppsList))
                     .commit();
         }
+    }
+
+    private ApplicationInfo getApplicationInfo(String packageName, UserHandle user, int flags) {
+        try {
+            ApplicationInfo info = mLauncherApps.getApplicationInfo(packageName, flags, user);
+            return (info.flags & ApplicationInfo.FLAG_INSTALLED) == 0 || !info.enabled
+                    ? null : info;
+        } catch (android.content.pm.PackageManager.NameNotFoundException e) {
+            return null;
+        }
+    }
+
+    public Drawable getPackageIcon(PackageItem item) {
+        ApplicationInfo applicationInfo = getApplicationInfo(item.packageName, Process.myUserHandle(), 0);
+        if (applicationInfo == null) {
+            Log.e(TAG, "Failed to get icon for package " + item.packageName);
+            return null;
+        }
+        Drawable d = applicationInfo.loadIcon(mContext.getPackageManager());
+        if (IconPackHelper.getInstance(mContext).isIconPackLoaded()){
+            int iconId = IconPackHelper.getInstance(mContext).getResourceIdForActivityIcon(item.activity);
+            if (iconId != 0) {
+                d = IconPackHelper.getInstance(mContext).getIconPackResources().getDrawable(iconId);
+            }
+        }
+        return d;
     }
 }

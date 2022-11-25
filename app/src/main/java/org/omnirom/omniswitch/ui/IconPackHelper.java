@@ -384,16 +384,16 @@ public class IconPackHelper implements DialogInterface.OnDismissListener {
         return mLoadedIconPackResource;
     }
 
-    public int getResourceIdForActivityIcon(ActivityInfo info) {
+    public int getResourceIdForActivityIcon(String packageName, String label) {
         // TODO since we are loading in background block access until load ready
         if (!isIconPackLoaded() || mLoading){
             return 0;
         }
-        String drawable = mIconPackResources.get(info.packageName.toLowerCase()
-                + "." + info.name.toLowerCase());
+        String drawable = mIconPackResources.get(packageName.toLowerCase()
+                + "." + label.toLowerCase());
         if (drawable == null) {
             // Icon pack doesn't have an icon for the activity, fallback to package icon
-            drawable = mIconPackResources.get(info.packageName.toLowerCase());
+            drawable = mIconPackResources.get(packageName.toLowerCase());
             if (drawable == null) {
                 return 0;
             }
@@ -401,11 +401,12 @@ public class IconPackHelper implements DialogInterface.OnDismissListener {
         return getResourceIdForDrawable(drawable);
     }
 
+    public int getResourceIdForActivityIcon(ActivityInfo info) {
+        return getResourceIdForActivityIcon(info.packageName, info.name);
+    }
+
     public int getResourceIdForApp(String pkgName) {
-        ActivityInfo info = new ActivityInfo();
-        info.packageName = pkgName;
-        info.name = "";
-        return getResourceIdForActivityIcon(info);
+        return getResourceIdForActivityIcon(pkgName, "");
     }
 
     static class IconPackInfo {

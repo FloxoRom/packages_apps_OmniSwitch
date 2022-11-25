@@ -17,46 +17,44 @@
  */
 package org.omnirom.omniswitch;
 
-import static android.graphics.Bitmap.Config.ARGB_8888;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.omnirom.omniswitch.ui.BitmapCache;
-import org.omnirom.omniswitch.ui.BitmapUtils;
-import org.omnirom.omniswitch.ui.IconPackHelper;
-
 import android.app.ActivityManager;
 import android.app.ActivityTaskManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.LauncherApps;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.GraphicBuffer;
-import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.hardware.HardwareBuffer;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.ParcelFileDescriptor;
 import android.os.Process;
 import android.os.RemoteException;
 import android.os.SystemClock;
+import android.os.UserHandle;
 import android.util.Log;
+import android.util.LruCache;
 import android.window.TaskSnapshot;
+
+import org.omnirom.omniswitch.ui.BitmapUtils;
+import org.omnirom.omniswitch.ui.IconPackHelper;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import static android.graphics.Bitmap.Config.ARGB_8888;
 
 public class RecentTasksLoader {
     private static final String TAG = "RecentTasksLoader";
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final int TASK_INIT_LOAD = 8;
 
     private Context mContext;
@@ -76,10 +74,41 @@ public class RecentTasksLoader {
     private PackageManager mPackageManager;
     private Drawable mDefaultAppIcon;
     private Set<String> mLockedAppsList;
+    private LauncherApps mLauncherApps;
+    private LruCache<String, TaskApplicationInfo> mTaskInfoCache;
 
+    class TaskApplicationInfo {
+        String mPackageName;
+        Drawable mIcon;
+        String mLabel;
+
+        @Override
+        public int hashCode() {
+            return mPackageName.hashCode();
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            return obj instanceof TaskApplicationInfo && ((TaskApplicationInfo) obj).mPackageName.equals(mPackageName);
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return mPackageName + " " + mLabel;
+        }
+
+        public TaskApplicationInfo(String packaName, String label, Drawable icon) {
+            mPackageName = packaName;
+            mLabel = label;
+            mIcon = icon;
+        }
+
+
+    }
     private enum State {
         LOADING, IDLE
-    };
+    }
 
     private State mState = State.IDLE;
 
@@ -111,10 +140,12 @@ public class RecentTasksLoader {
         mHasThumbPermissions = hasSystemPermission(context);
         mConfiguration = SwitchConfiguration.getInstance(mContext);
         mDefaultAppIcon = BitmapUtils.getDefaultActivityIcon(mContext);
+        mLauncherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+        mTaskInfoCache = new LruCache<>(128);
     }
 
     private boolean isCurrentHomeActivity(ComponentName component,
-            ActivityInfo homeInfo) {
+                                          ActivityInfo homeInfo) {
         if (homeInfo == null) {
             homeInfo = new Intent(Intent.ACTION_MAIN).addCategory(
                     Intent.CATEGORY_HOME).resolveActivityInfo(mPackageManager, 0);
@@ -124,28 +155,21 @@ public class RecentTasksLoader {
                 && homeInfo.name.equals(component.getClassName());
     }
 
-    // Create an TaskDescription, returning null if the title or icon is null
-    TaskDescription createTaskDescription(int taskId, int persistentTaskId,
-            Intent baseIntent, ComponentName origActivity, boolean supportsSplitScreenMultiWindow,
-            boolean multiWindowMode) {
-        // clear source bounds to find matching package intent
-        baseIntent.setSourceBounds(null);
-        Intent intent = new Intent(baseIntent);
-        if (origActivity != null) {
-            intent.setComponent(origActivity);
-        }
-        intent.setFlags((intent.getFlags() & ~Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
-                | Intent.FLAG_ACTIVITY_NEW_TASK);
-        final ResolveInfo resolveInfo = mPackageManager.resolveActivity(intent, 0);
-        if (resolveInfo != null) {
-            if (DEBUG)
-                Log.v(TAG, "creating activity desc for id=" + persistentTaskId);
-            TaskDescription ad = new TaskDescription(taskId,
-                    persistentTaskId, resolveInfo, baseIntent,
-                    supportsSplitScreenMultiWindow, multiWindowMode);
-            return ad;
-        }
-        return null;
+    TaskDescription createTaskDescription(ActivityManager.RecentTaskInfo recentInfo) {
+        int taskId = recentInfo.id;
+        int persistentTaskId = recentInfo.persistentId;
+        Intent baseIntent = recentInfo.baseIntent;
+        String packageName = baseIntent.getComponent().getPackageName();
+        boolean supportsSplitScreenMultiWindow = recentInfo.supportsSplitScreenMultiWindow;
+        boolean multiWindowMode = android.app.WindowConfiguration.inMultiWindowMode(
+                recentInfo.configuration.windowConfiguration.getWindowingMode());
+
+        if (DEBUG)
+            Log.v(TAG, "creating activity desc for id=" + persistentTaskId);
+        TaskDescription ad = new TaskDescription(taskId,
+                persistentTaskId, packageName, baseIntent,
+                supportsSplitScreenMultiWindow, multiWindowMode);
+        return ad;
     }
 
     private class PreloadTaskRunnable implements Runnable {
@@ -252,7 +276,7 @@ public class RecentTasksLoader {
                 final List<ActivityManager.RecentTaskInfo> recentTasks = mActivityManager
                         .getRecentTasks(maxNumTasks == 0 ? ActivityManager.getMaxRecentTasksStatic() : maxNumTasks,
                                 ActivityManager.RECENT_IGNORE_UNAVAILABLE |
-                                ActivityManager.RECENT_WITH_EXCLUDED);
+                                        ActivityManager.RECENT_WITH_EXCLUDED);
 
                 int numTasks = recentTasks.size();
                 final ActivityInfo homeInfo = new Intent(Intent.ACTION_MAIN)
@@ -272,14 +296,12 @@ public class RecentTasksLoader {
                     if (DEBUG) {
                         Log.d(TAG, "" + i + " recent item = " + recentInfo.baseIntent + " " + recentInfo.taskDescription.getLabel());
                     }
-                    TaskDescription item = createTaskDescription(recentInfo.id,
-                            recentInfo.persistentId,
-                            recentInfo.baseIntent, recentInfo.origActivity,
-                            recentInfo.supportsSplitScreenMultiWindow,
-                            android.app.WindowConfiguration.inMultiWindowMode(
-                                    recentInfo.configuration.windowConfiguration.getWindowingMode()));
+                    TaskDescription item = createTaskDescription(recentInfo);
 
                     if (item == null) {
+                        if (DEBUG) {
+                            Log.d(TAG, "" + i + " recent item skipped 1");
+                        }
                         continue;
                     }
 
@@ -299,12 +321,18 @@ public class RecentTasksLoader {
 
                     // Don't load the current home activity.
                     if (isCurrentHomeActivity(intent.getComponent(), homeInfo)) {
+                        if (DEBUG) {
+                            Log.d(TAG, "" + i + " recent item skipped 2");
+                        }
                         continue;
                     }
 
                     final String componentString = intent.getComponent().flattenToShortString();
                     if (componentString.contains(".recents.RecentsActivity") ||
                             componentString.contains("com.android.settings/.FallbackHome")) {
+                        if (DEBUG) {
+                            Log.d(TAG, "" + i + " recent item skipped 3");
+                        }
                         continue;
                     }
 
@@ -346,6 +374,9 @@ public class RecentTasksLoader {
                             == Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS;
 
                     if (isExcluded && !isFirstValidTask) {
+                        if (DEBUG) {
+                            Log.d(TAG, "" + i + " recent item skipped 4");
+                        }
                         continue;
                     }
                     isFirstValidTask = false;
@@ -359,9 +390,7 @@ public class RecentTasksLoader {
                     }
                     if (preloadTaskNum < TASK_INIT_LOAD) {
                         if (withIcons) {
-                            String label = item.resolveInfo.loadLabel(mPackageManager).toString();
-                            loadTaskIcon(item, withIconPack, label);
-                            item.setLabel(label);
+                            loadTaskInfo(item);
                         }
                         if (withThumbs) {
                             ThumbnailData b = getThumbnail(item.persistentTaskId);
@@ -402,50 +431,41 @@ public class RecentTasksLoader {
         return null;
     }
 
-    void loadTaskIcon(TaskDescription td, boolean withIconPack, String label) {
-        Drawable icon = getFullResIcon(td.resolveInfo, withIconPack, label);
+    /*void loadTaskIcon(TaskDescription td, boolean withIconPack, String label) {
+        Drawable icon = getTaskIcon(td);
         if (icon == null) {
             icon = mDefaultAppIcon;
         }
         td.setIcon(icon);
-    }
+    }*/
 
     private IconPackHelper getIconPackHelper() {
         return IconPackHelper.getInstance(mContext);
     }
 
-    private Drawable getFullResIcon(ResolveInfo info, boolean withIconPack, String label) {
+    private Drawable getIconPackIcon(TaskApplicationInfo ti) {
         Resources resources;
         try {
-            resources = mPackageManager
-                    .getResourcesForApplication(info.activityInfo.applicationInfo);
+            resources = mPackageManager.getResourcesForApplication(ti.mPackageName);
         } catch (PackageManager.NameNotFoundException e) {
             resources = null;
         }
         if (resources != null) {
-            int iconId = 0;
-            if (withIconPack) {
-                iconId = getIconPackHelper().getResourceIdForActivityIcon(info.activityInfo);
-                if (iconId != 0) {
-                    return IconPackHelper.getInstance(mContext).getIconPackResources().getDrawable(iconId);
-                }
-            }
-            iconId = info.activityInfo.getIconResource();
+            int iconId = getIconPackHelper().getResourceIdForActivityIcon(ti.mPackageName, ti.mLabel);
             if (iconId != 0) {
-                try {
-                    Drawable d = resources.getDrawable(iconId, null);
-                    if (withIconPack) {
-                        d = BitmapUtils.compose(resources,
-                                d, mContext, getIconPackHelper().getIconBackFor(label),
-                                getIconPackHelper().getIconMask(), getIconPackHelper().getIconUpon(),
-                                getIconPackHelper().getIconScale(), mConfiguration.mIconSize, mConfiguration.mDensity);
-                    }
-                    return d;
-                } catch (Exception e) {
-                }
+                return IconPackHelper.getInstance(mContext).getIconPackResources().getDrawable(iconId);
+            }
+            try {
+                Drawable icon = BitmapUtils.compose(resources,
+                        ti.mIcon, mContext, getIconPackHelper().getIconBackFor(ti.mLabel),
+                        getIconPackHelper().getIconMask(), getIconPackHelper().getIconUpon(),
+                        getIconPackHelper().getIconScale(), mConfiguration.mIconSize, mConfiguration.mDensity);
+
+                return icon;
+            } catch (Exception e) {
             }
         }
-        return null;
+        return ti.mIcon;
     }
 
     public void loadThumbnail(final TaskDescription td) {
@@ -459,6 +479,7 @@ public class RecentTasksLoader {
             @Override
             protected void onProgressUpdate(TaskDescription... values) {
             }
+
             @Override
             protected Void doInBackground(Void... params) {
                 final int origPri = Process.getThreadPriority(Process.myTid());
@@ -482,15 +503,31 @@ public class RecentTasksLoader {
     }
 
     public void loadTaskInfo(final TaskDescription td) {
-        synchronized(td) {
-            String label = td.resolveInfo.loadLabel(mPackageManager).toString();
-            final boolean withIconPack = IconPackHelper.getInstance(mContext).isIconPackLoaded();
-            Drawable icon = getFullResIcon(td.resolveInfo, withIconPack, label);
-            if (icon == null) {
-                icon = mDefaultAppIcon;
+        synchronized (td) {
+            TaskApplicationInfo ti = mTaskInfoCache.get(td.getPackageName());
+            if (ti == null) {
+                ApplicationInfo applicationInfo = getApplicationInfo(td.getPackageName(),
+                        Process.myUserHandle(), 0);
+                if (applicationInfo == null) {
+                    Log.e(TAG, "Failed to get icon for task " + td.persistentTaskId + " " + td.getPackageName());
+                    td.setIcon(mDefaultAppIcon);
+                    td.setLabel("foo");
+                    return;
+                }
+                String label = applicationInfo.loadLabel(mPackageManager).toString();
+                Drawable icon = applicationInfo.loadIcon(mPackageManager);
+
+                ti = new TaskApplicationInfo(td.getPackageName(), label, icon);
+                mTaskInfoCache.put(ti.mPackageName, ti);
             }
-            td.setIcon(icon);
-            td.setLabel(label);
+            final boolean withIconPack = IconPackHelper.getInstance(mContext).isIconPackLoaded();
+            if (withIconPack) {
+                td.setIcon(getIconPackIcon(ti));
+                td.setLabel(ti.mLabel);
+            } else {
+                td.setIcon(ti.mIcon);
+                td.setLabel(ti.mLabel);
+            }
         }
     }
 
@@ -499,6 +536,7 @@ public class RecentTasksLoader {
             @Override
             protected void onProgressUpdate(Void... values) {
             }
+
             @Override
             protected Void doInBackground(Void... params) {
                 long start = System.currentTimeMillis();
@@ -509,7 +547,7 @@ public class RecentTasksLoader {
                     if (isCancelled()) {
                         break;
                     }
-                    synchronized(td) {
+                    synchronized (td) {
                         if (DEBUG) {
                             Log.d(TAG, "late load task info " + td + " " + td.persistentTaskId);
                         }
@@ -538,5 +576,38 @@ public class RecentTasksLoader {
 
     private String getSettingsActivity() {
         return mContext.getPackageName() + "/.SettingsActivity";
+    }
+
+    private CharSequence getTaskTitle(TaskDescription td) {
+        ApplicationInfo applicationInfo = getApplicationInfo(td.getPackageName(), Process.myUserHandle(), 0);
+        if (applicationInfo == null) {
+            Log.e(TAG, "Failed to get title for task " + td.taskId);
+            return "";
+        }
+        return applicationInfo.loadLabel(mPackageManager);
+    }
+
+    private Drawable getTaskIcon(TaskDescription td) {
+        ApplicationInfo applicationInfo = getApplicationInfo(td.getPackageName(), Process.myUserHandle(), 0);
+        if (applicationInfo == null) {
+            Log.e(TAG, "Failed to get icon for task " + td.taskId);
+            return null;
+        }
+        return applicationInfo.loadIcon(mPackageManager);
+    }
+
+    private ApplicationInfo getApplicationInfo(String packageName, UserHandle user, int flags) {
+        try {
+            ApplicationInfo info = mLauncherApps.getApplicationInfo(packageName, flags, user);
+            return (info.flags & ApplicationInfo.FLAG_INSTALLED) == 0 || !info.enabled
+                    ? null : info;
+        } catch (PackageManager.NameNotFoundException e) {
+            return null;
+        }
+    }
+
+    public void clearTaskInfoCache() {
+        if (DEBUG) Log.d(TAG, "clearTaskInfoCache");
+        mTaskInfoCache.evictAll();
     }
 }

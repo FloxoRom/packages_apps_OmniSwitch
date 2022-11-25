@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.IconDrawableFactory;
 import android.util.LruCache;
 import android.util.Log;
 
@@ -41,7 +40,6 @@ public class BitmapCache {
     private static BitmapCache sInstance;
     private Context mContext;
     private LruCache<String, Drawable> mMemoryCache;
-    private final IconDrawableFactory mDrawableFactory;
 
     public static BitmapCache getInstance(Context context) {
         if (sInstance == null){
@@ -73,7 +71,6 @@ public class BitmapCache {
             protected void entryRemoved(boolean evicted, String key, Drawable oldValue, Drawable newValue){
             }
         };
-        mDrawableFactory = IconDrawableFactory.newInstance(mContext);
     }
 
     public void clear() {
@@ -97,7 +94,6 @@ public class BitmapCache {
         if (d == null){
             if (DEBUG) Log.d(TAG, "addToCache = " + key);
             d = getPackageIconUncached(resources, packageItem, configuration, configuration.mIconSize);
-            d = mDrawableFactory.getShadowedIcon(d);
             addBitmapToMemoryCache(key, d);
         }
         return d;

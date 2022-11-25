@@ -66,15 +66,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.omnirom.omniswitch.ToggleActivity"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.CREATE_SHORTCUT" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name="org.omnirom.omniswitch.PlaceholderActivity"
             android:launchMode="singleInstance"
             android:excludeFromRecents="true"
