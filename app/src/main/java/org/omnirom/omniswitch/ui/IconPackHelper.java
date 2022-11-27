@@ -384,13 +384,13 @@ public class IconPackHelper implements DialogInterface.OnDismissListener {
         return mLoadedIconPackResource;
     }
 
-    public int getResourceIdForActivityIcon(String packageName, String label) {
+    public int getResourceIdForActivityIcon(String packageName, CharSequence label) {
         // TODO since we are loading in background block access until load ready
         if (!isIconPackLoaded() || mLoading){
             return 0;
         }
         String drawable = mIconPackResources.get(packageName.toLowerCase()
-                + "." + label.toLowerCase());
+                + "." + label.toString().toLowerCase());
         if (drawable == null) {
             // Icon pack doesn't have an icon for the activity, fallback to package icon
             drawable = mIconPackResources.get(packageName.toLowerCase());

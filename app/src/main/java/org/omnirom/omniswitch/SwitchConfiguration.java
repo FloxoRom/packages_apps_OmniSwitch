@@ -33,6 +33,7 @@ import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.WindowManager;
@@ -81,7 +82,8 @@ public class SwitchConfiguration {
     public boolean mLimitLevelChangeX = true;
     public Map<Integer, Boolean> mSpeedSwitchButtons;
     public int mLimitItemsX = 10;
-    public float mLabelFontSize;
+    public float mLabelFontSize = 14f;
+    public float mLabelFontSizeSp;
     public int mButtonPos = 1; // 0 = top 1 = bottom
     public List<String> mFavoriteList = new ArrayList<String>();
     public boolean mSpeedSwitcher = true;
@@ -111,7 +113,6 @@ public class SwitchConfiguration {
     private ContextThemeWrapper mThemeContext;
     public boolean mDynamicDragHandleColor;
     public boolean mBlockSplitscreenBreakers = true;
-    public boolean mUsePowerHint;
     public Set<String> mHiddenAppsList = new HashSet<String>();
     public Launcher mLauncher;
     public boolean mColorfulHeader;
@@ -194,6 +195,7 @@ public class SwitchConfiguration {
                 .getDimensionPixelSize(R.dimen.thumbnail_height);
         mMemDisplaySize = (int) context.getResources().getDimensionPixelSize(
                 R.dimen.ram_display_size);
+        mLabelFontSizeSp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mLabelFontSize, context.getResources().getDisplayMetrics());
     }
 
     public void initDefaults(Context context) {
@@ -246,7 +248,6 @@ public class SwitchConfiguration {
         mIconSizePx = Math.round(mIconSize * mDensity);
         mMaxWidth = Math.round((mIconSize + mIconBorderDp) * mDensity);
         mMaxHeight = Math.round((mIconSize + mIconBorderDp) * mDensity);
-        mLabelFontSize = 14f;
         // add a small gap
         mLabelFontSizePx = Math.round((mLabelFontSize + mIconBorderDp) * mDensity);
 
@@ -307,7 +308,6 @@ public class SwitchConfiguration {
         mTopSortLockedApps = prefs.getBoolean(SettingsActivity.PREF_LOCKED_APPS_SORT, false);
         mDynamicDragHandleColor = prefs.getBoolean(SettingsActivity.PREF_DRAG_HANDLE_DYNAMIC_COLOR, false);
         mBlockSplitscreenBreakers = prefs.getBoolean(SettingsActivity.PREF_BLOCK_APPS_ON_SPLITSCREEN, true);
-        mUsePowerHint = prefs.getBoolean(SettingsActivity.PREF_USE_POWER_HINT, false);
         mColorfulHeader = prefs.getBoolean(SettingsActivity.PREF_COLOR_TASK_HEADER, false);
         mButtonHide = prefs.getBoolean(SettingsActivity.PREF_BUTTON_HIDE, false);
         mSystemFont = prefs.getBoolean(SettingsActivity.PREF_SYSTEM_FONT, false);

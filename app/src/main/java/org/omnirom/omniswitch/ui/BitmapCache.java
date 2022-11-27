@@ -78,40 +78,38 @@ public class BitmapCache {
         mMemoryCache.evictAll();
     }
 
-    private String bitmapHash(Intent intent, int iconSize) {
-        // unique identifier
-        String key = intent.getComponent().flattenToString();
-        return key + "_" + iconSize;
-    }
-
     private IconPackHelper getIconPackHelper() {
         return IconPackHelper.getInstance(mContext);
     }
 
     public Drawable getPackageIconCached(Resources resources, PackageManager.PackageItem packageItem, SwitchConfiguration configuration) {
-        String key = bitmapHash(packageItem.getIntentRaw(), configuration.mIconSize);
+        String key = packageItem.getPackageName();
         Drawable d = getBitmapFromMemCache(key);
         if (d == null){
             if (DEBUG) Log.d(TAG, "addToCache = " + key);
-            d = getPackageIconUncached(resources, packageItem, configuration, configuration.mIconSize);
+            d = getPackageIconUncached(resources, packageItem, configuration);
             addBitmapToMemoryCache(key, d);
         }
         return d;
     }
 
-    public Drawable getPackageIconUncached(Resources resources, PackageManager.PackageItem packageItem, SwitchConfiguration configuration, int iconSize) {
+    public Drawable getPackageIconUncached(Resources resources, PackageManager.PackageItem packageItem, SwitchConfiguration configuration) {
         Drawable icon = PackageManager.getInstance(mContext).getPackageIcon(packageItem);
-        if (getIconPackHelper().isIconPackLoaded() && (getIconPackHelper()
-                .getResourceIdForActivityIcon(packageItem.getActivityInfo()) == 0)) {
-            icon = BitmapUtils.compose(resources,
-                    icon, mContext, getIconPackHelper().getIconBackFor(packageItem.getTitle()),
-                    getIconPackHelper().getIconMask(), getIconPackHelper().getIconUpon(),
-                    getIconPackHelper().getIconScale(), iconSize, configuration.mDensity);
+        if (getIconPackHelper().isIconPackLoaded()){
+            int iconId = IconPackHelper.getInstance(mContext).getResourceIdForActivityIcon(packageItem.getActivityInfo());
+            if (iconId != 0) {
+                icon = IconPackHelper.getInstance(mContext).getIconPackResources().getDrawable(iconId);
+            } else {
+                icon = BitmapUtils.compose(resources,
+                        icon, mContext, getIconPackHelper().getIconBackFor(packageItem.getTitle()),
+                        getIconPackHelper().getIconMask(), getIconPackHelper().getIconUpon(),
+                        getIconPackHelper().getIconScale(), configuration.mDensity);
+            }
         }
         return icon;
     }
 
-    public void addBitmapToMemoryCache(String key, Drawable bitmap) {
+    private void addBitmapToMemoryCache(String key, Drawable bitmap) {
         mMemoryCache.put(key, bitmap);
     }
 
@@ -124,7 +122,7 @@ public class BitmapCache {
         Iterator<String> nextKey = keyIterator();
         while (nextKey.hasNext()) {
             String key = nextKey.next();
-            if (key.startsWith(packageName)) {
+            if (key.equals(packageName)) {
                 Drawable removed = mMemoryCache.remove(key);
                 if (removed != null) {
                     if (DEBUG) Log.d(TAG, "removedFromCache = " + key);
@@ -133,7 +131,7 @@ public class BitmapCache {
         }
     }
 
-    public Drawable getBitmapFromMemCache(String key) {
+    private Drawable getBitmapFromMemCache(String key) {
         return mMemoryCache.get(key);
     }
 }

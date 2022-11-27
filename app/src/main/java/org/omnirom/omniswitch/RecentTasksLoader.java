@@ -47,13 +47,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import static android.graphics.Bitmap.Config.ARGB_8888;
 
 public class RecentTasksLoader {
-    private static final String TAG = "RecentTasksLoader";
+    private static final String TAG = "OmniSwitch:RecentTasksLoader";
     private static final boolean DEBUG = true;
     private static final int TASK_INIT_LOAD = 8;
 
@@ -75,37 +72,8 @@ public class RecentTasksLoader {
     private Drawable mDefaultAppIcon;
     private Set<String> mLockedAppsList;
     private LauncherApps mLauncherApps;
-    private LruCache<String, TaskApplicationInfo> mTaskInfoCache;
+    private LruCache<String, ApplicationInfoHolder> mTaskInfoCache;
 
-    class TaskApplicationInfo {
-        String mPackageName;
-        Drawable mIcon;
-        String mLabel;
-
-        @Override
-        public int hashCode() {
-            return mPackageName.hashCode();
-        }
-
-        @Override
-        public boolean equals(@Nullable Object obj) {
-            return obj instanceof TaskApplicationInfo && ((TaskApplicationInfo) obj).mPackageName.equals(mPackageName);
-        }
-
-        @NonNull
-        @Override
-        public String toString() {
-            return mPackageName + " " + mLabel;
-        }
-
-        public TaskApplicationInfo(String packaName, String label, Drawable icon) {
-            mPackageName = packaName;
-            mLabel = label;
-            mIcon = icon;
-        }
-
-
-    }
     private enum State {
         LOADING, IDLE
     }
@@ -443,7 +411,7 @@ public class RecentTasksLoader {
         return IconPackHelper.getInstance(mContext);
     }
 
-    private Drawable getIconPackIcon(TaskApplicationInfo ti) {
+    private Drawable getIconPackIcon(ApplicationInfoHolder ti) {
         Resources resources;
         try {
             resources = mPackageManager.getResourcesForApplication(ti.mPackageName);
@@ -459,7 +427,7 @@ public class RecentTasksLoader {
                 Drawable icon = BitmapUtils.compose(resources,
                         ti.mIcon, mContext, getIconPackHelper().getIconBackFor(ti.mLabel),
                         getIconPackHelper().getIconMask(), getIconPackHelper().getIconUpon(),
-                        getIconPackHelper().getIconScale(), mConfiguration.mIconSize, mConfiguration.mDensity);
+                        getIconPackHelper().getIconScale(), mConfiguration.mDensity);
 
                 return icon;
             } catch (Exception e) {
@@ -504,7 +472,7 @@ public class RecentTasksLoader {
 
     public void loadTaskInfo(final TaskDescription td) {
         synchronized (td) {
-            TaskApplicationInfo ti = mTaskInfoCache.get(td.getPackageName());
+            ApplicationInfoHolder ti = mTaskInfoCache.get(td.getPackageName());
             if (ti == null) {
                 ApplicationInfo applicationInfo = getApplicationInfo(td.getPackageName(),
                         Process.myUserHandle(), 0);
@@ -517,7 +485,7 @@ public class RecentTasksLoader {
                 String label = applicationInfo.loadLabel(mPackageManager).toString();
                 Drawable icon = applicationInfo.loadIcon(mPackageManager);
 
-                ti = new TaskApplicationInfo(td.getPackageName(), label, icon);
+                ti = new ApplicationInfoHolder(td.getPackageName(), label, icon);
                 mTaskInfoCache.put(ti.mPackageName, ti);
             }
             final boolean withIconPack = IconPackHelper.getInstance(mContext).isIconPackLoaded();
@@ -576,24 +544,6 @@ public class RecentTasksLoader {
 
     private String getSettingsActivity() {
         return mContext.getPackageName() + "/.SettingsActivity";
-    }
-
-    private CharSequence getTaskTitle(TaskDescription td) {
-        ApplicationInfo applicationInfo = getApplicationInfo(td.getPackageName(), Process.myUserHandle(), 0);
-        if (applicationInfo == null) {
-            Log.e(TAG, "Failed to get title for task " + td.taskId);
-            return "";
-        }
-        return applicationInfo.loadLabel(mPackageManager);
-    }
-
-    private Drawable getTaskIcon(TaskDescription td) {
-        ApplicationInfo applicationInfo = getApplicationInfo(td.getPackageName(), Process.myUserHandle(), 0);
-        if (applicationInfo == null) {
-            Log.e(TAG, "Failed to get icon for task " + td.taskId);
-            return null;
-        }
-        return applicationInfo.loadIcon(mPackageManager);
     }
 
     private ApplicationInfo getApplicationInfo(String packageName, UserHandle user, int flags) {

@@ -170,7 +170,7 @@ public class ThumbnailTaskView extends View implements TaskDescription.ThumbChan
         return getDefaultThumb();
     }
 
-    private String getLabel() {
+    private CharSequence getLabel() {
         if (getTask() != null) {
             return getTask().getLabel();
         }
@@ -217,8 +217,7 @@ public class ThumbnailTaskView extends View implements TaskDescription.ThumbChan
 
         final TextPaint textPaint = BitmapUtils.getLabelTextPaint(getContext());
         final int startTextPx = iconBorderSizePx + textInsetPx;
-        final int textSize = Math.round(14 * mConfiguration.mDensity);
-        textPaint.setTextSize(textSize);
+        textPaint.setTextSize(mConfiguration.mLabelFontSizeSp);
 
         Paint bgPaint = null;
         if (getTask().isLocked()) {

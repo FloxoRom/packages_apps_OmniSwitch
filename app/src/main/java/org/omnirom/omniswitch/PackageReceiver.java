@@ -37,12 +37,6 @@ public class PackageReceiver extends BroadcastReceiver {
             if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())) {
                 PackageManager.getInstance(context).removePackageIconCache(packageName);
             }
-            // TODO
-            /*if (packageName.startsWith(context.getPackageName()) || packageName.startsWith("android")) {
-                // overlay package migth be installed - recalc color accent for drag handle
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                prefs.edit().putBoolean(SettingsActivity.PREF_COLOR_CHANGED, !prefs.getBoolean(SettingsActivity.PREF_COLOR_CHANGED, false)).commit();
-            }*/
             PackageManager.getInstance(context).reloadPackageList();
         }
     }

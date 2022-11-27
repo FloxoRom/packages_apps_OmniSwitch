@@ -115,11 +115,9 @@ public class SettingsActivity extends PreferenceActivity implements
     public static final String PREF_DRAG_HANDLE_DYNAMIC_COLOR ="drag_handle_dynamic_color";
     public static final String PREF_COLOR_CHANGED ="color_changed";
     public static final String PREF_BLOCK_APPS_ON_SPLITSCREEN = "block_apps_on_splitscreen";
-    public static final String PREF_USE_POWER_HINT = "use_power_hint";
     private static final String PREF_HIDDEN_APPS_CONFIG = "hidden_apps_config";
     public static final String PREF_HIDDEN_APPS = "hidden_apps";
     public static final String PREF_COLOR_TASK_HEADER = "color_task_header";
-    public static final String PREF_ICON_SHAPE = "icon_shape";
     public static final String PREF_BOTTOM_FAVORITES = "bottom_favorites";
     public static final String PREF_BUTTON_HIDE = "button_hide";
     public static final String PREF_SYSTEM_FONT = "system_font";
@@ -192,7 +190,6 @@ public class SettingsActivity extends PreferenceActivity implements
     private CheckBoxPreference mBottomFavorites;
     private Preference mHiddenAppsConfig;
     private CheckBoxPreference mColorTaskHeader;
-    private ListPreference mIconShape;
     private Handler mHandler;
     private CheckBoxPreference mButtonHide;
 
@@ -304,13 +301,6 @@ public class SettingsActivity extends PreferenceActivity implements
         mThumbSize.setEnabled(vertical);
         mColorTaskHeader.setEnabled(vertical);
         mBottomFavorites.setEnabled(vertical);
-
-        /*mIconShape = (ListPreference) findPreference(PREF_ICON_SHAPE);
-        mIconShape.setOnPreferenceChangeListener(this);
-        idx = mIconShape.findIndexOfValue(mPrefs.getString(PREF_ICON_SHAPE,
-                mIconShape.getEntryValues()[0].toString()));
-        mIconShape.setValueIndex(idx);
-        mIconShape.setSummary(mIconShape.getEntries()[idx]);*/
 
         mHiddenAppsConfig = findPreference(PREF_HIDDEN_APPS_CONFIG);
 
@@ -525,17 +515,6 @@ public class SettingsActivity extends PreferenceActivity implements
                 Toast.makeText(SettingsActivity.this, R.string.launcher_mode_enable_check, Toast.LENGTH_LONG).show();
             }
             return true;
-        } else if (preference == mIconShape) {
-            String value = (String) newValue;
-            mPrefs.edit().putString(SettingsActivity.PREF_ICON_SHAPE, value).commit();
-
-            ProgressDialog.show(this,
-                    null /* title */,
-                    getResources().getString(R.string.icon_shape_override_progress),
-                    true /* indeterminate */,
-                    false /* cancelable */);
-            mHandler.postDelayed(new OverrideApplyHandler(this), 1000);
-            return false;
         }
         return false;
     }

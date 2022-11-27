@@ -17,7 +17,25 @@
  */
 package org.omnirom.omniswitch;
 
-import java.net.URISyntaxException;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.LauncherApps;
+import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
+import android.os.Process;
+import android.os.UserHandle;
+import android.preference.PreferenceManager;
+import android.text.TextUtils;
+import android.util.Log;
+import android.util.LruCache;
+
+import org.omnirom.omniswitch.ui.BitmapCache;
+import org.omnirom.omniswitch.ui.IconPackHelper;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,38 +45,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.omnirom.omniswitch.ui.BitmapCache;
-import org.omnirom.omniswitch.ui.BitmapUtils;
-import org.omnirom.omniswitch.ui.IconPackHelper;
-
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.LauncherApps;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.ResolveInfo;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.BitmapDrawable;
-import android.icu.text.MessagePattern;
-import android.os.Process;
-import android.os.UserHandle;
-import android.preference.PreferenceManager;
-import android.text.TextUtils;
-import android.util.Log;
-
 public class PackageManager {
-    private static final boolean DEBUG = false;
-    private static final String TAG = "PackageManager";
+    private static final boolean DEBUG = true;
+    private static final String TAG = "OmniSwitch:PackageManager";
 
     private Map<String, PackageItem> mInstalledPackages;
     private List<PackageItem> mInstalledPackagesList;
     private Context mContext;
     private boolean mInitDone;
     private static PackageManager sInstance;
-    private LauncherApps mLauncherApps;
 
     public static final String PACKAGES_UPDATED_TAG = "PACKAGES_UPDATED";
 
@@ -67,6 +62,7 @@ public class PackageManager {
         private String packageName;
         private Intent intent;
         private ActivityInfo activity;
+        private Drawable icon;
 
         public Intent getIntentRaw() {
             return intent;
@@ -84,6 +80,8 @@ public class PackageManager {
             return activity;
         }
 
+        public String getPackageName() { return packageName; }
+
         @Override
         public int compareTo(PackageItem another) {
             int result = title.toString().compareToIgnoreCase(
@@ -99,7 +97,7 @@ public class PackageManager {
     }
 
     public static PackageManager getInstance(Context context) {
-        if (sInstance == null){
+        if (sInstance == null) {
             sInstance = new PackageManager();
         }
         sInstance.setContext(context);
@@ -113,18 +111,17 @@ public class PackageManager {
 
     private void setContext(Context context) {
         mContext = context;
-        mLauncherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
     }
 
     public synchronized List<PackageItem> getPackageList() {
-        if(!mInitDone){
+        if (!mInitDone) {
             updatePackageList();
         }
         return mInstalledPackagesList;
     }
 
     public synchronized Map<String, PackageItem> getPackageMap() {
-        if(!mInitDone){
+        if (!mInitDone) {
             updatePackageList();
         }
         return mInstalledPackages;
@@ -158,7 +155,6 @@ public class PackageManager {
 
         for (ResolveInfo info : installedAppsInfo) {
             ApplicationInfo appInfo = info.activityInfo.applicationInfo;
-
             final PackageItem item = new PackageItem();
             item.packageName = appInfo.packageName;
             packageNameList.add(item.packageName);
@@ -175,6 +171,7 @@ public class PackageManager {
             item.intent = intent;
 
             item.title = appInfo.loadLabel(mContext.getPackageManager());
+            item.icon = appInfo.loadIcon(mContext.getPackageManager());
             mInstalledPackages.put(item.getIntent(), item);
             mInstalledPackagesList.add(item);
         }
@@ -204,11 +201,11 @@ public class PackageManager {
         String pkgName = intent.getComponent().getPackageName();
 
         Iterator<PackageItem> nextPackage = mInstalledPackagesList.iterator();
-        while(nextPackage.hasNext()){
+        while (nextPackage.hasNext()) {
             PackageItem item = nextPackage.next();
             ComponentName name = item.getIntentRaw().getComponent();
             String pPkgName = name.getPackageName();
-            if (pkgName.equals(pPkgName)){
+            if (pkgName.equals(pPkgName)) {
                 return item;
             }
         }
@@ -218,11 +215,11 @@ public class PackageManager {
     public synchronized List<String> getPackageListForPackageName(String pkgName) {
         List<String> pkgList = new ArrayList<String>();
         Iterator<PackageItem> nextPackage = mInstalledPackagesList.iterator();
-        while(nextPackage.hasNext()){
+        while (nextPackage.hasNext()) {
             PackageItem item = nextPackage.next();
             ComponentName name = item.getIntentRaw().getComponent();
             String pPkgName = name.getPackageName();
-            if (pkgName.equals(pPkgName)){
+            if (pkgName.equals(pPkgName)) {
                 pkgList.add(item.getIntent());
             }
         }
@@ -249,7 +246,7 @@ public class PackageManager {
         while (nextFavorite.hasNext()) {
             String favorite = nextFavorite.next();
             // DONT USE getPackageMap() here!
-            if (!mInstalledPackages.containsKey(favorite)){
+            if (!mInstalledPackages.containsKey(favorite)) {
                 changed = true;
                 continue;
             }
@@ -273,7 +270,7 @@ public class PackageManager {
         Iterator<String> nextApp = appsList.iterator();
         while (nextApp.hasNext()) {
             String packageName = nextApp.next();
-            if (!packageNameList.contains(packageName)){
+            if (!packageNameList.contains(packageName)) {
                 changed = true;
                 continue;
             }
@@ -298,7 +295,7 @@ public class PackageManager {
         while (nextHiddenApp.hasNext()) {
             String hiddenApp = nextHiddenApp.next();
             // DONT USE getPackageMap() here!
-            if (!mInstalledPackages.containsKey(hiddenApp)){
+            if (!mInstalledPackages.containsKey(hiddenApp)) {
                 changed = true;
                 continue;
             }
@@ -311,29 +308,8 @@ public class PackageManager {
         }
     }
 
-    private ApplicationInfo getApplicationInfo(String packageName, UserHandle user, int flags) {
-        try {
-            ApplicationInfo info = mLauncherApps.getApplicationInfo(packageName, flags, user);
-            return (info.flags & ApplicationInfo.FLAG_INSTALLED) == 0 || !info.enabled
-                    ? null : info;
-        } catch (android.content.pm.PackageManager.NameNotFoundException e) {
-            return null;
-        }
-    }
-
     public Drawable getPackageIcon(PackageItem item) {
-        ApplicationInfo applicationInfo = getApplicationInfo(item.packageName, Process.myUserHandle(), 0);
-        if (applicationInfo == null) {
-            Log.e(TAG, "Failed to get icon for package " + item.packageName);
-            return null;
-        }
-        Drawable d = applicationInfo.loadIcon(mContext.getPackageManager());
-        if (IconPackHelper.getInstance(mContext).isIconPackLoaded()){
-            int iconId = IconPackHelper.getInstance(mContext).getResourceIdForActivityIcon(item.activity);
-            if (iconId != 0) {
-                d = IconPackHelper.getInstance(mContext).getIconPackResources().getDrawable(iconId);
-            }
-        }
-        return d;
+        return item.icon;
     }
 }
+

@@ -76,7 +76,7 @@ public class PackageTextView extends TextView {
 
     public void setTask(TaskDescription task) {
         mTask = task;
-        mLabel = mTask.getLabel();
+        mLabel = mTask.getLabel().toString();
     }
 
     public String getLabel() {
@@ -111,7 +111,7 @@ public class PackageTextView extends TextView {
             // now we need to make sure we have the correct icon and label
             if (getTask().getIcon() == null) {
                 RecentTasksLoader.getInstance(mContext).loadTaskInfo(getTask());
-                mLabel = getTask().getLabel();
+                mLabel = getTask().getLabel().toString();
             }
             Drawable d= getTask().getIcon();
             d.setBounds(0, 0, configuration.mIconSizePx, configuration.mIconSizePx);

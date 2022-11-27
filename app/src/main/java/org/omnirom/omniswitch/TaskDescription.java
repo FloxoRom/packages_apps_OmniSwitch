@@ -36,7 +36,7 @@ public final class TaskDescription {
     private ThumbChangeListener mListener;
     private boolean mThumbLoading;
     private ThumbnailData mThumb;
-    private String mLabel;
+    private CharSequence mLabel;
     private boolean mLocked;
     private boolean mNeedsUpdate;
     private boolean mSupportsSplitScreen;
@@ -81,11 +81,11 @@ public final class TaskDescription {
         return persistentTaskId;
     }
 
-    public void setLabel(String label) {
+    public void setLabel(CharSequence label) {
         mLabel = label;
     }
 
-    public String getLabel() {
+    public CharSequence getLabel() {
         return mLabel;
     }
 

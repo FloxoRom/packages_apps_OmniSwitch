@@ -325,7 +325,6 @@ public class SwitchGestureView {
                     mFlingEnable = false;
                     mMoveStarted = false;
 
-                    mRecentsManager.startBoost();
                     mRecentsManager.clearTasks();
                     RecentTasksLoader.getInstance(mContext).cancelLoadingTasks();
                     RecentTasksLoader.getInstance(mContext).setSwitchManager(mRecentsManager);
@@ -818,7 +817,7 @@ public class SwitchGestureView {
             item.setIntent(packageItem.getIntent());
             item.setLabel(packageItem.getTitle().toString());
             Drawable d = BitmapCache.getInstance(mContext).getPackageIconUncached(mContext.getResources(),
-                    packageItem, mConfiguration, mConfiguration.mIconSizeQuickPx);
+                    packageItem, mConfiguration);
             d.setBounds(0, 0, mConfiguration.mIconSizeQuickPx, mConfiguration.mIconSizeQuickPx);
             item.setOriginalImage(d);
             item.setCompoundDrawables(null, d, null, null);

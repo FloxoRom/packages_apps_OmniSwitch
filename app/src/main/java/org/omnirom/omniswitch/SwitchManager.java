@@ -71,7 +71,6 @@ public class SwitchManager {
         mConfiguration = SwitchConfiguration.getInstance(mContext);
         mLayoutStyle = layoutStyle;
         mAm = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
-        mPowerService = IPowerManager.Stub.asInterface(ServiceManager.getService("power"));
         mIAm = ActivityManager.getService();
         init();
     }
@@ -99,7 +98,6 @@ public class SwitchManager {
             if (DEBUG){
                 Log.d(TAG, "show");
             }
-            startBoost();
             mLayout.setHandleRecentsUpdate(true);
 
             clearTasks();
@@ -128,7 +126,6 @@ public class SwitchManager {
             if (DEBUG){
                 Log.d(TAG, "beforePreloadTasks");
             }
-            startBoost();
             clearTasks();
             mLayout.setHandleRecentsUpdate(true);
         }
@@ -588,26 +585,6 @@ public class SwitchManager {
         mLoadedTasks.remove(ad);
         mLoadedTasksOriginal.remove(ad);
         mLayout.notifiyRecentsListChanged();
-    }
-
-    public void startBoost() {
-        if (mConfiguration.mUsePowerHint) {
-            /*try {
-                // TODO 8 is the POWER_HINT_LAUNCH but there is no way to access this from here
-                mPowerService.powerHint(8, 1);
-            } catch (RemoteException e){
-            }*/
-        }
-    }
-
-    public void stopBoost() {
-        if (mConfiguration.mUsePowerHint) {
-            /*try {
-                // TODO 8 is the POWER_HINT_LAUNCH
-                mPowerService.powerHint(8, 0);
-            } catch (RemoteException e){
-            }*/
-        }
     }
 
     private void removeTask(int taskid) {

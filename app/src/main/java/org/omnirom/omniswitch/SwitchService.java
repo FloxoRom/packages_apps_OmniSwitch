@@ -167,6 +167,7 @@ public class SwitchService extends Service {
         }
         mIsRunning = false;
         BitmapCache.getInstance(this).clear();
+        RecentTasksLoader.getInstance(this).clearTaskInfoCache();
 
         mCommitSuicide = false;
     }
@@ -288,7 +289,6 @@ public class SwitchService extends Service {
                 Log.d(TAG, "onReceive " + action);
             }
             PackageManager.getInstance(context).updatePackageIcons();
-            updatePrefs(mPrefs, SettingsActivity.PREF_ICON_SHAPE);
         }
     }
 

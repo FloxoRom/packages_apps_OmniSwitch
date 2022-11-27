@@ -75,7 +75,6 @@ public class Utils {
         mForceUpdateKeys.add(SettingsActivity.PREF_ICONPACK);
         mForceUpdateKeys.add(SettingsActivity.PREF_THUMB_SIZE);
         mForceUpdateKeys.add(SwitchService.DPI_CHANGE);
-        mForceUpdateKeys.add(SettingsActivity.PREF_ICON_SHAPE);
         mForceUpdateKeys.add(SettingsActivity.PREF_SYSTEM_FONT);
     }
 
