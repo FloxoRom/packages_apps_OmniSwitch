@@ -17,22 +17,10 @@
  */
 package org.omnirom.omniswitch.ui;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.omnirom.omniswitch.PackageManager;
-import org.omnirom.omniswitch.TaskDescription;
-import org.omnirom.omniswitch.Utils;
-import org.omnirom.omniswitch.SwitchConfiguration;
-import org.omnirom.omniswitch.SwitchManager;
-import org.omnirom.omniswitch.R;
-import org.omnirom.omniswitch.SettingsActivity;
-
 import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.content.ComponentName;
@@ -40,10 +28,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -65,12 +51,23 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.omnirom.omniswitch.PackageManager;
+import org.omnirom.omniswitch.R;
+import org.omnirom.omniswitch.SettingsActivity;
+import org.omnirom.omniswitch.SwitchConfiguration;
+import org.omnirom.omniswitch.SwitchManager;
+import org.omnirom.omniswitch.TaskDescription;
+import org.omnirom.omniswitch.Utils;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public abstract class AbstractSwitchLayout implements ISwitchLayout {
     protected static final int FAVORITE_DURATION = 200;
@@ -163,7 +160,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2,
-                float distanceX, float distanceY) {
+                                float distanceX, float distanceY) {
             return false;
         }
 
@@ -173,7 +170,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                float velocityY) {
+                               float velocityY) {
             if (DEBUG) {
                 Log.d(TAG, "onFling close");
             }
@@ -206,60 +203,60 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                 return true;
             }
             switch (action) {
-            case MotionEvent.ACTION_DOWN:
-                mDownPoint[0] = xRaw;
-                mDownPoint[1] = yRaw;
-                mEnabled = true;
-                mFlingEnable = false;
-                mLastX = xRaw;
-                mMoveStarted = false;
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                mEnabled = true;
-                mFlingEnable = false;
-                mMoveStarted = false;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                mFlingEnable = false;
-                if (Math.abs(distanceX) > mSlop) {
-                    if (mLastX > xRaw) {
-                        // move left
-                        if (mConfiguration.mLocation != 0) {
-                            mFlingEnable = true;
-                            mMoveStarted = true;
-                        }
-                    } else {
-                        // move right
-                        if (mConfiguration.mLocation == 0) {
-                            mFlingEnable = true;
-                            mMoveStarted = true;
-                        }
-                    }
-                }
-                if (mMoveStarted) {
-                    if (distanceX > 0) {
-                        // move left
-                        if (mConfiguration.mLocation != 0) {
-                            slideLayoutHide(-distanceX);
-                        }
-                    } else {
-                        // move right
-                        if (mConfiguration.mLocation == 0) {
-                            slideLayoutHide(-distanceX);
+                case MotionEvent.ACTION_DOWN:
+                    mDownPoint[0] = xRaw;
+                    mDownPoint[1] = yRaw;
+                    mEnabled = true;
+                    mFlingEnable = false;
+                    mLastX = xRaw;
+                    mMoveStarted = false;
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    mEnabled = true;
+                    mFlingEnable = false;
+                    mMoveStarted = false;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    mFlingEnable = false;
+                    if (Math.abs(distanceX) > mSlop) {
+                        if (mLastX > xRaw) {
+                            // move left
+                            if (mConfiguration.mLocation != 0) {
+                                mFlingEnable = true;
+                                mMoveStarted = true;
+                            }
+                        } else {
+                            // move right
+                            if (mConfiguration.mLocation == 0) {
+                                mFlingEnable = true;
+                                mMoveStarted = true;
+                            }
                         }
                     }
-                }
-                mLastX = xRaw;
-                break;
-            case MotionEvent.ACTION_UP:
-                mFlingEnable = false;
-                if (mMoveStarted) {
-                    finishSlideLayoutHide();
-                } else {
-                    hide(false);
-                }
-                mMoveStarted = false;
-                break;
+                    if (mMoveStarted) {
+                        if (distanceX > 0) {
+                            // move left
+                            if (mConfiguration.mLocation != 0) {
+                                slideLayoutHide(-distanceX);
+                            }
+                        } else {
+                            // move right
+                            if (mConfiguration.mLocation == 0) {
+                                slideLayoutHide(-distanceX);
+                            }
+                        }
+                    }
+                    mLastX = xRaw;
+                    break;
+                case MotionEvent.ACTION_UP:
+                    mFlingEnable = false;
+                    if (mMoveStarted) {
+                        finishSlideLayoutHide();
+                    } else {
+                        hide(false);
+                    }
+                    mMoveStarted = false;
+                    break;
             }
             return true;
         }
@@ -292,7 +289,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     public class FavoriteListAdapter extends ArrayAdapter<String> {
 
         public FavoriteListAdapter(Context context, int resource,
-                List<String> values) {
+                                   List<String> values) {
             super(context, R.layout.package_item, resource, values);
         }
 
@@ -304,10 +301,9 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
             } else {
                 item = (PackageTextView) convertView;
             }
-            String intent = getItem(position);
-
+            String packageName = getItem(position);
             PackageManager.PackageItem packageItem = PackageManager
-                    .getInstance(mContext).getPackageItem(intent);
+                    .getInstance(mContext).getPackageItem(packageName);
             item.setIntent(packageItem.getIntent());
             if (mConfiguration.mShowLabels) {
                 item.setText(packageItem.getTitle());
@@ -379,9 +375,9 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                 @Override
                 public boolean onLongClick(View v) {
                     Toast.makeText(
-                            mContext,
-                            mContext.getResources().getString(
-                                    R.string.home_help), Toast.LENGTH_SHORT)
+                                    mContext,
+                                    mContext.getResources().getString(
+                                            R.string.home_help), Toast.LENGTH_SHORT)
                             .show();
                     return true;
                 }
@@ -514,9 +510,9 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                 @Override
                 public boolean onLongClick(View v) {
                     Toast.makeText(
-                            mContext,
-                            mContext.getResources().getString(
-                                    R.string.back_help), Toast.LENGTH_SHORT)
+                                    mContext,
+                                    mContext.getResources().getString(
+                                            R.string.back_help), Toast.LENGTH_SHORT)
                             .show();
                     return true;
                 }
@@ -590,9 +586,9 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                 @Override
                 public boolean onLongClick(View v) {
                     Toast.makeText(
-                            mContext,
-                            mContext.getResources().getString(
-                                    R.string.menu_help), Toast.LENGTH_SHORT)
+                                    mContext,
+                                    mContext.getResources().getString(
+                                            R.string.menu_help), Toast.LENGTH_SHORT)
                             .show();
                     return true;
                 }
@@ -623,7 +619,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                     hide(true);
                     final Intent cameraIntent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
                     cameraIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                            | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                     mContext.startActivity(cameraIntent);
                 }
             });
@@ -639,7 +635,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                     final Intent assistIntent = new Intent(Intent.ACTION_ASSIST);
                     if (Utils.canResolveIntent(mContext, assistIntent)) {
                         assistIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                            | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                                | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                         mContext.startActivity(assistIntent);
                     }
                 }
@@ -654,7 +650,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                 public void onClick(View v) {
                     hide(true);
                     ComponentName gsa = new ComponentName("com.google.android.googlequicksearchbox",
-                        "com.google.android.apps.gsa.staticplugins.opa.OpaActivity");
+                            "com.google.android.apps.gsa.staticplugins.opa.OpaActivity");
                     final Intent assistIntent = new Intent();
                     assistIntent.setComponent(gsa);
                     if (Utils.canResolveIntent(mContext, assistIntent)) {
@@ -680,7 +676,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     }
 
     protected Animator setVisibilityWhenDone(final Animator a, final View v,
-            final int vis) {
+                                             final int vis) {
         a.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -903,15 +899,14 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     }
 
     protected void handleLongPressRecent(final List<TaskDescription> tasks,
-            final TaskDescription ad, final View view) {
+                                         final TaskDescription ad, final View view) {
         final Context wrapper = new ContextThemeWrapper(mContext,
                 mConfiguration.getPopupMenuStyle());
-        final String intentStr = getRecentsItemIntent(ad);
         final PopupMenu popup = new PopupMenu(wrapper, view);
         //popup.setWindowLayoutType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
         popup.getMenuInflater().inflate(R.menu.recent_popup_menu,
                 popup.getMenu());
-        boolean addFavEnabled = intentStr != null && !mFavoriteList.contains(intentStr);
+        boolean addFavEnabled = !mFavoriteList.contains(ad.getPackageName());
         if (!addFavEnabled) {
             popup.getMenu().removeItem(R.id.package_add_favorite);
         }
@@ -938,11 +933,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                 } else if (item.getItemId() == R.id.package_lock_app) {
                     mRecentsManager.toggleLockedApp(ad, isLockedApp, true);
                 } else if (item.getItemId() == R.id.package_add_favorite) {
-                    if (intentStr == null) {
-                        Log.d(TAG, "failed to add " + ad.getIntent().toUri(0));
-                        return false;
-                    }
-                    Utils.addToFavorites(mContext, intentStr, mFavoriteList);
+                    Utils.addToFavoritesWithPackageName(mContext, packageName, mFavoriteList);
                 } else if (item.getItemId() == R.id.package_lock_task) {
                     if (!Utils.isLockToAppEnabled(mContext)) {
                         return false;
@@ -964,29 +955,19 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         popup.show();
     }
 
-    private String getRecentsItemIntent(final TaskDescription ad) {
+    /*private String getRecentsItemIntent(final TaskDescription ad) {
         try {
-            Intent intent = ad.getIntent();
-            String intentStr = intent.toUri(0);
             PackageManager.PackageItem packageItem = PackageManager
-                    .getInstance(mContext).getPackageItem(intentStr);
+                    .getInstance(mContext).getPackageItemForPackageName(ad.getPackageName());
             if (packageItem == null) {
-                // find a matching available package by matching thing
-                // like
-                // package name
-                packageItem = PackageManager.getInstance(mContext)
-                        .getPackageItemByComponent(intent);
-                if (packageItem == null) {
-                    return null;
-                }
-                intentStr = packageItem.getIntent();
+                return null;
             }
-            return intentStr;
+            return packageItem.getIntent();
         } catch (Exception e) {
-            // toUri can throw an exception
             return null;
         }
-    }
+
+    }*/
 
     protected void handleLongPressFavorite(final PackageManager.PackageItem packageItem, View view) {
         ContextMenuUtils.handleLongPressFavorite(mContext, packageItem, view,
@@ -1081,6 +1062,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     }
 
     protected abstract void updateRamDisplay();
+
     protected abstract void updateRecentsAppsList(boolean force, boolean refresh);
 
     protected synchronized void hideDone() {
@@ -1331,7 +1313,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
             mButtonListContainerTop.addView(getButtonList());
             mButtonListContainerTop.setVisibility(View.VISIBLE);
             mButtonListContainer = mButtonListContainerTop;
-       } else {
+        } else {
             mButtonListContainerTop.removeAllViews();
             mButtonListContainerBottom.removeAllViews();
             mButtonListContainerTop.setVisibility(View.GONE);

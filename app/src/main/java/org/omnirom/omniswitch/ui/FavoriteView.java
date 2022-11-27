@@ -18,30 +18,20 @@
 package org.omnirom.omniswitch.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import org.omnirom.omniswitch.PackageManager;
 import org.omnirom.omniswitch.SettingsActivity;
@@ -51,7 +41,6 @@ import org.omnirom.omniswitch.Utils;
 import org.omnirom.omniswitch.R;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class FavoriteView extends GridView {
@@ -80,17 +69,16 @@ public class FavoriteView extends GridView {
             } else {
                 item = (PackageTextView) convertView;
             }
-            String intent = getItem(position);
-
+            String packageName = getItem(position);
             PackageManager.PackageItem packageItem = PackageManager
-                    .getInstance(mContext).getPackageItem(intent);
+                    .getInstance(getContext()).getPackageItem(packageName);
             item.setIntent(packageItem.getIntent());
             if (mConfiguration.mShowLabels) {
                 item.setText(packageItem.getTitle());
             } else {
                 item.setText("");
             }
-            Drawable d = BitmapCache.getInstance(mContext).getPackageIconCached(getResources(), packageItem, mConfiguration);
+            Drawable d = BitmapCache.getInstance(getContext()).getPackageIconCached(getResources(), packageItem, mConfiguration);
             d.setBounds(0, 0, mConfiguration.mIconSizePx, mConfiguration.mIconSizePx);
             item.setCompoundDrawables(null, d, null, null);
             return item;
@@ -99,10 +87,10 @@ public class FavoriteView extends GridView {
 
     public FavoriteView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mConfiguration = SwitchConfiguration.getInstance(mContext);
-        mLabelFont = Utils.getAppLabelFont(mContext);
+        mConfiguration = SwitchConfiguration.getInstance(getContext());
+        mLabelFont = Utils.getAppLabelFont(getContext());
         mFavoriteList = new ArrayList<String>();
-        mFavoriteListAdapter = new FavoriteListAdapter(mContext,
+        mFavoriteListAdapter = new FavoriteListAdapter(getContext(),
                 android.R.layout.simple_list_item_single_choice, mFavoriteList);
         setAdapter(mFavoriteListAdapter);
         updateLayout();
@@ -135,9 +123,9 @@ public class FavoriteView extends GridView {
     }
 
     protected PackageTextView getPackageItemTemplate() {
-        PackageTextView item = new PackageTextView(mContext);
+        PackageTextView item = new PackageTextView(getContext());
         if (mTransparent) {
-            item.setTextColor(mContext.getResources().getColor(R.color.text_color_dark));
+            item.setTextColor(getContext().getResources().getColor(R.color.text_color_dark));
             item.setShadowLayer(5f, 0, 0, Color.BLACK);
         } else {
             item.setTextColor(mConfiguration.getCurrentTextTint(mConfiguration.getViewBackgroundColor()));
@@ -164,7 +152,7 @@ public class FavoriteView extends GridView {
             Log.d(TAG, "updatePrefs " + key);
         }
         if (key != null && key.equals(SettingsActivity.PREF_SYSTEM_FONT)) {
-            mLabelFont = Utils.getAppLabelFont(mContext);
+            mLabelFont = Utils.getAppLabelFont(getContext());
         }
         if (key != null && key.equals(SettingsActivity.PREF_FAVORITE_APPS)) {
             updateFavoritesList();
@@ -202,7 +190,7 @@ public class FavoriteView extends GridView {
     }
 
     private void updateFavoritesList() {
-        Utils.updateFavoritesList(mContext, mConfiguration, mFavoriteList);
+        Utils.updateFavoritesList(getContext(), mConfiguration, mFavoriteList);
         if (DEBUG) {
             Log.d(TAG, "updateFavoritesList " + mFavoriteList);
         }
@@ -210,23 +198,25 @@ public class FavoriteView extends GridView {
     }
 
     protected void doOnCLickAction(int position) {
-        String intent = mFavoriteList.get(position);
+        String packageName = mFavoriteList.get(position);
+        PackageManager.PackageItem packageItem = PackageManager
+                .getInstance(getContext()).getPackageItem(packageName);
         if (mRecentsManager != null) {
-            mRecentsManager.startIntentFromtString(intent, true);
+            mRecentsManager.startIntentFromtString(packageItem.getIntent(), true);
         } else {
-            SwitchManager.startIntentFromtString(mContext, intent);
+            SwitchManager.startIntentFromtString(getContext(), packageItem.getIntent());
         }
     }
 
     protected void doOnLongClickAction(int position, View view) {
-        String intent = mFavoriteList.get(position);
+        String packageName = mFavoriteList.get(position);
         PackageManager.PackageItem packageItem = PackageManager
-                .getInstance(mContext).getPackageItem(intent);
+                .getInstance(getContext()).getPackageItem(packageName);
         handleLongPressFavorite(packageItem, view);
     }
 
     private void handleLongPressFavorite(final PackageManager.PackageItem packageItem, View view) {
-        ContextMenuUtils.handleLongPressFavorite(mContext, packageItem, view,
+        ContextMenuUtils.handleLongPressFavorite(getContext(), packageItem, view,
                 mRecentsManager, mFavoriteList);
     }
 }

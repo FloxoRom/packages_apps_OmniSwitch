@@ -39,7 +39,6 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -807,11 +806,11 @@ public class SwitchGestureView {
         int i = 0;
         Iterator<String> nextFavorite = favoriteList.iterator();
         while(nextFavorite.hasNext() && i < mConfiguration.mLimitItemsX){
-            String intent = nextFavorite.next();
+            String packageName = nextFavorite.next();
             PackageTextView item = getPackageItemTemplate();
-            PackageManager.PackageItem packageItem = PackageManager.getInstance(mContext).getPackageItem(intent);
+            PackageManager.PackageItem packageItem = PackageManager.getInstance(mContext).getPackageItem(packageName);
             if (packageItem == null){
-                Log.d(TAG, "failed to add " + intent);
+                Log.d(TAG, "failed to add " + packageName);
                 continue;
             }
             item.setIntent(packageItem.getIntent());

@@ -92,8 +92,7 @@ public class HiddenAppsDialog extends AlertDialog implements
 
         @Override
         public long getItemId(int position) {
-            // intent is guaranteed to be unique in mInstalledPackages
-            return mInstalledPackages.get(position).getIntent().hashCode();
+            return mInstalledPackages.get(position).getPackageName().hashCode();
         }
 
         @Override
@@ -121,7 +120,7 @@ public class HiddenAppsDialog extends AlertDialog implements
                             mConfiguration);
             holder.image.setImageDrawable(d.mutate());
             holder.check.setChecked(mHiddenAppsList
-                    .contains(applicationInfo.getIntent()));
+                    .contains(applicationInfo.getPackageName()));
 
             return convertView;
         }
@@ -171,11 +170,11 @@ public class HiddenAppsDialog extends AlertDialog implements
                 ViewHolder viewHolder = (ViewHolder) view.getTag();
                 viewHolder.check.setChecked(!viewHolder.check.isChecked());
                 if (viewHolder.check.isChecked()) {
-                    if (!mHiddenAppsList.contains(info.getIntent())) {
-                        mHiddenAppsList.add(info.getIntent());
+                    if (!mHiddenAppsList.contains(info.getPackageName())) {
+                        mHiddenAppsList.add(info.getPackageName());
                     }
                 } else {
-                    mHiddenAppsList.remove(info.getIntent());
+                    mHiddenAppsList.remove(info.getPackageName());
                 }
             }
         });

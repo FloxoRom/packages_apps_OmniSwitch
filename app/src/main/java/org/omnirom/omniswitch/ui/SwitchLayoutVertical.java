@@ -37,25 +37,19 @@ import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Outline;
-import android.graphics.drawable.Drawable;
 import android.graphics.PixelFormat;
-import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -214,8 +208,10 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
-                String intent = mFavoriteList.get(position);
-                mRecentsManager.startIntentFromtString(intent, true);
+                String packageName = mFavoriteList.get(position);
+                PackageManager.PackageItem packageItem = PackageManager
+                        .getInstance(mContext).getPackageItem(packageName);
+                mRecentsManager.startIntentFromtString(packageItem.getIntent(), true);
             }
         });
         mFavoriteListView.setAdapter(mFavoriteListAdapter);
@@ -225,9 +221,9 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> parent,
                             View view, int position, long id) {
-                        String intent = mFavoriteList.get(position);
+                        String packageName = mFavoriteList.get(position);
                         PackageManager.PackageItem packageItem = PackageManager
-                                .getInstance(mContext).getPackageItem(intent);
+                                .getInstance(mContext).getPackageItem(packageName);
                         handleLongPressFavorite(packageItem, view);
                         return true;
                     }

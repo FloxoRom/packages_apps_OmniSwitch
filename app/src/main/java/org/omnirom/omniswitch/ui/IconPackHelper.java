@@ -50,6 +50,8 @@ public class IconPackHelper implements DialogInterface.OnDismissListener {
     static final String ICON_UPON_TAG = "iconupon";
     static final String ICON_SCALE_TAG = "scale";
 
+    private static final String TAG = "OmniSwitch:IconPackHelper";
+
     public final static String[] sSupportedActions = new String[] {
         "org.adw.launcher.THEMES",
         "com.gau.go.launcherex.theme",
@@ -384,13 +386,13 @@ public class IconPackHelper implements DialogInterface.OnDismissListener {
         return mLoadedIconPackResource;
     }
 
-    public int getResourceIdForActivityIcon(String packageName, CharSequence label) {
+    public int getResourceIdForActivityIcon(String packageName, String activity) {
         // TODO since we are loading in background block access until load ready
         if (!isIconPackLoaded() || mLoading){
             return 0;
         }
         String drawable = mIconPackResources.get(packageName.toLowerCase()
-                + "." + label.toString().toLowerCase());
+                + "." + activity.toLowerCase());
         if (drawable == null) {
             // Icon pack doesn't have an icon for the activity, fallback to package icon
             drawable = mIconPackResources.get(packageName.toLowerCase());
@@ -405,10 +407,6 @@ public class IconPackHelper implements DialogInterface.OnDismissListener {
         return getResourceIdForActivityIcon(info.packageName, info.name);
     }
 
-    public int getResourceIdForApp(String pkgName) {
-        return getResourceIdForActivityIcon(pkgName, "");
-    }
-
     static class IconPackInfo {
         String packageName;
         CharSequence label;
@@ -418,9 +416,6 @@ public class IconPackHelper implements DialogInterface.OnDismissListener {
             packageName = r.activityInfo.packageName;
             icon = r.loadIcon(packageManager);
             label = r.loadLabel(packageManager);
-        }
-
-        IconPackInfo(){
         }
 
         public IconPackInfo(String label, Drawable icon, String packageName) {

@@ -91,7 +91,7 @@ public class AppDrawerView extends GridView {
             } else {
                 item.setText("");
             }
-            Drawable d = BitmapCache.getInstance(mContext).getPackageIconCached(getResources(), packageItem, mConfiguration);
+            Drawable d = BitmapCache.getInstance(getContext()).getPackageIconCached(getResources(), packageItem, mConfiguration);
             d.setBounds(0, 0, mConfiguration.mIconSizePx, mConfiguration.mIconSizePx);
             item.setCompoundDrawables(null, d, null, null);
             return item;
@@ -100,12 +100,12 @@ public class AppDrawerView extends GridView {
 
     public AppDrawerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mConfiguration = SwitchConfiguration.getInstance(mContext);
-        mLabelFont = Utils.getAppLabelFont(mContext);
+        mConfiguration = SwitchConfiguration.getInstance(getContext());
+        mLabelFont = Utils.getAppLabelFont(getContext());
 
         mFilteredPackagesList = new ArrayList<PackageManager.PackageItem>();
         updateHiddenAppsList();
-        mAppDrawerListAdapter = new AppDrawerListAdapter(mContext,
+        mAppDrawerListAdapter = new AppDrawerListAdapter(getContext(),
                 android.R.layout.simple_list_item_single_choice, mFilteredPackagesList);
         setAdapter(mAppDrawerListAdapter);
         updateLayout();
@@ -138,9 +138,9 @@ public class AppDrawerView extends GridView {
     }
 
     protected PackageTextView getPackageItemTemplate() {
-        PackageTextView item = new PackageTextView(mContext);
+        PackageTextView item = new PackageTextView(getContext());
         if (mTransparent) {
-            item.setTextColor(mContext.getResources().getColor(R.color.text_color_dark));
+            item.setTextColor(getContext().getResources().getColor(R.color.text_color_dark));
             item.setShadowLayer(5f, 0, 0, Color.BLACK);
         } else {
             item.setTextColor(mConfiguration.getCurrentTextTint(mConfiguration.getViewBackgroundColor()));
@@ -167,7 +167,7 @@ public class AppDrawerView extends GridView {
             Log.d(TAG, "updatePrefs " + key);
         }
         if (key != null && key.equals(SettingsActivity.PREF_SYSTEM_FONT)) {
-            mLabelFont = Utils.getAppLabelFont(mContext);
+            mLabelFont = Utils.getAppLabelFont(getContext());
         }
         if (key != null && Utils.isPrefKeyForForceUpdate(key)) {
             setAdapter(mAppDrawerListAdapter);
@@ -208,7 +208,7 @@ public class AppDrawerView extends GridView {
         if (mRecentsManager != null) {
             mRecentsManager.startIntentFromtString(packageItem.getIntent(), true);
         } else {
-            SwitchManager.startIntentFromtString(mContext, packageItem.getIntent());
+            SwitchManager.startIntentFromtString(getContext(), packageItem.getIntent());
         }
     }
 
@@ -218,7 +218,7 @@ public class AppDrawerView extends GridView {
     }
 
     private void handleLongPressAppDrawer(final PackageManager.PackageItem packageItem, View view) {
-        ContextMenuUtils.handleLongPressAppDrawer(mContext, packageItem,
+        ContextMenuUtils.handleLongPressAppDrawer(getContext(), packageItem,
                 mRecentsManager, view);
     }
 
@@ -229,10 +229,10 @@ public class AppDrawerView extends GridView {
         }
         mFilteredPackagesList.clear();
 
-        Iterator<PackageManager.PackageItem> nextApp = PackageManager.getInstance(mContext).getPackageList().iterator();
+        Iterator<PackageManager.PackageItem> nextApp = PackageManager.getInstance(getContext()).getPackageList().iterator();
         while (nextApp.hasNext()) {
             PackageManager.PackageItem app = nextApp.next();
-            if (!hiddenAppsList.contains(app.getIntent())) {
+            if (!hiddenAppsList.contains(app.getPackageName())) {
                 mFilteredPackagesList.add(app);
             }
         }

@@ -93,8 +93,8 @@ public class FavoriteDialog extends AlertDialog implements
                 holder.image = (ImageView) convertView
                             .findViewById(R.id.app_icon);
             }
-            String intent = mFavoriteList.get(position);
-            PackageManager.PackageItem packageItem = PackageManager.getInstance(getContext()).getPackageItem(intent);
+            String packageName = mFavoriteList.get(position);
+            PackageManager.PackageItem packageItem = PackageManager.getInstance(getContext()).getPackageItem(packageName);
             holder.item.setText(packageItem.getTitle());
             Drawable d = BitmapCache.getInstance(getContext())
                         .getPackageIconCached(getContext().getResources(), packageItem,
@@ -174,8 +174,8 @@ public class FavoriteDialog extends AlertDialog implements
                 .setDropListener(new DragSortListView.DropListener() {
                     @Override
                     public void drop(int from, int to) {
-                        String intent = mFavoriteList.remove(from);
-                        mFavoriteList.add(to, intent);
+                        String packageName = mFavoriteList.remove(from);
+                        mFavoriteList.add(to, packageName);
                         mFavoriteAdapter.notifyDataSetChanged();
                     }
                 });
@@ -282,8 +282,7 @@ public class FavoriteDialog extends AlertDialog implements
 
             @Override
             public long getItemId(int position) {
-                // intent is guaranteed to be unique in mInstalledPackages
-                return mInstalledPackages.get(position).getIntent().hashCode();
+                return mInstalledPackages.get(position).getPackageName().hashCode();
             }
 
             @Override
@@ -311,7 +310,7 @@ public class FavoriteDialog extends AlertDialog implements
                         mConfiguration);
                 holder.image.setImageDrawable(d.mutate());
                 holder.check.setChecked(mChangedFavoriteListSet
-                        .contains(applicationInfo.getIntent()));
+                        .contains(applicationInfo.getPackageName()));
 
                 return convertView;
             }
@@ -362,13 +361,13 @@ public class FavoriteDialog extends AlertDialog implements
                     ViewHolder viewHolder = (ViewHolder) view.getTag();
                     viewHolder.check.setChecked(!viewHolder.check.isChecked());
                     if (viewHolder.check.isChecked()) {
-                        if (!mChangedFavoriteList.contains(info.getIntent())) {
-                            mChangedFavoriteList.add(info.getIntent());
-                            mChangedFavoriteListSet.add(info.getIntent());
+                        if (!mChangedFavoriteList.contains(info.getPackageName())) {
+                            mChangedFavoriteList.add(info.getPackageName());
+                            mChangedFavoriteListSet.add(info.getPackageName());
                         }
                     } else {
-                        mChangedFavoriteList.remove(info.getIntent());
-                        mChangedFavoriteListSet.remove(info.getIntent());
+                        mChangedFavoriteList.remove(info.getPackageName());
+                        mChangedFavoriteListSet.remove(info.getPackageName());
                     }
                 }
             });

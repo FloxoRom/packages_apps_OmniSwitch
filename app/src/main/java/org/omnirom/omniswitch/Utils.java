@@ -17,20 +17,12 @@
  */
 package org.omnirom.omniswitch;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
-import android.app.ActivityTaskManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.pm.ResolveInfo;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -40,9 +32,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.PatternMatcher;
 import android.os.RemoteException;
-import android.os.ServiceManager;
 import android.os.SystemClock;
-import android.os.SystemProperties;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
@@ -52,22 +42,23 @@ import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
-import android.view.WindowManagerGlobal;
-import android.view.WindowManager;
-import static android.view.WindowManager.DOCKED_INVALID;
-import com.android.internal.statusbar.IStatusBarService;
 
+import org.omnirom.omniswitch.launcher.Launcher;
+
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import org.omnirom.omniswitch.launcher.Launcher;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class Utils {
-
+    private static final String TAG = "OmniSwitch:Utils";
     private static final HashSet<String> mForceUpdateKeys = new HashSet<>();
+
     static {
         mForceUpdateKeys.add(SettingsActivity.PREF_BG_STYLE);
         mForceUpdateKeys.add(SettingsActivity.PREF_SHOW_LABELS);
@@ -79,12 +70,12 @@ public class Utils {
     }
 
     public static void parseCollection(String listString,
-            Collection<String> list) {
-        if (listString.length() == 0){
+                                       Collection<String> list) {
+        if (listString.length() == 0) {
             return;
         }
 
-        if (listString.indexOf("##") == -1){
+        if (listString.indexOf("##") == -1) {
             list.add(listString);
             return;
         }
@@ -107,10 +98,10 @@ public class Utils {
         return buffer.toString();
     }
 
-    public static Map<Integer, Boolean> buttonStringToMap(String buttonString, String defaultButtonString){
+    public static Map<Integer, Boolean> buttonStringToMap(String buttonString, String defaultButtonString) {
         Map<Integer, Boolean> buttons = new LinkedHashMap<Integer, Boolean>();
         String[] splitParts = buttonString.split(",");
-        for(int i = 0; i < splitParts.length; i++){
+        for (int i = 0; i < splitParts.length; i++) {
             String[] buttonParts = splitParts[i].split(":");
             Integer key = Integer.valueOf(buttonParts[0]);
             boolean value = buttonParts[1].equals("1") ? true : false;
@@ -118,8 +109,8 @@ public class Utils {
         }
         // add any entries that are more in the default
         String[] splitPartsDefault = defaultButtonString.split(",");
-        if (splitPartsDefault.length > splitParts.length){
-            for(int i = splitParts.length; i < splitPartsDefault.length; i++){
+        if (splitPartsDefault.length > splitParts.length) {
+            for (int i = splitParts.length; i < splitPartsDefault.length; i++) {
                 String[] buttonParts = splitPartsDefault[i].split(":");
                 Integer key = Integer.valueOf(buttonParts[0]);
                 boolean value = buttonParts[1].equals("1") ? true : false;
@@ -129,19 +120,19 @@ public class Utils {
         return buttons;
     }
 
-    public static String buttonMapToString(Map<Integer, Boolean> buttons){
+    public static String buttonMapToString(Map<Integer, Boolean> buttons) {
         String buttonString = "";
         Iterator<Integer> nextBoolean = buttons.keySet().iterator();
-        while(nextBoolean.hasNext()){
+        while (nextBoolean.hasNext()) {
             Integer key = nextBoolean.next();
             boolean value = buttons.get(key);
-            if (value){
-                buttonString = buttonString + key +":1,";
+            if (value) {
+                buttonString = buttonString + key + ":1,";
             } else {
                 buttonString = buttonString + key + ":0,";
             }
         }
-        if(buttonString.length() > 0){
+        if (buttonString.length() > 0) {
             buttonString = buttonString.substring(0, buttonString.length() - 1);
         }
         return buttonString;
@@ -152,23 +143,25 @@ public class Utils {
         long now = SystemClock.uptimeMillis();
 
         final KeyEvent downEvent = new KeyEvent(now, now, KeyEvent.ACTION_DOWN,
-              keyCode, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
-              KeyEvent.FLAG_FROM_SYSTEM | KeyEvent.FLAG_VIRTUAL_HARD_KEY, InputDevice.SOURCE_CLASS_BUTTON);
+                keyCode, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
+                KeyEvent.FLAG_FROM_SYSTEM | KeyEvent.FLAG_VIRTUAL_HARD_KEY, InputDevice.SOURCE_CLASS_BUTTON);
         final KeyEvent upEvent = KeyEvent.changeAction(downEvent,
-              KeyEvent.ACTION_UP);
+                KeyEvent.ACTION_UP);
 
         // add a small delay to make sure everything behind got focus
-        handler.postDelayed(new Runnable(){
+        handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                im.injectInputEvent(downEvent,InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
-            }}, 100);
+                im.injectInputEvent(downEvent, InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
+            }
+        }, 100);
 
-        handler.postDelayed(new Runnable(){
+        handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 im.injectInputEvent(upEvent, InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
-            }}, 150);
+            }
+        }, 150);
     }
 
     public static void toggleImmersiveMode(Context context) {
@@ -179,8 +172,8 @@ public class Utils {
                 Settings.System.IMMERSIVE_MODE, !immersive ? 1 : 0);*/
     }
 
-    public static void removeFromFavorites(Context context, String item, List<String> favoriteList) {
-        if (favoriteList.contains(item)){
+    private static void removeFromFavorites(Context context, String item, List<String> favoriteList) {
+        if (favoriteList.contains(item)) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             favoriteList.remove(item);
             prefs.edit().putString(SettingsActivity.PREF_FAVORITE_APPS,
@@ -188,8 +181,18 @@ public class Utils {
         }
     }
 
-    public static void addToFavorites(Context context, String item, List<String> favoriteList) {
-        if (!favoriteList.contains(item)){
+    public static void removeFromFavoritesWithPackageName(Context context, String packageName, List<String> favoriteList) {
+        if (favoriteList.contains(packageName)) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            favoriteList.remove(packageName);
+            prefs.edit().putString(SettingsActivity.PREF_FAVORITE_APPS,
+                    Utils.flattenCollection(favoriteList)).commit();
+        }
+    }
+
+
+    private static void addToFavorites(Context context, String item, List<String> favoriteList) {
+        if (!favoriteList.contains(item)) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             favoriteList.add(item);
             prefs.edit().putString(SettingsActivity.PREF_FAVORITE_APPS,
@@ -197,19 +200,29 @@ public class Utils {
         }
     }
 
+    public static void addToFavoritesWithPackageName(Context context, String packageName, List<String> favoriteList) {
+        if (!favoriteList.contains(packageName)) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            favoriteList.add(packageName);
+            prefs.edit().putString(SettingsActivity.PREF_FAVORITE_APPS,
+                    Utils.flattenCollection(favoriteList)).commit();
+        }
+    }
+
+
     public static boolean isLockToAppEnabled(Context context) {
         try {
             return Settings.System.getInt(context.getContentResolver(), Settings.System.LOCK_TO_APP_ENABLED)
-                != 0;
+                    != 0;
         } catch (SettingNotFoundException e) {
             return false;
         }
     }
 
-     public static boolean isInLockTaskMode() {
+    public static boolean isInLockTaskMode() {
         try {
             return ActivityManagerNative.getDefault().isInLockTaskMode();
-        } catch(RemoteException e) {
+        } catch (RemoteException e) {
         }
         return false;
     }
@@ -221,7 +234,7 @@ public class Utils {
     }
 
     public static boolean isDockingAvailable(Context context, final List<TaskDescription> tasks) {
-        for (TaskDescription ad : tasks){
+        for (TaskDescription ad : tasks) {
             if (ad.isMultiWindowMode()) {
                 return false;
             }
@@ -232,18 +245,6 @@ public class Utils {
     public static void updateFavoritesList(Context context, SwitchConfiguration config, List<String> favoriteList) {
         favoriteList.clear();
         favoriteList.addAll(config.mFavoriteList);
-
-        /*List<String> fList = new ArrayList<String>();
-        fList.addAll(favoriteList);
-        Iterator<String> nextFavorite = fList.iterator();
-        while (nextFavorite.hasNext()) {
-            String intent = nextFavorite.next();
-            PackageManager.PackageItem packageItem = PackageManager
-                    .getInstance(context).getPackageItem(intent);
-            if (packageItem == null) {
-                favoriteList.remove(intent);
-            }
-        }*/
     }
 
     public static boolean isPrefKeyForForceUpdate(String key) {
@@ -254,16 +255,16 @@ public class Utils {
         final android.content.pm.PackageManager pm = context.getPackageManager();
         pm.setComponentEnabledSetting(new ComponentName(context, Launcher.class),
                 value ? android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
-                android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 0);
+                        android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 0);
     }
 
     public static List<String> getFavoriteListFromStats(Context context, int count) {
         List<String> favoriteList = new ArrayList<String>();
         List<String> topLaunchList = SwitchStatistics.getInstance(context).getTopmostLaunches(count);
         for (String pkgName : topLaunchList) {
-            List<String> pkgList = PackageManager.getInstance(context).getPackageListForPackageName(pkgName);
-            if (pkgList.size() != 0) {
-                favoriteList.addAll(pkgList);
+            PackageManager.PackageItem item = PackageManager.getInstance(context).getPackageItem(pkgName);
+            if (item != null) {
+                favoriteList.add(pkgName);
             }
         }
         return favoriteList;
@@ -282,7 +283,7 @@ public class Utils {
     }
 
     public static void removedFromLockedApps(Context context, String packageName, List<String> appsList) {
-        if (appsList.contains(packageName)){
+        if (appsList.contains(packageName)) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             appsList.remove(packageName);
             prefs.edit().putString(SettingsActivity.PREF_LOCKED_APPS_LIST,
@@ -291,7 +292,7 @@ public class Utils {
     }
 
     public static void addToLockedApps(Context context, String packageName, List<String> appsList) {
-        if (!appsList.contains(packageName)){
+        if (!appsList.contains(packageName)) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             appsList.add(packageName);
             prefs.edit().putString(SettingsActivity.PREF_LOCKED_APPS_LIST,
@@ -300,11 +301,11 @@ public class Utils {
     }
 
     public static void parseLockedApps(String lockedAppsListString, List<String> appsList) {
-        if (lockedAppsListString.length() == 0){
+        if (lockedAppsListString.length() == 0) {
             return;
         }
 
-        if (lockedAppsListString.indexOf(",") == -1){
+        if (lockedAppsListString.indexOf(",") == -1) {
             appsList.add(lockedAppsListString);
             return;
         }
@@ -314,10 +315,19 @@ public class Utils {
         }
     }
 
-    public static void addToHiddenApps(Context context, String item, Collection<String> hiddenAppsList) {
-        if (!hiddenAppsList.contains(item)){
+    private static void addToHiddenApps(Context context, String item, Collection<String> hiddenAppsList) {
+        if (!hiddenAppsList.contains(item)) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             hiddenAppsList.add(item);
+            prefs.edit().putString(SettingsActivity.PREF_HIDDEN_APPS,
+                    Utils.flattenCollection(hiddenAppsList)).commit();
+        }
+    }
+
+    public static void addToHiddenAppsWithPackageName(Context context, String packageName, Collection<String> hiddenAppsList) {
+        if (!hiddenAppsList.contains(packageName)) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            hiddenAppsList.add(packageName);
             prefs.edit().putString(SettingsActivity.PREF_HIDDEN_APPS,
                     Utils.flattenCollection(hiddenAppsList)).commit();
         }
@@ -331,9 +341,9 @@ public class Utils {
         } else if (color == Color.WHITE) {
             return true;
         }
-        int[] rgb = { Color.red(color), Color.green(color), Color.blue(color) };
+        int[] rgb = {Color.red(color), Color.green(color), Color.blue(color)};
         int brightness = (int) Math.sqrt(rgb[0] * rgb[0] * .241 + rgb[1]
-            * rgb[1] * .691 + rgb[2] * rgb[2] * .068);
+                * rgb[1] * .691 + rgb[2] * rgb[2] * .068);
         if (brightness >= 170) {
             return true;
         }
@@ -410,7 +420,7 @@ public class Utils {
 
     public static String getDefaultBodyFont(Context context) {
         TypedArray ta = context.obtainStyledAttributes(android.R.style.TextAppearance_DeviceDefault,
-                new int[]{ android.R.attr.fontFamily });
+                new int[]{android.R.attr.fontFamily});
         String value = ta.getString(0);
         ta.recycle();
         return value;
@@ -424,7 +434,7 @@ public class Utils {
         }
     }
 
-    public static  void toggleTorch(Context context) {
+    public static void toggleTorch(Context context) {
         /*IStatusBarService service = IStatusBarService.Stub.asInterface(ServiceManager.getService("statusbar"));
         if (service != null) {
             try {
@@ -433,5 +443,51 @@ public class Utils {
                 // do nothing.
             }
         }*/
+    }
+
+    public static void convertLegacyAppLists(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (prefs.contains(SettingsActivity.PREF_FAVORITE_APPS_OLD)) {
+            List<String> favoriteIntents = new ArrayList<>();
+            Utils.parseCollection(prefs.getString(SettingsActivity.PREF_FAVORITE_APPS_OLD, ""), favoriteIntents);
+            List<String> favoritePackageNames = new ArrayList<>();
+            favoriteIntents.stream().forEach(new Consumer<String>() {
+                @Override
+                public void accept(String s) {
+                    try {
+                        Intent i = Intent.parseUri(s, 0);
+                        favoritePackageNames.add(i.getComponent().getPackageName());
+                    } catch (URISyntaxException e) {
+                    }
+                }
+            });
+            Log.d(TAG, "convert legacy favorite list old size = " + favoriteIntents.size() + " new = " + favoritePackageNames.size());
+
+            prefs.edit()
+                    .putString(SettingsActivity.PREF_FAVORITE_APPS, Utils.flattenCollection(favoritePackageNames))
+                    .apply();
+            prefs.edit().remove(SettingsActivity.PREF_FAVORITE_APPS_OLD).apply();
+        }
+        if (prefs.contains(SettingsActivity.PREF_HIDDEN_APPS_OLD)) {
+            List<String> hiddenIntents = new ArrayList<>();
+            Utils.parseCollection(prefs.getString(SettingsActivity.PREF_HIDDEN_APPS_OLD, ""), hiddenIntents);
+            List<String> hiddenPackageNames = new ArrayList<>();
+            hiddenIntents.stream().forEach(new Consumer<String>() {
+                @Override
+                public void accept(String s) {
+                    try {
+                        Intent i = Intent.parseUri(s, 0);
+                        hiddenPackageNames.add(i.getComponent().getPackageName());
+                    } catch (URISyntaxException e) {
+                    }
+                }
+            });
+            Log.d(TAG, "convert legacy hidden list old size = " + hiddenIntents.size() + " new = " + hiddenPackageNames.size());
+
+            prefs.edit()
+                    .putString(SettingsActivity.PREF_HIDDEN_APPS, Utils.flattenCollection(hiddenPackageNames))
+                    .apply();
+            prefs.edit().remove(SettingsActivity.PREF_HIDDEN_APPS_OLD).apply();
+        }
     }
 }

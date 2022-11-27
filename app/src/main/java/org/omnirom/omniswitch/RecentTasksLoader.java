@@ -251,7 +251,6 @@ public class RecentTasksLoader {
                         .addCategory(Intent.CATEGORY_HOME).resolveActivityInfo(mPackageManager, 0);
                 boolean isFirstValidTask = true;
                 int preloadTaskNum = 0;
-                final boolean withIconPack = IconPackHelper.getInstance(mContext).isIconPackLoaded();
 
                 for (int i = 0; i < numTasks; ++i) {
                     if (isCancelled()) {
@@ -419,7 +418,7 @@ public class RecentTasksLoader {
             resources = null;
         }
         if (resources != null) {
-            int iconId = getIconPackHelper().getResourceIdForActivityIcon(ti.mPackageName, ti.mLabel);
+            int iconId = getIconPackHelper().getResourceIdForActivityIcon(ti.mPackageName, ti.mIntent.getComponent().getClassName());
             if (iconId != 0) {
                 return IconPackHelper.getInstance(mContext).getIconPackResources().getDrawable(iconId);
             }
@@ -485,7 +484,7 @@ public class RecentTasksLoader {
                 String label = applicationInfo.loadLabel(mPackageManager).toString();
                 Drawable icon = applicationInfo.loadIcon(mPackageManager);
 
-                ti = new ApplicationInfoHolder(td.getPackageName(), label, icon);
+                ti = new ApplicationInfoHolder(td.getPackageName(), label, icon, td.intent);
                 mTaskInfoCache.put(ti.mPackageName, ti);
             }
             final boolean withIconPack = IconPackHelper.getInstance(mContext).isIconPackLoaded();

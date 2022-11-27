@@ -17,24 +17,20 @@
  */
 package org.omnirom.omniswitch;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.LauncherActivityInfo;
 import android.content.pm.LauncherApps;
-import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Process;
-import android.os.UserHandle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.LruCache;
 
 import org.omnirom.omniswitch.ui.BitmapCache;
-import org.omnirom.omniswitch.ui.IconPackHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,11 +45,12 @@ public class PackageManager {
     private static final boolean DEBUG = true;
     private static final String TAG = "OmniSwitch:PackageManager";
 
-    private Map<String, PackageItem> mInstalledPackages;
+    private Map<String, PackageItem> mInstalledPackagesMap;
     private List<PackageItem> mInstalledPackagesList;
     private Context mContext;
     private boolean mInitDone;
     private static PackageManager sInstance;
+    private LauncherApps mLauncherApps;
 
     public static final String PACKAGES_UPDATED_TAG = "PACKAGES_UPDATED";
 
@@ -105,12 +102,13 @@ public class PackageManager {
     }
 
     private PackageManager() {
-        mInstalledPackages = new HashMap<String, PackageItem>();
+        mInstalledPackagesMap = new HashMap<String, PackageItem>();
         mInstalledPackagesList = new ArrayList<PackageItem>();
     }
 
     private void setContext(Context context) {
         mContext = context;
+        mLauncherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
     }
 
     public synchronized List<PackageItem> getPackageList() {
@@ -120,59 +118,46 @@ public class PackageManager {
         return mInstalledPackagesList;
     }
 
-    public synchronized Map<String, PackageItem> getPackageMap() {
-        if (!mInitDone) {
-            updatePackageList();
-        }
-        return mInstalledPackages;
-    }
-
-    public synchronized void clearPackageList() {
-        mInstalledPackages.clear();
-        mInstalledPackagesList.clear();
-        mInitDone = false;
-    }
-
     public synchronized void reloadPackageList() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         boolean old = prefs.getBoolean(PackageManager.PACKAGES_UPDATED_TAG, false);
         updatePackageList();
-        prefs.edit().putBoolean(PackageManager.PACKAGES_UPDATED_TAG, !old).commit();
+        prefs.edit().putBoolean(PackageManager.PACKAGES_UPDATED_TAG, !old).apply();
     }
 
     public synchronized void updatePackageList() {
         if (DEBUG) Log.d(TAG, "updatePackageList");
-        final android.content.pm.PackageManager pm = mContext.getPackageManager();
         Set<String> packageNameList = new HashSet<String>();
 
-        mInstalledPackages.clear();
         mInstalledPackagesList.clear();
+        mInstalledPackagesMap.clear();
 
-        final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        List<ResolveInfo> installedAppsInfo = pm.queryIntentActivities(
-                mainIntent, android.content.pm.PackageManager.ResolveInfoFlags.of(0));
+        List<LauncherActivityInfo> installedAppsInfo2 = mLauncherApps.getActivityList(null, Process.myUserHandle());
+        for (LauncherActivityInfo info : installedAppsInfo2) {
+            ApplicationInfo appInfo = info.getApplicationInfo();
+            ActivityInfo activity = info.getActivityInfo();
 
-        for (ResolveInfo info : installedAppsInfo) {
-            ApplicationInfo appInfo = info.activityInfo.applicationInfo;
             final PackageItem item = new PackageItem();
             item.packageName = appInfo.packageName;
+            if (DEBUG) {
+                if (packageNameList.contains(item.packageName)) {
+                    Log.d(TAG, "duplicate = " + item.packageName + " " + activity.name + " " + activity.packageName);
+                }
+            }
             packageNameList.add(item.packageName);
 
-            ActivityInfo activity = info.activityInfo;
             item.activity = activity;
-            ComponentName name = new ComponentName(
-                    activity.applicationInfo.packageName, activity.name);
+
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_LAUNCHER);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                     | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            intent.setComponent(name);
+            intent.setComponent(info.getComponentName());
             item.intent = intent;
 
-            item.title = appInfo.loadLabel(mContext.getPackageManager());
-            item.icon = appInfo.loadIcon(mContext.getPackageManager());
-            mInstalledPackages.put(item.getIntent(), item);
+            item.title = info.getLabel();
+            item.icon = info.getIcon(0);
+            mInstalledPackagesMap.put(item.getPackageName(), item);
             mInstalledPackagesList.add(item);
         }
 
@@ -189,45 +174,13 @@ public class PackageManager {
         RecentTasksLoader.getInstance(mContext).clearTaskInfoCache();
     }
 
-    public synchronized CharSequence getTitle(String intent) {
-        return getPackageMap().get(intent).getTitle();
-    }
-
-    public synchronized PackageItem getPackageItem(String intent) {
-        return getPackageMap().get(intent);
-    }
-
-    public synchronized PackageItem getPackageItemByComponent(Intent intent) {
-        String pkgName = intent.getComponent().getPackageName();
-
-        Iterator<PackageItem> nextPackage = mInstalledPackagesList.iterator();
-        while (nextPackage.hasNext()) {
-            PackageItem item = nextPackage.next();
-            ComponentName name = item.getIntentRaw().getComponent();
-            String pPkgName = name.getPackageName();
-            if (pkgName.equals(pPkgName)) {
-                return item;
-            }
+    public synchronized PackageItem getPackageItem(String pkgName) {
+        try {
+            return mInstalledPackagesMap.get(pkgName);
+        } catch (NullPointerException e) {
+            Log.d(TAG, "no PackageItem for " + pkgName);
+            throw new RuntimeException("no PackageItem for " + pkgName);
         }
-        return null;
-    }
-
-    public synchronized List<String> getPackageListForPackageName(String pkgName) {
-        List<String> pkgList = new ArrayList<String>();
-        Iterator<PackageItem> nextPackage = mInstalledPackagesList.iterator();
-        while (nextPackage.hasNext()) {
-            PackageItem item = nextPackage.next();
-            ComponentName name = item.getIntentRaw().getComponent();
-            String pPkgName = name.getPackageName();
-            if (pkgName.equals(pPkgName)) {
-                pkgList.add(item.getIntent());
-            }
-        }
-        return pkgList;
-    }
-
-    public synchronized boolean contains(String intent) {
-        return getPackageMap().containsKey(intent);
     }
 
     public void removePackageIconCache(String packageName) {
@@ -246,7 +199,7 @@ public class PackageManager {
         while (nextFavorite.hasNext()) {
             String favorite = nextFavorite.next();
             // DONT USE getPackageMap() here!
-            if (!mInstalledPackages.containsKey(favorite)) {
+            if (!mInstalledPackagesMap.containsKey(favorite)) {
                 changed = true;
                 continue;
             }
@@ -255,7 +208,7 @@ public class PackageManager {
         if (changed) {
             prefs.edit()
                     .putString(SettingsActivity.PREF_FAVORITE_APPS, Utils.flattenCollection(newFavoriteList))
-                    .commit();
+                    .apply();
         }
     }
 
@@ -279,7 +232,7 @@ public class PackageManager {
         if (changed) {
             prefs.edit()
                     .putString(SettingsActivity.PREF_LOCKED_APPS_LIST, TextUtils.join(",", newAppsList))
-                    .commit();
+                    .apply();
         }
     }
 
@@ -295,7 +248,7 @@ public class PackageManager {
         while (nextHiddenApp.hasNext()) {
             String hiddenApp = nextHiddenApp.next();
             // DONT USE getPackageMap() here!
-            if (!mInstalledPackages.containsKey(hiddenApp)) {
+            if (!mInstalledPackagesMap.containsKey(hiddenApp)) {
                 changed = true;
                 continue;
             }
@@ -304,7 +257,7 @@ public class PackageManager {
         if (changed) {
             prefs.edit()
                     .putString(SettingsActivity.PREF_HIDDEN_APPS, Utils.flattenCollection(newHiddenAppsList))
-                    .commit();
+                    .apply();
         }
     }
 

@@ -88,15 +88,15 @@ public class ContextMenuUtils {
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.package_inspect_item) {
-                    final String packageName = packageItem.getActivityInfo().packageName;
+                    final String packageName = packageItem.getPackageName();
                     if (recentsManager != null) {
                         recentsManager.startApplicationDetailsActivity(packageName);
                     } else {
                         SwitchManager.startApplicationDetailsActivity(context, packageName);
                     }
                 } else if (item.getItemId() == R.id.package_remove_favorite) {
-                    Utils.removeFromFavorites(context,
-                            packageItem.getIntent(), favoriteList);
+                    Utils.removeFromFavoritesWithPackageName(context,
+                            packageItem.getPackageName(), favoriteList);
                 } else {
                     ShortcutInfo sc = scMap.get(item.getItemId());
                     if (sc != null) {
@@ -133,7 +133,7 @@ public class ContextMenuUtils {
         popup.getMenuInflater().inflate(R.menu.package_popup_menu,
                 popup.getMenu());
         final List<String> favoritList = configuration.mFavoriteList;
-        boolean addFavEnabled = !favoritList.contains(packageItem.getIntent());
+        boolean addFavEnabled = !favoritList.contains(packageItem.getPackageName());
         if (!addFavEnabled) {
             popup.getMenu().removeItem(R.id.package_add_favorite);
         }
@@ -160,17 +160,17 @@ public class ContextMenuUtils {
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.package_inspect_item) {
-                    final String packageName = packageItem.getActivityInfo().packageName;
+                    final String packageName = packageItem.getPackageName();
                     if (recentsManager != null) {
                         recentsManager.startApplicationDetailsActivity(packageName);
                     } else {
                         SwitchManager.startApplicationDetailsActivity(context, packageName);
                     }
                 } else if (item.getItemId() == R.id.package_add_favorite) {
-                    Utils.addToFavorites(context, packageItem.getIntent(),
+                    Utils.addToFavoritesWithPackageName(context, packageItem.getPackageName(),
                             favoritList);
                 } else if (item.getItemId() == R.id.package_add_hidden_app) {
-                    Utils.addToHiddenApps(context, packageItem.getIntent(),
+                    Utils.addToHiddenAppsWithPackageName(context, packageItem.getPackageName(),
                             configuration.mHiddenAppsList);
                 } else {
                     ShortcutInfo sc = scMap.get(item.getItemId());

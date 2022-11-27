@@ -1,5 +1,6 @@
 package org.omnirom.omniswitch;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ class ApplicationInfoHolder
     String mPackageName;
     Drawable mIcon;
     CharSequence mLabel;
+    Intent mIntent;
 
     @Override
     public int hashCode() {
@@ -27,11 +29,10 @@ class ApplicationInfoHolder
         return mPackageName + " " + mLabel;
     }
 
-    public ApplicationInfoHolder(String packaName, CharSequence label, Drawable icon) {
-        mPackageName = packaName;
+    public ApplicationInfoHolder(String packageName, CharSequence label, Drawable icon, Intent intent) {
+        mPackageName = packageName;
         mLabel = label;
         mIcon = icon;
+        mIntent = intent;
     }
-
-
 }

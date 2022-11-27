@@ -283,6 +283,8 @@ public class SwitchConfiguration {
             mBgStyle = BgStyle.SOLID_DARK;
         }
 
+        Utils.convertLegacyAppLists(mContext);
+
         mFavoriteList.clear();
         String favoriteListString = prefs.getString(SettingsActivity.PREF_FAVORITE_APPS, "");
         Utils.parseCollection(favoriteListString, mFavoriteList);

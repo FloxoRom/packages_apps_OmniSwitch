@@ -78,7 +78,8 @@ public class SettingsActivity extends PreferenceActivity implements
     public static final String PREF_SHOW_RAMBAR = "show_rambar";
     public static final String PREF_SHOW_LABELS = "show_labels";
     private static final String PREF_FAVORITE_APPS_CONFIG = "favorite_apps_config";
-    public static final String PREF_FAVORITE_APPS = "favorite_apps";
+    public static final String PREF_FAVORITE_APPS = "favorite_apps_new";
+    public static final String PREF_FAVORITE_APPS_OLD = "favorite_apps";
     public static final String PREF_HANDLE_POS_START_RELATIVE = "handle_pos_start_relative";
     public static final String PREF_HANDLE_HEIGHT = "handle_height";
     public static final String PREF_BUTTON_CONFIG = "button_config";
@@ -116,7 +117,8 @@ public class SettingsActivity extends PreferenceActivity implements
     public static final String PREF_COLOR_CHANGED ="color_changed";
     public static final String PREF_BLOCK_APPS_ON_SPLITSCREEN = "block_apps_on_splitscreen";
     private static final String PREF_HIDDEN_APPS_CONFIG = "hidden_apps_config";
-    public static final String PREF_HIDDEN_APPS = "hidden_apps";
+    public static final String PREF_HIDDEN_APPS = "hidden_apps_new";
+    public static final String PREF_HIDDEN_APPS_OLD = "hidden_apps";
     public static final String PREF_COLOR_TASK_HEADER = "color_task_header";
     public static final String PREF_BOTTOM_FAVORITES = "bottom_favorites";
     public static final String PREF_BUTTON_HIDE = "button_hide";
