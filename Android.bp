@@ -32,9 +32,9 @@ android_app {
         "androidx.core_core",
         "androidx.appcompat_appcompat",
         "androidx.preference_preference",
-        "androidx.lifecycle_lifecycle-runtime",
-        "androidx.lifecycle_lifecycle-runtime-ktx",
         "com.google.android.material_material",
+        "OmniLib",
+        "OmniLibCore",
         "OmniPreferenceTheme"
     ],
     kotlincflags: ["-Xjvm-default=enable"],

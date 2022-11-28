@@ -17,7 +17,6 @@
  */
 package org.omnirom.omniswitch.ui;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,7 +25,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.preference.Preference;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,44 +43,30 @@ import java.util.Map;
 
 import org.omnirom.omniswitch.R;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.Preference;
 
-public class IconPackPreference extends Preference {
 
-    private final PackageManager pm;
-
-    public IconPackPreference(Context context) {
-        this(context, null);
-    }
-
+public class IconPackPreference  extends  Preference {
     public IconPackPreference(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        super(context, attrs);
     }
 
     public IconPackPreference(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setLayoutResource(R.layout.preference_iconpack);
-        pm = context.getPackageManager();
     }
 
-    @Override
-    protected View onCreateView(ViewGroup parent) {
-        init();
-        return super.onCreateView(parent);
-    }
-
-    private void init() {
+    public void init() {
         String currentPack = getPersistedString("");
-        if (currentPack.isEmpty()) {
-            setNone();
-        } else {
+        if (!currentPack.isEmpty()) {
             try {
-                ApplicationInfo info = pm.getApplicationInfo(currentPack, 0);
-                setIcon(info.loadIcon(pm));
-                setSummary(info.loadLabel(pm));
+                ApplicationInfo info = getContext().getPackageManager().getApplicationInfo(currentPack, 0);
+                setIcon(info.loadIcon(getContext().getPackageManager()));
+                setSummary(info.loadLabel(getContext().getPackageManager()));
             } catch (PackageManager.NameNotFoundException e) {
-                setNone();
-                persistString("");
             }
+        } else {
+            setNone();
         }
     }
 
@@ -91,13 +75,7 @@ public class IconPackPreference extends Preference {
         setSummary("None");
     }
 
-    @Override
-    protected void onClick() {
-        super.onClick();
-        showDialog();
-    }
-
-    protected void showDialog() {
+    public void showDialog() {
         final Map<String, IconPackInfo> packages = loadAvailableIconPacks();
         final IconAdapter adapter = new IconAdapter(getContext(), packages, getPersistedString(""));
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -121,6 +99,7 @@ public class IconPackPreference extends Preference {
     private Map<String, IconPackInfo> loadAvailableIconPacks() {
         Map<String, IconPackInfo> iconPacks = new HashMap<>();
         List<ResolveInfo> list;
+        PackageManager pm = getContext().getPackageManager();
         list = pm.queryIntentActivities(new Intent("com.novalauncher.THEME"), 0);
         list.addAll(pm.queryIntentActivities(new Intent("org.adw.launcher.icons.ACTION_PICK_ICON"), 0));
         list.addAll(pm.queryIntentActivities(new Intent("com.dlto.atom.launcher.THEME"), 0));

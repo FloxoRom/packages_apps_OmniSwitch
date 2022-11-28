@@ -17,40 +17,32 @@
  */
 package org.omnirom.omniswitch.ui;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
-
-import org.omnirom.omniswitch.PackageManager;
-import org.omnirom.omniswitch.PackageManager.PackageItem;
-import org.omnirom.omniswitch.R;
-import org.omnirom.omniswitch.IEditFavoriteActivity;
-import org.omnirom.omniswitch.SwitchConfiguration;
-import org.omnirom.omniswitch.dslv.DragSortController;
-import org.omnirom.omniswitch.dslv.DragSortListView;
-
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
-import android.graphics.Point;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.omnirom.omniswitch.IEditFavoriteActivity;
+import org.omnirom.omniswitch.PackageManager;
+import org.omnirom.omniswitch.PackageManager.PackageItem;
+import org.omnirom.omniswitch.R;
+import org.omnirom.omniswitch.SwitchConfiguration;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import androidx.appcompat.app.AlertDialog;
 
 public class HiddenAppsDialog extends AlertDialog implements
         DialogInterface.OnClickListener {

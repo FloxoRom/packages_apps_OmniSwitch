@@ -17,8 +17,8 @@
 -->
 <resources>
     <dimen name="drag_handle_height">25dp</dimen>
-    <dimen name="color_button_width">18dp</dimen>
-    <dimen name="color_button_height">18dp</dimen>
+    <dimen name="color_button_width">28dp</dimen>
+    <dimen name="color_button_height">28dp</dimen>
     <dimen name="drag_grip_ridge_size">6dp</dimen>
     <dimen name="drag_grip_ridge_gap">4dp</dimen>
     <dimen name="thumbnail_width">140dp</dimen>
@@ -33,4 +33,5 @@
     <dimen name="top_widget_padding">10dp</dimen>
     <dimen name="top_widget_height">100dp</dimen>
     <dimen name="app_drawer_height_horizontal">300dp</dimen>
+    <dimen name="content_side_margin">6dp</dimen>
 </resources>

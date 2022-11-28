@@ -22,7 +22,6 @@ import java.util.Locale;
 import org.omnirom.omniswitch.R;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
@@ -34,6 +33,8 @@ import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
+import androidx.appcompat.app.AlertDialog;
 
 public class ColorPickerDialog extends AlertDialog implements
         ColorPickerView.OnColorChangedListener, TextWatcher,

@@ -154,4 +154,23 @@
         <item>@string/icon_shape_teardrop</item>
         <item>@string/icon_shape_rounded_square</item>
     </string-array>
+
+    <string-array name="speed_switch_items_entries" translatable="false">
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+    </string-array>
+    <string-array name="speed_switch_items_values" translatable="false">
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+    </string-array>
 </resources>

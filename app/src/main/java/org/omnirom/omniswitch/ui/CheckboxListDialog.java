@@ -17,17 +17,6 @@
  */
 package org.omnirom.omniswitch.ui;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.omnirom.omniswitch.R;
-import org.omnirom.omniswitch.dslv.DragSortController;
-import org.omnirom.omniswitch.dslv.DragSortListView;
-
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Point;
@@ -43,6 +32,18 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.omnirom.omniswitch.R;
+import org.omnirom.omniswitch.dslv.DragSortController;
+import org.omnirom.omniswitch.dslv.DragSortListView;
+
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import androidx.appcompat.app.AlertDialog;
 
 public class CheckboxListDialog extends AlertDialog implements
         DialogInterface.OnClickListener {
@@ -62,7 +63,10 @@ public class CheckboxListDialog extends AlertDialog implements
 
     public interface ApplyRunnable {
         public void apply(Map<Integer, Boolean> buttons);
-    };
+    }
+
+    ;
+
     private class CheckboxListAdapter extends ArrayAdapter<String> {
 
         public CheckboxListAdapter(Context context, List<String> values) {
@@ -73,26 +77,26 @@ public class CheckboxListDialog extends AlertDialog implements
         public View getView(int position, View convertView, ViewGroup parent) {
             View rowView = mInflater.inflate(R.layout.checkbox_item, parent, false);
 
-            final TextView item = (TextView)rowView.findViewById(R.id.item_text);
+            final TextView item = (TextView) rowView.findViewById(R.id.item_text);
             int orderPosition = getPositionOfItem(position, mCheckedItems);
             item.setText(mListItems[orderPosition]);
 
-            final CheckBox check = (CheckBox)rowView.findViewById(R.id.item_check);
+            final CheckBox check = (CheckBox) rowView.findViewById(R.id.item_check);
             check.setChecked(mCheckedItems.get(orderPosition));
 
-            final ImageView image = (ImageView)rowView.findViewById(R.id.item_image);
+            final ImageView image = (ImageView) rowView.findViewById(R.id.item_image);
             image.setImageDrawable(mListImages[orderPosition]);
 
             return rowView;
-        }   
+        }
     }
 
     private int getPositionOfItem(int position, Map<Integer, Boolean> buttons) {
         int i = 0;
         Iterator<Integer> nextKey = buttons.keySet().iterator();
-        while(nextKey.hasNext()){
+        while (nextKey.hasNext()) {
             Integer key = nextKey.next();
-            if (i == position){
+            if (i == position) {
                 return key;
             }
             i++;
@@ -103,9 +107,9 @@ public class CheckboxListDialog extends AlertDialog implements
     private void setValueAtPosition(int position, Map<Integer, Boolean> buttons, boolean value) {
         int i = 0;
         Iterator<Integer> nextKey = buttons.keySet().iterator();
-        while(nextKey.hasNext()){
+        while (nextKey.hasNext()) {
             Integer key = nextKey.next();
-            if (i == position){
+            if (i == position) {
                 buttons.put(key, value);
                 break;
             }
@@ -116,9 +120,9 @@ public class CheckboxListDialog extends AlertDialog implements
     private Boolean getValueAtPosition(int position, Map<Integer, Boolean> buttons) {
         int i = 0;
         Iterator<Integer> nextKey = buttons.keySet().iterator();
-        while(nextKey.hasNext()){
+        while (nextKey.hasNext()) {
             Integer key = nextKey.next();
-            if (i == position){
+            if (i == position) {
                 return buttons.get(key);
             }
             i++;
@@ -139,7 +143,7 @@ public class CheckboxListDialog extends AlertDialog implements
 
         @Override
         public void onDragFloatView(View floatView, Point floatPoint,
-                Point touchPoint) {
+                                    Point touchPoint) {
             floatView.setLayoutParams(params);
             mCheckboxListView.setFloatAlpha(0.8f);
         }
@@ -171,7 +175,7 @@ public class CheckboxListDialog extends AlertDialog implements
     private void applyChanges() {
         mApplyRunnable.apply(mCheckedItems);
     }
-    
+
     @Override
     public void onClick(DialogInterface dialog, int which) {
         if (which == DialogInterface.BUTTON_POSITIVE) {
@@ -204,9 +208,9 @@ public class CheckboxListDialog extends AlertDialog implements
         mCheckboxListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
-                    int position, long id) {
+                                    int position, long id) {
                 Boolean value = getValueAtPosition(position, mCheckedItems);
-                if (value != null){
+                if (value != null) {
                     setValueAtPosition(position, mCheckedItems, !value);
                     mListAdapter.notifyDataSetChanged();
                 }
@@ -224,25 +228,25 @@ public class CheckboxListDialog extends AlertDialog implements
                         Integer fromKey = null;
                         Boolean fromValue = null;
                         int i = 0;
-                        while(nextKey.hasNext()){
+                        while (nextKey.hasNext()) {
                             Integer key = nextKey.next();
                             Boolean value = mCheckedItems.get(key);
-                            if (i == from){
+                            if (i == from) {
                                 fromKey = key;
                                 fromValue = value;
                                 break;
                             }
                             i++;
                         }
-                        if (fromKey != null && fromValue != null){
+                        if (fromKey != null && fromValue != null) {
                             nextKey = mCheckedItems.keySet().iterator();
                             i = 0;
                             boolean added = false;
-                            while(nextKey.hasNext()){
+                            while (nextKey.hasNext()) {
                                 Integer key = nextKey.next();
                                 Boolean value = mCheckedItems.get(key);
-                                if (i == to && to != mCheckedItems.size() - 1){
-                                    if (to > from){
+                                if (i == to && to != mCheckedItems.size() - 1) {
+                                    if (to > from) {
                                         newItems.put(key, value);
                                         newItems.put(fromKey, fromValue);
                                         added = true;
@@ -251,7 +255,7 @@ public class CheckboxListDialog extends AlertDialog implements
                                     }
                                     newItems.put(fromKey, fromValue);
                                     added = true;
-                                } else if (i == from){
+                                } else if (i == from) {
                                     i++;
                                     continue;
                                 }
@@ -259,7 +263,7 @@ public class CheckboxListDialog extends AlertDialog implements
                                 i++;
                             }
                             // added at the end
-                            if (!added){
+                            if (!added) {
                                 newItems.put(fromKey, fromValue);
                             }
                             mCheckedItems.clear();

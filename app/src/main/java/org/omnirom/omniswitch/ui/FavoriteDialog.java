@@ -31,7 +31,6 @@ import org.omnirom.omniswitch.SwitchConfiguration;
 import org.omnirom.omniswitch.dslv.DragSortController;
 import org.omnirom.omniswitch.dslv.DragSortListView;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
@@ -50,6 +49,8 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 
 public class FavoriteDialog extends AlertDialog implements
         DialogInterface.OnClickListener, DialogInterface.OnDismissListener {

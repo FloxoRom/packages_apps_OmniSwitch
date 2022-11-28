@@ -17,7 +17,6 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -43,6 +42,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ListView;
 import android.util.Log;
+
+import androidx.appcompat.app.AlertDialog;
 
 public class IconPackHelper implements DialogInterface.OnDismissListener {
     static final String ICON_MASK_TAG = "iconmask";

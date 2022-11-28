@@ -23,7 +23,6 @@ import org.omnirom.omniswitch.SettingsActivity;
 import org.omnirom.omniswitch.SwitchConfiguration;
 import org.omnirom.omniswitch.SwitchService;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -49,6 +48,10 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Switch;
+
+import androidx.appcompat.app.AlertDialog;
+
 
 public class SettingsGestureView implements DialogInterface.OnDismissListener {
     private WindowManager mWindowManager;
@@ -86,7 +89,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
     private ImageView mDragHandleColorView;
     private View mDragHandleColorContainer;
     private Dialog mDialog;
-    private CheckBox mDragHandleDynamicColor;
+    private Switch mDragHandleDynamicColor;
 
     public SettingsGestureView(Context context) {
         mContext = context;
@@ -334,7 +337,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
             }
         });
 
-        mDragHandleDynamicColor = (CheckBox) mView.findViewById(R.id.drag_handle_dynamic_color);
+        mDragHandleDynamicColor = mView.findViewById(R.id.drag_handle_dynamic_color);
         mDragHandleDynamicColor.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 mDragHandleColorContainer.setEnabled(!mDragHandleDynamicColor.isChecked());

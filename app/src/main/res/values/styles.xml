@@ -27,7 +27,26 @@
         <item name="android:textAppearanceLargePopupMenu">@style/TextAppearancePopupMenuCondensed</item>
         <item name="android:textAppearanceSmallPopupMenu">@style/TextAppearancePopupMenuCondensed</item>
     </style>
-    <style name="SettingsTheme" parent="@android:style/Theme.DeviceDefault.Settings"></style>
+
+    <style name="SettingsTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+        <item name="android:windowLightNavigationBar">?attr/isLightTheme</item>
+        <item name="preferenceTheme">@style/Omni.PreferenceTheme</item>
+        <item name="android:switchStyle">@style/Omni.SwitchStyle</item>
+        <item name="android:textAppearanceListItem">@style/Omni.PreferenceTitle</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="Theme.Material3.DayNight.Dialog.Alert">
+        <item name="colorAccent">?attr/colorPrimary</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="dialogCornerRadius">8dp</item>
+    </style>
+
     <style name="AppTheme" parent="@android:style/Theme.Material" />
     <style name="AppThemeSystem" parent="@android:style/Theme.DeviceDefault.Light.Dialog" />
     <style name="PlaceholderTheme" parent="@android:style/Theme.Translucent.NoTitleBar"></style>

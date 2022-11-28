@@ -267,7 +267,7 @@ public class SwitchConfiguration {
         mLimitLevelChangeX = prefs.getBoolean(SettingsActivity.PREF_SPEED_SWITCHER_LIMIT, true);
         mSpeedSwitchButtons = Utils.buttonStringToMap(prefs.getString(SettingsActivity.PREF_SPEED_SWITCHER_BUTTON_NEW,
                 SettingsActivity.PREF_SPEED_SWITCHER_BUTTON_DEFAULT_NEW), SettingsActivity.PREF_SPEED_SWITCHER_BUTTON_DEFAULT_NEW);
-        mLimitItemsX = prefs.getInt(SettingsActivity.PREF_SPEED_SWITCHER_ITEMS, 10);
+        mLimitItemsX = Integer.parseInt(prefs.getString(SettingsActivity.PREF_SPEED_SWITCHER_ITEMS, "10"));
         String buttonPos = prefs.getString(SettingsActivity.PREF_BUTTON_POS, "1");
         mButtonPos = Integer.valueOf(buttonPos);
 

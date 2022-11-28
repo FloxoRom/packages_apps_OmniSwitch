@@ -17,11 +17,7 @@
  */
  package org.omnirom.omniswitch;
 
-import org.omnirom.omniswitch.ui.IconShapeOverride;
-
 import android.app.Application;
-import android.preference.PreferenceManager;
-import android.os.Build;
 
 public class OmniSwitch extends Application {
     public static final String TAG = OmniSwitch.class.getSimpleName();
