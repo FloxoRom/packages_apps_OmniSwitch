@@ -119,7 +119,6 @@ public class SwitchConfiguration {
     public boolean mBottomFavorites;
     public boolean mButtonHide;
     public int mShortcutIconSizeDp = 32;
-    public boolean mSystemFont;
 
     // old pref slots
     private static final String PREF_DRAG_HANDLE_COLOR = "drag_handle_color";
@@ -312,7 +311,6 @@ public class SwitchConfiguration {
         mBlockSplitscreenBreakers = prefs.getBoolean(SettingsActivity.PREF_BLOCK_APPS_ON_SPLITSCREEN, true);
         mColorfulHeader = prefs.getBoolean(SettingsActivity.PREF_COLOR_TASK_HEADER, false);
         mButtonHide = prefs.getBoolean(SettingsActivity.PREF_BUTTON_HIDE, false);
-        mSystemFont = prefs.getBoolean(SettingsActivity.PREF_SYSTEM_FONT, false);
 
         mHiddenAppsList.clear();
         String hiddenListString = prefs.getString(SettingsActivity.PREF_HIDDEN_APPS, "");
@@ -466,7 +464,7 @@ public class SwitchConfiguration {
     }
 
     public int getSystemAccentColor() {
-        return getAttrColor(mThemeContext, android.R.attr.colorAccent);
+        return mContext.getResources().getColor(R.color.colorPrimary);
     }
 
     public int getTaskHeaderColor() {

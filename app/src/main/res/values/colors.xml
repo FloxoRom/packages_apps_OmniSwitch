@@ -18,10 +18,10 @@
 <resources>
     <color name="text_shadow">#000000</color>
     <color name="bg_transparent">#000000</color>
-    <color name="bg_flat_color">@*android:color/primary_device_default_settings_light</color>
-    <color name="bg_flat_color_dark">@*android:color/primary_device_default_settings</color>
-    <color name="button_bg_flat_color">@*android:color/primary_dark_device_default_settings_light</color>
-    <color name="button_bg_flat_color_dark">@*android:color/primary_dark_device_default_settings</color>
+    <color name="bg_flat_color">@android:color/system_neutral1_50</color>
+    <color name="bg_flat_color_dark">@android:color/system_neutral1_800</color>
+    <color name="button_bg_flat_color">@android:color/system_neutral1_100</color>
+    <color name="button_bg_flat_color_dark">@android:color/system_neutral1_900</color>
     <color name="ripple_material_light">#40000000</color>
     <color name="ripple_material_dark">#40ffffff</color>
     <color name="ripple_material_system">@color/ripple_material_light</color>
@@ -49,8 +49,8 @@
     <color name="text_color_light">@color/material_grey_900</color>
     <color name="ic_launcher_background">#ff4caf50</color>
     <color name="system_default_accent">#ff009688</color>
-    <color name="system_default_primary">@*android:color/primary_device_default_settings_light</color>
-    <color name="system_default_primary_dark">@*android:color/primary_dark_device_default_settings_light</color>
+    <color name="system_default_primary">@android:color/system_neutral1_50</color>
+    <color name="system_default_primary_dark">@android:color/system_neutral1_100</color>
     <color name="default_drag_handle_color">#ff4caf50</color>
     <color name="colorPrimary">@android:color/system_accent1_600</color>
 </resources>

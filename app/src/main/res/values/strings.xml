@@ -150,7 +150,7 @@
         <string name="settings_button_text">Settings</string>
         <string name="wallpaper_button_text">Wallpaper</string>
         <string name="category_launcher_title">Launcher</string>
-        <string name="launcher_mode_summary">Run OmniSwitch also as your launcher. After enabling press home and select OmniSwitch</string>
+        <string name="launcher_mode_summary">Run OmniSwitch also as your launcher. After enabling go to system settings and select OmniSwitch as default home app</string>
         <string name="launcher_mode_title">Enable</string>
         <string name="launcher_mode_enable_check">Disabling is not possible while the launcher mode is active</string>
         <string name="welcome_cling_header">Welcome to OmniSwitch launcher mode</string>
@@ -178,7 +178,7 @@
         <string name="package_unlock_app_title">Unlock app</string>
         <string name="locked_apps_sort_summary">Locked apps will be displayed first in list</string>
         <string name="locked_apps_sort_title">Sort locked apps</string>
-        <string name="drag_handle_dynamic_color_title">Use accent color</string>
+        <string name="drag_handle_dynamic_color_title">System accent color</string>
         <string name="dock_non_resizeble_failed_to_dock_text">App does not support split-screen</string>
         <string name="block_apps_on_splitscreen_summary">While in split-screen mode block switches to unsupported apps</string>
         <string name="block_apps_on_splitscreen_title">Block undockable apps</string>

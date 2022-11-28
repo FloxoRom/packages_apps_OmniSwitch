@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class PackageManager {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final String TAG = "OmniSwitch:PackageManager";
 
     private Map<String, PackageItem> mInstalledPackagesMap;

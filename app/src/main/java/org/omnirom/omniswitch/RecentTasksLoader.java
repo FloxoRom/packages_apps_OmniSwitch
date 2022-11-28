@@ -51,7 +51,7 @@ import static android.graphics.Bitmap.Config.ARGB_8888;
 
 public class RecentTasksLoader {
     private static final String TAG = "OmniSwitch:RecentTasksLoader";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final int TASK_INIT_LOAD = 8;
 
     private Context mContext;

@@ -151,9 +151,6 @@ public class FavoriteView extends GridView {
         if (DEBUG) {
             Log.d(TAG, "updatePrefs " + key);
         }
-        if (key != null && key.equals(SettingsActivity.PREF_SYSTEM_FONT)) {
-            mLabelFont = Utils.getAppLabelFont(getContext());
-        }
         if (key != null && key.equals(SettingsActivity.PREF_FAVORITE_APPS)) {
             updateFavoritesList();
         }

@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static android.content.pm.PackageManager.DONT_KILL_APP;
+
 public class Utils {
     private static final String TAG = "OmniSwitch:Utils";
     private static final HashSet<String> mForceUpdateKeys = new HashSet<>();
@@ -66,7 +68,6 @@ public class Utils {
         mForceUpdateKeys.add(SettingsActivity.PREF_ICONPACK);
         mForceUpdateKeys.add(SettingsActivity.PREF_THUMB_SIZE);
         mForceUpdateKeys.add(SwitchService.DPI_CHANGE);
-        mForceUpdateKeys.add(SettingsActivity.PREF_SYSTEM_FONT);
     }
 
     public static void parseCollection(String listString,
@@ -255,7 +256,7 @@ public class Utils {
         final android.content.pm.PackageManager pm = context.getPackageManager();
         pm.setComponentEnabledSetting(new ComponentName(context, Launcher.class),
                 value ? android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
-                        android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 0);
+                        android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED, DONT_KILL_APP);
     }
 
     public static List<String> getFavoriteListFromStats(Context context, int count) {
@@ -418,20 +419,8 @@ public class Utils {
         return Typeface.create("sans-serif-condensed", Typeface.NORMAL);
     }
 
-    public static String getDefaultBodyFont(Context context) {
-        TypedArray ta = context.obtainStyledAttributes(android.R.style.TextAppearance_DeviceDefault,
-                new int[]{android.R.attr.fontFamily});
-        String value = ta.getString(0);
-        ta.recycle();
-        return value;
-    }
-
     public static Typeface getAppLabelFont(Context context) {
-        if (SwitchConfiguration.getInstance(context).mSystemFont) {
-            return Typeface.create(getDefaultBodyFont(context), Typeface.NORMAL);
-        } else {
-            return getAppLabelFont();
-        }
+        return getAppLabelFont();
     }
 
     public static void toggleTorch(Context context) {
