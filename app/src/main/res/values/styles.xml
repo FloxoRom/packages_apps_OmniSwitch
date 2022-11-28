@@ -49,6 +49,10 @@
 
     <style name="AppTheme" parent="Theme.Material3.DayNight" />
     <style name="AppThemeSystem" parent="Theme.Material3.DayNight" />
+
+    <style name="AppTheme.Overlay" parent="ThemeOverlay.Material3.DynamicColors.DayNight">
+    </style>
+
     <style name="PlaceholderTheme" parent="@android:style/Theme.Translucent.NoTitleBar"></style>
     <style name="TextAppearancePopupMenuCondensed" parent="@android:style/TextAppearance.Material.Menu" />
     <style name="LauncherTheme" parent="Theme.Material3.DayNight.NoActionBar">

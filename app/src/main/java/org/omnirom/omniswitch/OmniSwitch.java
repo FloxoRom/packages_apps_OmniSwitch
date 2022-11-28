@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
- package org.omnirom.omniswitch;
+package org.omnirom.omniswitch;
 
 import android.app.Application;
+
+import com.google.android.material.color.DynamicColors;
 
 public class OmniSwitch extends Application {
     public static final String TAG = OmniSwitch.class.getSimpleName();
@@ -25,5 +27,7 @@ public class OmniSwitch extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        DynamicColors.applyToActivitiesIfAvailable(
+                this, R.style.AppTheme_Overlay);
     }
 }
