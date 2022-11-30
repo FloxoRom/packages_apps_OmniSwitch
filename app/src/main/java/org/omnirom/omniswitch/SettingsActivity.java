@@ -548,32 +548,33 @@ public class SettingsActivity extends AppCompatActivity {
         private void initButtons() {
             mButtonEntries = getResources().getStringArray(R.array.button_entries);
             mButtonImages = new Drawable[mButtonEntries.length];
-            mButtonImages[0] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.kill_all));
-            mButtonImages[1] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.kill_other));
-            mButtonImages[2] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_lastapp));
-            mButtonImages[3] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_sysbar_home));
-            mButtonImages[4] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_settings));
-            mButtonImages[5] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_apps));
-            mButtonImages[6] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_sysbar_back));
-            mButtonImages[7] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_pin));
-            mButtonImages[8] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_close));
-            mButtonImages[9] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_menu));
-            mButtonImages[10] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_phone));
-            mButtonImages[11] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_camera));
-            mButtonImages[12] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_assist));
-            mButtonImages[13] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_google_assist));
-            mButtonImages[14] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_qs_flashlight));
+            int color = Utils.getAttrColor(getContext(), android.R.attr.textColorPrimary);
+            mButtonImages[0] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.kill_all));
+            mButtonImages[1] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.kill_other));
+            mButtonImages[2] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_lastapp));
+            mButtonImages[3] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_sysbar_home));
+            mButtonImages[4] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_settings));
+            mButtonImages[5] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_apps));
+            mButtonImages[6] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_sysbar_back));
+            mButtonImages[7] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_pin));
+            mButtonImages[8] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_close));
+            mButtonImages[9] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_menu));
+            mButtonImages[10] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_phone));
+            mButtonImages[11] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_camera));
+            mButtonImages[12] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_assist));
+            mButtonImages[13] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_google_assist));
+            mButtonImages[14] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_qs_flashlight));
 
             mSpeedSwitchButtonEntries = getResources().getStringArray(R.array.speed_switch_button_entries);
             mSpeedSwitchButtonImages = new Drawable[mSpeedSwitchButtonEntries.length];
-            mSpeedSwitchButtonImages[0] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_sysbar_home));
-            mSpeedSwitchButtonImages[1] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_sysbar_back));
-            mSpeedSwitchButtonImages[2] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.kill_current));
-            mSpeedSwitchButtonImages[3] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.kill_all));
-            mSpeedSwitchButtonImages[4] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.kill_other));
-            mSpeedSwitchButtonImages[5] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_pin));
-            mSpeedSwitchButtonImages[6] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_lastapp));
-            mSpeedSwitchButtonImages[7] = BitmapUtils.colorize(getResources(), Color.GRAY, getResources().getDrawable(R.drawable.ic_menu));
+            mSpeedSwitchButtonImages[0] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_sysbar_home));
+            mSpeedSwitchButtonImages[1] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_sysbar_back));
+            mSpeedSwitchButtonImages[2] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.kill_current));
+            mSpeedSwitchButtonImages[3] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.kill_all));
+            mSpeedSwitchButtonImages[4] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.kill_other));
+            mSpeedSwitchButtonImages[5] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_pin));
+            mSpeedSwitchButtonImages[6] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_lastapp));
+            mSpeedSwitchButtonImages[7] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_menu));
         }
 
         @Override

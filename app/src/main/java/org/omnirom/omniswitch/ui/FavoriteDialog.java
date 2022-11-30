@@ -45,16 +45,15 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
 public class FavoriteDialog extends AlertDialog implements
         DialogInterface.OnClickListener, DialogInterface.OnDismissListener {
-    private LayoutInflater mInflater;
     private List<String> mFavoriteList;
     private FavoriteListAdapter mFavoriteAdapter;
     private DragSortListView mFavoriteConfigList;
@@ -68,7 +67,7 @@ public class FavoriteDialog extends AlertDialog implements
 
     private class ViewHolder {
         TextView item;
-        CheckBox check;
+        Switch check;
         ImageView image;
     }
 
@@ -140,13 +139,10 @@ public class FavoriteDialog extends AlertDialog implements
         super(context);
         mEditor = editor;
         mFavoriteList = favoriteList;
-        mInflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        final Context context = getContext();
         final View view = getLayoutInflater().inflate(R.layout.favorite_dialog,
                 null);
         setView(view);
@@ -154,19 +150,19 @@ public class FavoriteDialog extends AlertDialog implements
         setCancelable(true);
 
         setButton(DialogInterface.BUTTON_POSITIVE,
-                context.getString(android.R.string.ok), this);
+                getContext().getString(android.R.string.ok), this);
         setButton(DialogInterface.BUTTON_NEUTRAL,
-                context.getString(R.string.favorite_add), this);
+                getContext().getString(R.string.favorite_add), this);
         setButton(DialogInterface.BUTTON_NEGATIVE,
-                context.getString(android.R.string.cancel), this);
+                getContext().getString(android.R.string.cancel), this);
 
         super.onCreate(savedInstanceState);
 
-        mConfiguration = SwitchConfiguration.getInstance(context);
+        mConfiguration = SwitchConfiguration.getInstance(getContext());
 
         mFavoriteConfigList = (DragSortListView) view
                 .findViewById(R.id.favorite_apps);
-        mFavoriteAdapter = new FavoriteListAdapter(context, mFavoriteList);
+        mFavoriteAdapter = new FavoriteListAdapter(getContext(), mFavoriteList);
         mFavoriteConfigList.setAdapter(mFavoriteAdapter);
 
         final DragSortController dragSortController = new FavoriteDragSortController();
@@ -299,7 +295,7 @@ public class FavoriteDialog extends AlertDialog implements
 
                     holder.item = (TextView) convertView
                             .findViewById(R.id.app_item);
-                    holder.check = (CheckBox) convertView
+                    holder.check = (Switch) convertView
                             .findViewById(R.id.app_check);
                     holder.image = (ImageView) convertView
                             .findViewById(R.id.app_icon);
@@ -318,7 +314,7 @@ public class FavoriteDialog extends AlertDialog implements
         }
 
         protected AddFavoriteDialog(Context context) {
-            super(context);
+            super(context, R.style.AlertDialogTheme);
         }
 
         @Override
@@ -332,7 +328,6 @@ public class FavoriteDialog extends AlertDialog implements
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
-            final Context context = getContext();
             final View view = getLayoutInflater().inflate(
                     R.layout.installed_apps_dialog, null);
             setView(view);
@@ -340,9 +335,9 @@ public class FavoriteDialog extends AlertDialog implements
             setCancelable(true);
 
             setButton(DialogInterface.BUTTON_POSITIVE,
-                    context.getString(android.R.string.ok), this);
+                    getContext().getString(android.R.string.ok), this);
             setButton(DialogInterface.BUTTON_NEGATIVE,
-                    context.getString(android.R.string.cancel), this);
+                    getContext().getString(android.R.string.cancel), this);
 
             super.onCreate(savedInstanceState);
             mChangedFavoriteList = new ArrayList<String>();

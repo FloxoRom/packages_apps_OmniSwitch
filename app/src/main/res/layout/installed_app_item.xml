@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   Copyright (C) 2013 The OmniROM Project
 
   This program is free software: you can redistribute it and/or modify
@@ -16,13 +15,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@android:id/widget_frame"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:minHeight="?android:attr/listPreferredItemHeight"
-              android:gravity="center_vertical"
-              android:paddingStart="6dp"
-              android:background="?android:attr/selectableItemBackground">
+    android:id="@android:id/widget_frame"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:paddingStart="6dp">
 
     <ImageView
         android:id="@+id/app_icon"
@@ -31,20 +30,21 @@
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="8dip"
         android:contentDescription="@null"
-        android:scaleType="fitXY" />
+        android:scaleType="centerInside" />
+
     <TextView
         android:id="@+id/app_item"
         android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="8dip"
+        android:layout_weight="1"
         android:ellipsize="end"
         android:focusable="false"
         android:singleLine="true"
-        android:textAlignment="viewStart"
-        android:textAppearance="@*android:style/TextAppearance.DeviceDefault.ListItem" />
-    <CheckBox
+        android:textAppearance="?android:attr/textAppearanceListItem" />
+
+    <Switch
         android:id="@+id/app_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

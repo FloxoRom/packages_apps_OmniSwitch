@@ -479,4 +479,11 @@ public class Utils {
             prefs.edit().remove(SettingsActivity.PREF_HIDDEN_APPS_OLD).apply();
         }
     }
+
+    public static int getAttrColor(Context context, int attr) {
+        TypedArray ta = context.obtainStyledAttributes(new int[]{attr});
+        int color = ta.getColor(0, 0);
+        ta.recycle();
+        return color;
+    }
 }

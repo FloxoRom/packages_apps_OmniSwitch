@@ -23,7 +23,7 @@
     <dimen name="drag_grip_ridge_gap">4dp</dimen>
     <dimen name="thumbnail_width">140dp</dimen>
     <dimen name="thumbnail_height">140dp</dimen>
-    <dimen name="alert_dialog_padding_material">24dp</dimen>
+    <dimen name="alert_dialog_padding_material">20dp</dimen>
     <dimen name="rambar_elevation">3dp</dimen>
     <dimen name="button_elevation">5dp</dimen>
     <dimen name="fake_shadow_width">2dp</dimen>
@@ -34,4 +34,5 @@
     <dimen name="top_widget_height">100dp</dimen>
     <dimen name="app_drawer_height_horizontal">300dp</dimen>
     <dimen name="content_side_margin">6dp</dimen>
+    <dimen name="color_preset_item_size">44dp</dimen>
 </resources>

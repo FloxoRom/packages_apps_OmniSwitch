@@ -110,7 +110,6 @@ public class SwitchConfiguration {
     public List<String> mLockedAppList = new ArrayList<String>();
     public boolean mTopSortLockedApps;
     private Context mContext;
-    private ContextThemeWrapper mThemeContext;
     public boolean mDynamicDragHandleColor;
     public boolean mBlockSplitscreenBreakers = true;
     public Set<String> mHiddenAppsList = new HashSet<String>();
@@ -149,7 +148,6 @@ public class SwitchConfiguration {
 
     private SwitchConfiguration(Context context) {
         mContext = context;
-        mThemeContext = new ContextThemeWrapper(context, R.style.AppThemeSystem);
         mWindowManager = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
 
@@ -532,13 +530,6 @@ public class SwitchConfiguration {
             return R.style.PopupMenuSystem;
         }
         return R.style.PopupMenuLight;
-    }
-
-    public int getAttrColor(Context context, int attr) {
-        TypedArray ta = context.obtainStyledAttributes(new int[]{attr});
-        int color = ta.getColor(0, 0);
-        ta.recycle();
-        return color;
     }
 
     private static SharedPreferences getPrefs(Context context) {

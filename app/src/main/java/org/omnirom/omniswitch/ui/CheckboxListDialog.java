@@ -31,6 +31,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import org.omnirom.omniswitch.R;
@@ -52,7 +53,6 @@ public class CheckboxListDialog extends AlertDialog implements
     private Drawable[] mListImages;
     private Map<Integer, Boolean> mCheckedItems;
     private DragSortListView mCheckboxListView;
-    private LayoutInflater mInflater;
     private ArrayAdapter<String> mListAdapter;
     private ApplyRunnable mApplyRunnable;
     private String mTitle;
@@ -75,13 +75,13 @@ public class CheckboxListDialog extends AlertDialog implements
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            View rowView = mInflater.inflate(R.layout.checkbox_item, parent, false);
+            View rowView = getLayoutInflater().inflate(R.layout.checkbox_item, parent, false);
 
             final TextView item = (TextView) rowView.findViewById(R.id.item_text);
             int orderPosition = getPositionOfItem(position, mCheckedItems);
             item.setText(mListItems[orderPosition]);
 
-            final CheckBox check = (CheckBox) rowView.findViewById(R.id.item_check);
+            final Switch check = (Switch) rowView.findViewById(R.id.item_check);
             check.setChecked(mCheckedItems.get(orderPosition));
 
             final ImageView image = (ImageView) rowView.findViewById(R.id.item_image);
@@ -168,8 +168,6 @@ public class CheckboxListDialog extends AlertDialog implements
         mListItems = items;
         mListImages = images;
         mCheckedItems = checked;
-        mInflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     private void applyChanges() {

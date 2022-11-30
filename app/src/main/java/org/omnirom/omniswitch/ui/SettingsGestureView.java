@@ -17,12 +17,6 @@
  */
 package org.omnirom.omniswitch.ui;
 
-import org.omnirom.omniswitch.R;
-import org.omnirom.omniswitch.colorpicker.ColorPickerDialog;
-import org.omnirom.omniswitch.SettingsActivity;
-import org.omnirom.omniswitch.SwitchConfiguration;
-import org.omnirom.omniswitch.SwitchService;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -44,11 +38,16 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
+
+import org.omnirom.omniswitch.R;
+import org.omnirom.omniswitch.SettingsActivity;
+import org.omnirom.omniswitch.SwitchConfiguration;
+import org.omnirom.omniswitch.SwitchService;
+import org.omnirom.omniswitch.colorpicker.ColorSelectDialog;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -118,8 +117,8 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
 
         mView = (LinearLayout) inflater.inflate(R.layout.settings_gesture_view, null, false);
 
-        mDragHandleViewLeft = (LinearLayout)mView.findViewById(R.id.drag_handle_view_left);
-        mDragHandleViewRight = (LinearLayout)mView.findViewById(R.id.drag_handle_view_right);
+        mDragHandleViewLeft = (LinearLayout) mView.findViewById(R.id.drag_handle_view_left);
+        mDragHandleViewRight = (LinearLayout) mView.findViewById(R.id.drag_handle_view_right);
 
         mOkButton = (Button) mView.findViewById(R.id.ok_button);
         mCancelButton = (Button) mView.findViewById(R.id.cancel_button);
@@ -133,36 +132,36 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
                 int action = event.getAction();
 
                 switch (action) {
-                case MotionEvent.ACTION_DOWN:
-                    mDownY = event.getRawY();
-                    mDeltaY = 0;
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if(mDeltaY != 0){
-                        mStartY += mDeltaY;
-                        mEndY += mDeltaY;
-                        updateDragHandleLayoutParams();
-                    }
-                    mDragButton.setTranslationY(0);
-                    mDragButtonStart.setTranslationY(0);
-                    mDragButtonEnd.setTranslationY(0);
-                    mDownY = 0;
-                    break;
-                case MotionEvent.ACTION_CANCEL:
-                    mDownY = 0;
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    float deltaY = event.getRawY() - mDownY;
-                    if(Math.abs(deltaY) > mSlop){
-                        if(((mEndY + deltaY) < getLowerHandleLimit())
-                                && (mStartY + deltaY > getUpperHandleLimit())){
-                            mDeltaY = deltaY;
-                            mDragButton.setTranslationY(mDeltaY);
-                            mDragButtonStart.setTranslationY(mDeltaY);
-                            mDragButtonEnd.setTranslationY(mDeltaY);
+                    case MotionEvent.ACTION_DOWN:
+                        mDownY = event.getRawY();
+                        mDeltaY = 0;
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if (mDeltaY != 0) {
+                            mStartY += mDeltaY;
+                            mEndY += mDeltaY;
+                            updateDragHandleLayoutParams();
                         }
-                    }
-                    break;
+                        mDragButton.setTranslationY(0);
+                        mDragButtonStart.setTranslationY(0);
+                        mDragButtonEnd.setTranslationY(0);
+                        mDownY = 0;
+                        break;
+                    case MotionEvent.ACTION_CANCEL:
+                        mDownY = 0;
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        float deltaY = event.getRawY() - mDownY;
+                        if (Math.abs(deltaY) > mSlop) {
+                            if (((mEndY + deltaY) < getLowerHandleLimit())
+                                    && (mStartY + deltaY > getUpperHandleLimit())) {
+                                mDeltaY = deltaY;
+                                mDragButton.setTranslationY(mDeltaY);
+                                mDragButtonStart.setTranslationY(mDeltaY);
+                                mDragButtonEnd.setTranslationY(mDeltaY);
+                            }
+                        }
+                        break;
                 }
                 return true;
             }
@@ -175,31 +174,31 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
                 int action = event.getAction();
 
                 switch (action) {
-                case MotionEvent.ACTION_DOWN:
-                    mDownY = event.getRawY();
-                    mDeltaY = 0;
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if(mDeltaY != 0){
-                        mStartY += mDeltaY;
-                        updateDragHandleLayoutParams();
-                    }
-                    mDragButtonStart.setTranslationY(0);
-                    mDownY = 0;
-                    break;
-                case MotionEvent.ACTION_CANCEL:
-                    mDownY = 0;
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    float deltaY = event.getRawY() - mDownY;
-                    if(Math.abs(deltaY) > mSlop){
-                        if(((mStartY + deltaY) < (mEndY - mDragHandleMinHeight))
-                                && (mStartY + deltaY - mDragHandleLimiterHeight > 0)){
-                            mDeltaY = deltaY;
-                            mDragButtonStart.setTranslationY(mDeltaY);
+                    case MotionEvent.ACTION_DOWN:
+                        mDownY = event.getRawY();
+                        mDeltaY = 0;
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if (mDeltaY != 0) {
+                            mStartY += mDeltaY;
+                            updateDragHandleLayoutParams();
                         }
-                    }
-                    break;
+                        mDragButtonStart.setTranslationY(0);
+                        mDownY = 0;
+                        break;
+                    case MotionEvent.ACTION_CANCEL:
+                        mDownY = 0;
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        float deltaY = event.getRawY() - mDownY;
+                        if (Math.abs(deltaY) > mSlop) {
+                            if (((mStartY + deltaY) < (mEndY - mDragHandleMinHeight))
+                                    && (mStartY + deltaY - mDragHandleLimiterHeight > 0)) {
+                                mDeltaY = deltaY;
+                                mDragButtonStart.setTranslationY(mDeltaY);
+                            }
+                        }
+                        break;
                 }
                 return true;
             }
@@ -211,31 +210,31 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
                 int action = event.getAction();
 
                 switch (action) {
-                case MotionEvent.ACTION_DOWN:
-                    mDownY = event.getRawY();
-                    mDeltaY = 0;
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if(mDeltaY != 0){
-                        mEndY += mDeltaY;
-                        updateDragHandleLayoutParams();
-                    }
-                    mDragButtonEnd.setTranslationY(0);
-                    mDownY = 0;
-                    break;
-                case MotionEvent.ACTION_CANCEL:
-                    mDownY = 0;
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    float deltaY = event.getRawY() - mDownY;
-                    if(Math.abs(deltaY) > mSlop){
-                        if(((mEndY + deltaY) > (mStartY + mDragHandleMinHeight))
-                                && (mEndY + deltaY + mDragHandleLimiterHeight < getLowerHandleLimit())){
-                            mDeltaY = deltaY;
-                            mDragButtonEnd.setTranslationY(mDeltaY);
+                    case MotionEvent.ACTION_DOWN:
+                        mDownY = event.getRawY();
+                        mDeltaY = 0;
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if (mDeltaY != 0) {
+                            mEndY += mDeltaY;
+                            updateDragHandleLayoutParams();
                         }
-                    }
-                    break;
+                        mDragButtonEnd.setTranslationY(0);
+                        mDownY = 0;
+                        break;
+                    case MotionEvent.ACTION_CANCEL:
+                        mDownY = 0;
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        float deltaY = event.getRawY() - mDownY;
+                        if (Math.abs(deltaY) > mSlop) {
+                            if (((mEndY + deltaY) > (mStartY + mDragHandleMinHeight))
+                                    && (mEndY + deltaY + mDragHandleLimiterHeight < getLowerHandleLimit())) {
+                                mDeltaY = deltaY;
+                                mDragButtonEnd.setTranslationY(mDeltaY);
+                            }
+                        }
+                        break;
                 }
                 return true;
             }
@@ -255,16 +254,18 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
                 // max = 2,0 * mConfiguration.mDefaultDragHandleWidth
                 // min = mConfiguration.mDefaultDragHandleWidth / 2
                 // 1-100 -> 0.5-2.0 -> 10-40
-                double scaleFactor= scaleValue(progressValue, 1f, 100f, 0.5f, 2.0f);
+                double scaleFactor = scaleValue(progressValue, 1f, 100f, 0.5f, 2.0f);
                 mDragHandleWidth = (int) (mConfiguration.mDefaultDragHandleWidth * scaleFactor);
                 updateDragHandleLayoutParams();
             }
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
+
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress,
-                    boolean fromUser) {
+                                          boolean fromUser) {
             }
         });
 
@@ -275,7 +276,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
                 }
                 Editor edit = mPrefs.edit();
                 edit.putInt(SettingsActivity.PREF_DRAG_HANDLE_LOCATION, mLocation);
-                int relHeight = (int)(mStartY / (mConfiguration.getCurrentDisplayHeight() /100));
+                int relHeight = (int) (mStartY / (mConfiguration.getCurrentDisplayHeight() / 100));
                 edit.putInt(SettingsActivity.PREF_HANDLE_POS_START_RELATIVE, relHeight);
                 edit.putInt(SettingsActivity.PREF_HANDLE_HEIGHT, mEndY - mStartY);
                 edit.putInt(SettingsActivity.PREF_HANDLE_WIDTH, mDragHandleWidth);
@@ -297,7 +298,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
 
         mLocationButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (mLocation == 1){
+                if (mLocation == 1) {
                     mLocation = 0;
                     mLocationButton.setText(mContext.getResources().getString(R.string.location_left));
                 } else {
@@ -318,7 +319,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         mView.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(event.getAction()==KeyEvent.ACTION_DOWN){
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     hide();
                     return true;
                 }
@@ -371,14 +372,15 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         getDragHandleContainer().addView(mDragButton);
         getDragHandleContainer().addView(mDragButtonEnd);
     }
-    
+
     private LinearLayout getDragHandleContainer() {
-        if(mLocation == 1){
+        if (mLocation == 1) {
             return mDragHandleViewLeft;
         } else {
             return mDragHandleViewRight;
         }
     }
+
     private void updateDragHandleLayoutParams() {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 mDragHandleWidth,
@@ -388,7 +390,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
 
         params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
-                mDragHandleLimiterHeight );
+                mDragHandleLimiterHeight);
         params.topMargin = mStartY - mDragHandleLimiterHeight;
         params.gravity = mLocation == 1 ? Gravity.LEFT : Gravity.RIGHT;
         mDragButtonStart.setLayoutParams(params);
@@ -398,8 +400,8 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
                 mDragHandleLimiterHeight);
         params.gravity = mLocation == 1 ? Gravity.LEFT : Gravity.RIGHT;
         mDragButtonEnd.setLayoutParams(params);
-        
-        mStartYRelative = (int)(mStartY / (mConfiguration.getCurrentDisplayHeight() /100));
+
+        mStartYRelative = (int) (mStartY / (mConfiguration.getCurrentDisplayHeight() / 100));
         mHandleHeight = mEndY - mStartY;
     }
 
@@ -412,7 +414,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         mDragButton.setImageDrawable(BitmapUtils.colorize(mContext.getResources(), getDragHandleColor(), d));
         mDragButton.getDrawable().setColorFilter(getDragHandleColor(), Mode.SRC_ATOP);
         mDragButton.setRotation(mLocation == 1 ? 180 : 0);
-        
+
         mDragButtonStart.setScaleType(ImageView.ScaleType.FIT_XY);
         mDragButtonStart.setImageDrawable(d1);
         mDragButtonStart.setRotation(mLocation == 1 ? 180 : 0);
@@ -428,7 +430,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         mDragHandleWidth = mConfiguration.mDragHandleWidth;
 
         mLocation = mConfiguration.mLocation;
-        if (mLocation == 1){
+        if (mLocation == 1) {
             mLocationButton.setText(mContext.getResources().getString(R.string.location_right));
         } else {
             mLocationButton.setText(mContext.getResources().getString(R.string.location_left));
@@ -477,7 +479,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         return mShowing;
     }
 
-    public void handleRotation(){
+    public void handleRotation() {
         mStartY = mConfiguration.getCustomOffsetStart(mStartYRelative);
         mEndY = mConfiguration.getCustomOffsetEnd(mStartYRelative, mHandleHeight);
         updateLayout();
@@ -492,7 +494,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
     }
 
     private double scaleValue(double value, double oldMin, double oldMax, double newMin, double newMax) {
-        return ( (value - oldMin) / (oldMax - oldMin) ) * (newMax - newMin) + newMin;
+        return ((value - oldMin) / (oldMax - oldMin)) * (newMax - newMin) + newMin;
     }
 
     private static ShapeDrawable createRectShape(int width, int height, int color) {
@@ -510,7 +512,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
     }
 
     private Dialog getColorDialog() {
-        final ColorPickerDialog d = new ColorPickerDialog(mContext, mColor, true);
+        final ColorSelectDialog d = new ColorSelectDialog(mContext, mColor, true, ColorSelectDialog.CUSTOM_ACCENT_COLORS);
         d.setButton(AlertDialog.BUTTON_POSITIVE,
                 mContext.getResources().getString(R.string.ok),
                 new DialogInterface.OnClickListener() {

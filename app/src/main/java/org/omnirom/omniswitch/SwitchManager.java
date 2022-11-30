@@ -443,15 +443,6 @@ public class SwitchManager {
         context.startActivity(mainActivity);
     }
 
-    public static void startPlaceholderActivity(Context context) {
-        Intent mainActivity = new Intent(context,
-                PlaceholderActivity.class);
-        mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-                | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-        context.startActivity(mainActivity);
-    }
-
     public void shutdownService() {
         mLayout.shutdownService();
     }

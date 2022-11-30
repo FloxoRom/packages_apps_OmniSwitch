@@ -21,14 +21,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import org.omnirom.omniswitch.IEditFavoriteActivity;
@@ -56,7 +57,7 @@ public class HiddenAppsDialog extends AlertDialog implements
 
     private class ViewHolder {
         TextView item;
-        CheckBox check;
+        Switch check;
         ImageView image;
     }
 
@@ -100,7 +101,7 @@ public class HiddenAppsDialog extends AlertDialog implements
 
                 holder.item = (TextView) convertView
                         .findViewById(R.id.app_item);
-                holder.check = (CheckBox) convertView
+                holder.check = (Switch) convertView
                         .findViewById(R.id.app_check);
                 holder.image = (ImageView) convertView
                         .findViewById(R.id.app_icon);

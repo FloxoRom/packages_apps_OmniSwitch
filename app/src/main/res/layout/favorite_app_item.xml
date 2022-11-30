@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   Copyright (C) 2013 The OmniROM Project
 
   This program is free software: you can redistribute it and/or modify
@@ -16,22 +15,25 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@android:id/widget_frame"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:minHeight="?android:attr/listPreferredItemHeight"
-              android:gravity="center_vertical"
-              android:paddingStart="6dp"
-              android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-              android:background="?android:attr/selectableItemBackground">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@android:id/widget_frame"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:paddingStart="6dp"
+    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd">
 
-    <org.omnirom.omniswitch.dslv.DragGripView
+    <ImageView
         android:id="@+id/drag_handle"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_gravity="center_vertical"
-        android:paddingBottom="12dp"
-        android:paddingTop="12dp" />
+        android:layout_marginEnd="8dip"
+        android:src="@drawable/ic_drag_handle"
+        app:tint="?android:attr/textColorPrimary" />
+
     <ImageView
         android:id="@+id/app_icon"
         android:layout_width="@android:dimen/app_icon_size"
@@ -39,17 +41,18 @@
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="8dip"
         android:contentDescription="@null"
-        android:scaleType="fitXY" />
+        android:scaleType="centerInside" />
+
     <TextView
         android:id="@+id/app_item"
         android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_gravity="center_vertical"
+        android:layout_weight="1"
         android:ellipsize="end"
         android:focusable="false"
+        android:gravity="center_vertical"
         android:singleLine="true"
-        android:textAlignment="viewStart"
-        android:textAppearance="@*android:style/TextAppearance.DeviceDefault.ListItem" />
+        android:textAppearance="?android:attr/textAppearanceListItem" />
 
 </LinearLayout>

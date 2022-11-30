@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--  Copyright (C) 2013 The OmniROM Project
+<?xml version="1.0" encoding="utf-8"?><!--  Copyright (C) 2013 The OmniROM Project
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -15,17 +14,26 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
+
     <style name="PopupMenuLight" parent="Theme.Material3.Light.Dialog">
-        <item name="android:textAppearanceLargePopupMenu">@style/TextAppearancePopupMenuCondensed</item>
-        <item name="android:textAppearanceSmallPopupMenu">@style/TextAppearancePopupMenuCondensed</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/TextAppearancePopupMenuCondensed
+        </item>
+        <item name="android:textAppearanceSmallPopupMenu">@style/TextAppearancePopupMenuCondensed
+        </item>
     </style>
+
     <style name="PopupMenuDark" parent="Theme.Material3.Dark.Dialog">
-        <item name="android:textAppearanceLargePopupMenu">@style/TextAppearancePopupMenuCondensed</item>
-        <item name="android:textAppearanceSmallPopupMenu">@style/TextAppearancePopupMenuCondensed</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/TextAppearancePopupMenuCondensed
+        </item>
+        <item name="android:textAppearanceSmallPopupMenu">@style/TextAppearancePopupMenuCondensed
+        </item>
     </style>
+
     <style name="PopupMenuSystem" parent="Theme.Material3.DayNight.Dialog">
-        <item name="android:textAppearanceLargePopupMenu">@style/TextAppearancePopupMenuCondensed</item>
-        <item name="android:textAppearanceSmallPopupMenu">@style/TextAppearancePopupMenuCondensed</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/TextAppearancePopupMenuCondensed
+        </item>
+        <item name="android:textAppearanceSmallPopupMenu">@style/TextAppearancePopupMenuCondensed
+        </item>
     </style>
 
     <style name="SettingsTheme" parent="Theme.Material3.DayNight.NoActionBar">
@@ -45,16 +53,17 @@
         <item name="colorAccent">?attr/colorPrimary</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="dialogCornerRadius">8dp</item>
+        <item name="android:switchStyle">@style/Omni.SwitchStyle</item>
     </style>
 
-    <style name="AppTheme" parent="Theme.Material3.DayNight" />
-    <style name="AppThemeSystem" parent="Theme.Material3.DayNight" />
+    <style name="AppTheme" parent="Theme.Material3.DayNight">
+    </style>
 
     <style name="AppTheme.Overlay" parent="ThemeOverlay.Material3.DynamicColors.DayNight">
     </style>
 
-    <style name="PlaceholderTheme" parent="@android:style/Theme.Translucent.NoTitleBar"></style>
     <style name="TextAppearancePopupMenuCondensed" parent="@android:style/TextAppearance.Material.Menu" />
+
     <style name="LauncherTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- NoTitle -->
         <item name="android:windowNoTitle">true</item>
@@ -81,7 +90,7 @@
         <item name="isWorkspaceDarkText">true</item>
     </style>
 
-    <style name="Calendar" parent="TextAppearance.Material3.BodyMedium" >
+    <style name="Calendar" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">?attr/workspaceTextColor</item>
@@ -91,19 +100,19 @@
         <item name="android:shadowRadius">4.0</item>
     </style>
 
-    <style name="CalendarSmall" parent="@style/Calendar" >
+    <style name="CalendarSmall" parent="@style/Calendar">
         <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="CalendarBig" parent="@style/Calendar" >
+    <style name="CalendarBig" parent="@style/Calendar">
         <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="CalendarBigger" parent="@style/Calendar" >
+    <style name="CalendarBigger" parent="@style/Calendar">
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="WeatherDetailed" parent="TextAppearance.Material3.BodyMedium" >
+    <style name="WeatherDetailed" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">?attr/workspaceTextColor</item>
