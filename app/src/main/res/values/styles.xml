@@ -56,7 +56,22 @@
         <item name="android:switchStyle">@style/Omni.SwitchStyle</item>
     </style>
 
-    <style name="AppTheme" parent="Theme.Material3.DayNight">
+    <style name="AppThemeSwitch" parent="Theme.Material3.DayNight.NoActionBar">
+    </style>
+
+    <style name="AppTheme" parent="ThemeOverlay.Material3.DynamicColors.DayNight">
+        <item name="elevationOverlayEnabled">true</item>
+        <item name="elevationOverlayColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="AppThemeLight" parent="ThemeOverlay.Material3.DynamicColors.Light">
+        <item name="elevationOverlayEnabled">true</item>
+        <item name="elevationOverlayColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="AppThemeDark" parent="ThemeOverlay.Material3.DynamicColors.Dark">
+        <item name="elevationOverlayEnabled">true</item>
+        <item name="elevationOverlayColor">?attr/colorPrimary</item>
     </style>
 
     <style name="AppTheme.Overlay" parent="ThemeOverlay.Material3.DynamicColors.DayNight">

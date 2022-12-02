@@ -52,6 +52,7 @@
             android:entries="@array/bg_style_entries"
             android:entryValues="@array/bg_style_values"
             android:key="bg_style"
+            android:defaultValue="3"
             android:summary="@string/bg_style_solid_light"
             android:title="@string/bg_style_title" />
 

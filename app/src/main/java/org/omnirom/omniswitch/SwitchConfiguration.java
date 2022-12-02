@@ -17,28 +17,25 @@
  */
 package org.omnirom.omniswitch;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.content.res.Configuration;
-import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
-import android.view.View;
 import android.view.WindowManager;
 
+import com.google.android.material.elevation.SurfaceColors;
+
 import org.omnirom.omniswitch.launcher.Launcher;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SwitchConfiguration {
     private final static String TAG = "OmniSwitch:SwitchConfiguration";
@@ -118,6 +115,7 @@ public class SwitchConfiguration {
     public boolean mBottomFavorites;
     public boolean mButtonHide;
     public int mShortcutIconSizeDp = 32;
+    private Context mThemeContext;
 
     // old pref slots
     private static final String PREF_DRAG_HANDLE_COLOR = "drag_handle_color";
@@ -150,14 +148,14 @@ public class SwitchConfiguration {
         mContext = context;
         mWindowManager = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
-
+        mThemeContext = new ContextThemeWrapper(mContext, R.style.AppTheme);
         setDensityConfiguration(context);
         updatePrefs(PreferenceManager.getDefaultSharedPreferences(context), "");
     }
 
     public boolean onConfigurationChanged(Context context) {
         final float newDensity = context.getResources().getDisplayMetrics().density;
-        if(DEBUG){
+        if (DEBUG) {
             Log.d(TAG, "onConfigurationChanged " + mDensity + " " + newDensity);
         }
         if (newDensity != mDensity) {
@@ -169,8 +167,8 @@ public class SwitchConfiguration {
 
     private void setDensityConfiguration(Context context) {
         mDensity = context.getResources().getDisplayMetrics().density;
-        mDensityDpi =  context.getResources().getDisplayMetrics().densityDpi;
-        if(DEBUG){
+        mDensityDpi = context.getResources().getDisplayMetrics().densityDpi;
+        if (DEBUG) {
             Log.d(TAG, "setDensityConfiguration " + mDensity);
         }
 
@@ -181,7 +179,7 @@ public class SwitchConfiguration {
         mActionSizePx = Math.round(48 * mDensity);
         mQSActionSizePx = Math.round(60 * mDensity);
         mOverlayIconSizePx = Math.round(mOverlayIconSizeDp * mDensity);
-        mOverlayIconBorderPx =  Math.round(mOverlayIconBorderDp * mDensity);
+        mOverlayIconBorderPx = Math.round(mOverlayIconBorderDp * mDensity);
         mIconBorderHorizontalPx = Math.round(mIconBorderHorizontalDp * mDensity);
         mIconSizeQuickPx = Math.round(100 * mDensity);
         mIconBorderPx = Math.round(mIconBorderDp * mDensity);
@@ -212,7 +210,7 @@ public class SwitchConfiguration {
     }
 
     public void updatePrefs(SharedPreferences prefs, String key) {
-        if(DEBUG){
+        if (DEBUG) {
             Log.d(TAG, "updatePrefs");
         }
         mLocation = prefs.getInt(SettingsActivity.PREF_DRAG_HANDLE_LOCATION, 0);
@@ -249,7 +247,7 @@ public class SwitchConfiguration {
         mLabelFontSizePx = Math.round((mLabelFontSize + mIconBorderDp) * mDensity);
 
         mDragHandleColor = prefs.getInt(
-                    SettingsActivity.PREF_DRAG_HANDLE_COLOR_NEW, getDefaultDragHandleColor());
+                SettingsActivity.PREF_DRAG_HANDLE_COLOR_NEW, getDefaultDragHandleColor());
         mAutoHide = prefs.getBoolean(SettingsActivity.PREF_AUTO_HIDE_HANDLE,
                 false);
         mDragHandleShow = prefs.getBoolean(
@@ -257,7 +255,7 @@ public class SwitchConfiguration {
         mDimBehind = prefs.getBoolean(SettingsActivity.PREF_DIM_BEHIND, false);
         mDefaultDragHandleWidth = Math.round(20 * mDensity);
         mDragHandleWidth = prefs.getInt(
-                    SettingsActivity.PREF_HANDLE_WIDTH, mDefaultDragHandleWidth);
+                SettingsActivity.PREF_HANDLE_WIDTH, mDefaultDragHandleWidth);
         mButtons = Utils.buttonStringToMap(prefs.getString(SettingsActivity.PREF_BUTTONS_NEW,
                 SettingsActivity.PREF_BUTTON_DEFAULT_NEW), SettingsActivity.PREF_BUTTON_DEFAULT_NEW);
         mLevelBackgroundColor = prefs.getBoolean(SettingsActivity.PREF_SPEED_SWITCHER_COLOR, true);
@@ -268,13 +266,13 @@ public class SwitchConfiguration {
         String buttonPos = prefs.getString(SettingsActivity.PREF_BUTTON_POS, "1");
         mButtonPos = Integer.valueOf(buttonPos);
 
-        String bgStyle = prefs.getString(SettingsActivity.PREF_BG_STYLE, "0");
+        String bgStyle = prefs.getString(SettingsActivity.PREF_BG_STYLE, "3");
         int bgStyleInt = Integer.valueOf(bgStyle);
         if (bgStyleInt == 0) {
             mBgStyle = BgStyle.SOLID_LIGHT;
-        } else if(bgStyleInt == 1) {
+        } else if (bgStyleInt == 1) {
             mBgStyle = BgStyle.TRANSPARENT;
-        } else if(bgStyleInt == 3) {
+        } else if (bgStyleInt == 3) {
             mBgStyle = BgStyle.SOLID_SYSTEM;
         } else {
             mBgStyle = BgStyle.SOLID_DARK;
@@ -314,8 +312,8 @@ public class SwitchConfiguration {
         String hiddenListString = prefs.getString(SettingsActivity.PREF_HIDDEN_APPS, "");
         Utils.parseCollection(hiddenListString, mHiddenAppsList);
 
-        for(OnSharedPreferenceChangeListener listener : mPrefsListeners) {
-            if(DEBUG){
+        for (OnSharedPreferenceChangeListener listener : mPrefsListeners) {
+            if (DEBUG) {
                 Log.d(TAG, "onSharedPreferenceChanged " + listener.getClass().getName());
             }
             listener.onSharedPreferenceChanged(prefs, key);
@@ -350,7 +348,7 @@ public class SwitchConfiguration {
         if (isLandscape()) {
             // landscape
             return Math.max(mMaxWidth * 6,
-                (int) (getCurrentDisplayWidth() * 0.66f));
+                    (int) (getCurrentDisplayWidth() * 0.66f));
         }
         return getCurrentDisplayWidth();
     }
@@ -420,7 +418,7 @@ public class SwitchConfiguration {
     }
 
     public int getItemMaxHeight() {
-        return mShowLabels ? mMaxHeight + mLabelFontSizePx :  mMaxHeight;
+        return mShowLabels ? mMaxHeight + mLabelFontSizePx : mMaxHeight;
     }
 
     public int getOverlayHeaderWidth() {
@@ -454,11 +452,27 @@ public class SwitchConfiguration {
     }
 
     public int getSystemPrimaryColor() {
-        return mContext.getResources().getColor(R.color.system_default_primary);
+        return SurfaceColors.SURFACE_1.getColor(new ContextThemeWrapper(mContext, R.style.AppTheme));
     }
 
     public int getSystemPrimaryDarkColor() {
-        return mContext.getResources().getColor(R.color.system_default_primary_dark);
+        return SurfaceColors.SURFACE_3.getColor(new ContextThemeWrapper(mContext, R.style.AppTheme));
+    }
+
+    public int getLightPrimaryColor() {
+        return SurfaceColors.SURFACE_1.getColor(new ContextThemeWrapper(mContext, R.style.AppThemeLight));
+    }
+
+    public int getLightPrimaryDarkColor() {
+        return SurfaceColors.SURFACE_3.getColor(new ContextThemeWrapper(mContext, R.style.AppThemeLight));
+    }
+
+    public int getDarkPrimaryColor() {
+        return SurfaceColors.SURFACE_1.getColor(new ContextThemeWrapper(mContext, R.style.AppThemeDark));
+    }
+
+    public int getDarkPrimaryDarkColor() {
+        return SurfaceColors.SURFACE_3.getColor(new ContextThemeWrapper(mContext, R.style.AppThemeDark));
     }
 
     public int getSystemAccentColor() {
@@ -483,9 +497,9 @@ public class SwitchConfiguration {
 
     public int getButtonBackgroundColor() {
         if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT) {
-            return mContext.getResources().getColor(R.color.button_bg_flat_color);
+            return getLightPrimaryDarkColor();
         } else if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_DARK) {
-            return mContext.getResources().getColor(R.color.button_bg_flat_color_dark);
+            return getDarkPrimaryDarkColor();
         } else if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_SYSTEM) {
             return getSystemPrimaryDarkColor();
         }
@@ -505,9 +519,9 @@ public class SwitchConfiguration {
 
     public int getViewBackgroundColor() {
         if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT) {
-            return mContext.getResources().getColor(R.color.bg_flat_color);
+            return getLightPrimaryColor();
         } else if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_DARK) {
-            return mContext.getResources().getColor(R.color.bg_flat_color_dark);
+            return getDarkPrimaryColor();
         } else if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_SYSTEM) {
             return getSystemPrimaryColor();
         }
@@ -523,7 +537,7 @@ public class SwitchConfiguration {
 
     public int getPopupMenuStyle() {
         if (mBgStyle == BgStyle.SOLID_LIGHT) {
-           return R.style.PopupMenuLight;
+            return R.style.PopupMenuLight;
         } else if (mBgStyle == BgStyle.SOLID_DARK || mBgStyle == BgStyle.TRANSPARENT) {
             return R.style.PopupMenuDark;
         } else if (mBgStyle == BgStyle.SOLID_SYSTEM) {

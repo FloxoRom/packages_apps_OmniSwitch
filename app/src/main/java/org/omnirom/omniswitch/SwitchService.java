@@ -40,6 +40,7 @@ import android.os.UserHandle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -102,7 +103,7 @@ public class SwitchService extends Service {
             BitmapUtils.clearCachedColors();
 
             String layoutStyle = mPrefs.getString(SettingsActivity.PREF_LAYOUT_STYLE, "1");
-            mManager = new SwitchManager(this, Integer.valueOf(layoutStyle));
+            mManager = new SwitchManager(new ContextThemeWrapper(this, R.style.AppThemeSwitch), Integer.valueOf(layoutStyle));
 
             mReceiver = new RecentsReceiver();
             IntentFilter filter = new IntentFilter();
