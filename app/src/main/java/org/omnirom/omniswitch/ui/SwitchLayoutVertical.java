@@ -44,6 +44,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -56,6 +57,10 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+import static android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
+import static android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
 
 public class SwitchLayoutVertical extends AbstractSwitchLayout {
     private ListView mRecentList;
@@ -367,6 +372,14 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         if (Utils.isLockToAppEnabled(mContext)) {
             updatePinAppButton();
         }
+
+        int statusbarHeight = mWindowManager.getCurrentWindowMetrics().getWindowInsets().getInsets(WindowInsets.Type.statusBars()).top;
+        int navbarHeight = mWindowManager.getCurrentWindowMetrics().getWindowInsets().getInsets(WindowInsets.Type.navigationBars()).bottom;
+
+        mFavoriteListView.setPaddingRelative(0, statusbarHeight, 0, navbarHeight);
+        mAppDrawer.setPaddingRelative(0, statusbarHeight, 0, navbarHeight);
+        mButtonList.setPaddingRelative(0, statusbarHeight, 0, navbarHeight);
+        mRecentList.setPaddingRelative(0, statusbarHeight, 0, navbarHeight);
     }
 
     protected LinearLayout.LayoutParams getListParams() {
@@ -418,7 +431,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_PHONE,
-                0, PixelFormat.TRANSLUCENT);
+                FLAG_LAYOUT_IN_SCREEN|FLAG_TRANSLUCENT_NAVIGATION, PixelFormat.TRANSLUCENT);
 
         if (mConfiguration.mDimBehind) {
             mPopupView.getBackground().setAlpha(
@@ -428,6 +441,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         }
         params.gravity = getHorizontalGravity();
         params.setTrustedOverlay();
+        params.layoutInDisplayCutoutMode = LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
         return params;
     }
 
@@ -501,7 +515,9 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         final boolean resizeUpfront = mConfiguration.mLocation == 0 ?
                 mConfiguration.mButtonPos == 1 :
                 mConfiguration.mButtonPos == 0;
-        Log.d(TAG, "resizeUpfront = " + resizeUpfront);
+        if (DEBUG) {
+            Log.d(TAG, "resizeUpfront = " + resizeUpfront);
+        }
         if (resizeUpfront) {
             ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
             layoutParams.width = appDrawerWidth;
