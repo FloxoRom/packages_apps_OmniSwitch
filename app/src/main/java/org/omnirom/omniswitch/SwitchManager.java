@@ -19,7 +19,6 @@ package org.omnirom.omniswitch;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,17 +39,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.RemoteException;
-import android.os.PowerManager;
 import android.os.IPowerManager;
 import android.os.ServiceManager;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.Toast;
 
 public class SwitchManager {
     private static final String TAG = "OmniSwitch:SwitchManager";
@@ -396,10 +391,12 @@ public class SwitchManager {
         }
     }
 
-    public void updateLayout(int height) {
+    public void onConfigurationChanged(int height) {
         if (mLayout.isShowing()){
-            mLayout.updateLayout();
+            // close on rotate
+            mLayout.hide(true);
         }
+        mLayout.updateLayout();
         if (mGestureView.isShowing()){
             mGestureView.updateDragHandlePosition(height);
         }

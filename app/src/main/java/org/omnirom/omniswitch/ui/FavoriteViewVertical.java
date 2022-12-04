@@ -30,7 +30,7 @@ public class FavoriteViewVertical extends ListView {
 
     public FavoriteViewVertical(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mConfiguration = SwitchConfiguration.getInstance(mContext);
+        mConfiguration = SwitchConfiguration.getInstance(getContext());
     }
 
     @Override

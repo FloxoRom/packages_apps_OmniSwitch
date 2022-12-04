@@ -407,13 +407,13 @@ public class SwitchConfiguration {
 
     public int calcVerticalDivider(int height) {
         int verticalDividerHeight = 0;
-        int numRows = height / getItemMaxHeight();
+        /*int numRows = height / getItemMaxHeight();
         if (numRows > 1) {
             int equalHeight = height / numRows;
             if (equalHeight > getItemMaxHeight()) {
                 verticalDividerHeight = equalHeight - getItemMaxHeight();
             }
-        }
+        }*/
         return verticalDividerHeight;
     }
 

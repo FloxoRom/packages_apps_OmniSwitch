@@ -326,7 +326,6 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             Log.d(TAG, "initView");
         }
         mFavoriteListView.setLayoutParams(getListParams());
-        mFavoriteListView.setSelection(0);
         mRecentList.setLayoutParams(getRecentListParams());
         mNoRecentApps.setLayoutParams(getRecentListParams());
 
@@ -484,30 +483,6 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         item.setThumbRatio(mConfiguration.mThumbRatio);
         return item;
     }
-
-    /*@Override
-    protected void flipToAppDrawerNew() {
-        if (mConfiguration.mLocation == 0) {
-            mView.setTranslationX(getSlideEndPoint());
-        }
-        mRecents.setVisibility(View.GONE);
-        mAppDrawer.setVisibility(View.VISIBLE);
-        mAppDrawer.setLayoutParams(getAppDrawerParams());
-        mAppDrawer.requestLayout();
-        mRecentsOrAppDrawer.requestLayout();
-        enableOpenFavoriteButton(false);
-    }*/
-
-    /*@Override
-    protected void flipToRecentsNew() {
-        if (mConfiguration.mLocation == 0) {
-            mView.setTranslationX(getSlideEndPoint());
-        }
-        mAppDrawer.setVisibility(View.GONE);
-        mRecents.setVisibility(View.VISIBLE);
-        mRecentsOrAppDrawer.requestLayout();
-        enableOpenFavoriteButton(true);
-    }*/
 
     @Override
     protected void flipToAppDrawerNew() {
@@ -884,6 +859,18 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         }
     }
 
+    private void resetFavoritesPosition() {
+        if (mConfiguration.mBottomFavorites) {
+            mFavoriteListView.setSelection(mFavoriteList.size());
+        } else {
+            mFavoriteListView.setSelection(0);
+        }
+    }
+
+    private void resetButtonsPosition() {
+        mButtonList.scrollTo(0, mButtonListContainer.getHeight());
+    }
+
     private void createOpenFavoriteButton() {
         mOpenFavorite = getActionButtonTemplate(mContext.getResources()
                 .getDrawable(R.drawable.ic_expand));
@@ -914,5 +901,16 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             Log.d(TAG, "notifiyRecentsListChanged");
         }
         mRecentListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected synchronized void preShowDone() {
+        super.preShowDone();
+
+        if (DEBUG) {
+            Log.d(TAG, "reset scroll positions");
+        }
+        resetFavoritesPosition();
+        resetButtonsPosition();
     }
 }

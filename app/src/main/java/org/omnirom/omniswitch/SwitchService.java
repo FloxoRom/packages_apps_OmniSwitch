@@ -327,7 +327,7 @@ public class SwitchService extends Service {
                 if(DEBUG){
                     Log.d(TAG, "newScreenHeight = " + newScreenHeight);
                 }
-                mManager.updateLayout(newScreenHeight);
+                mManager.onConfigurationChanged(newScreenHeight);
             }
         } catch(Exception e) {
             Log.e(TAG, "onConfigurationChanged", e);
