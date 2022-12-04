@@ -65,7 +65,6 @@ public class SwitchConfiguration {
     public int mDefaultDragHandleWidth;
     public boolean mShowLabels = true;
     public int mDragHandleColor;
-    public int mIconDpi;
     public boolean mAutoHide;
     public static final int AUTO_HIDE_DEFAULT = 3000; // 3s
     public boolean mDragHandleShow = true;
@@ -90,15 +89,13 @@ public class SwitchConfiguration {
     public boolean mSideHeader = true;
     private static SwitchConfiguration mInstance;
     private WindowManager mWindowManager;
-    private int mDefaultHandleHeight;
+    public int mDefaultHandleHeight;
     private int mLabelFontSizePx;
     public int mMaxHeight;
     public int mMemDisplaySize;
     public int mLayoutStyle;
     public float mThumbRatio = 1.0f;
     public IconSize mIconSizeDesc = IconSize.NORMAL;
-    public int mIconBorderHorizontalDp = 8; // in dp
-    public int mIconBorderHorizontalPx; // in px
     public BgStyle mBgStyle = BgStyle.SOLID_LIGHT;
     public boolean mLaunchStatsEnabled;
     public boolean mRevertRecents;
@@ -115,7 +112,10 @@ public class SwitchConfiguration {
     public boolean mBottomFavorites;
     public boolean mButtonHide;
     public int mShortcutIconSizeDp = 32;
-    private Context mThemeContext;
+    public int mVerticalSidebarPx;
+    public int mHorizontalTopBottomPaddingPx;
+    public int mHorizontalContentPaddingPx;
+    public int mDragHandleLowerLimitPx;
 
     // old pref slots
     private static final String PREF_DRAG_HANDLE_COLOR = "drag_handle_color";
@@ -148,7 +148,6 @@ public class SwitchConfiguration {
         mContext = context;
         mWindowManager = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
-        mThemeContext = new ContextThemeWrapper(mContext, R.style.AppTheme);
         setDensityConfiguration(context);
         updatePrefs(PreferenceManager.getDefaultSharedPreferences(context), "");
     }
@@ -180,7 +179,6 @@ public class SwitchConfiguration {
         mQSActionSizePx = Math.round(60 * mDensity);
         mOverlayIconSizePx = Math.round(mOverlayIconSizeDp * mDensity);
         mOverlayIconBorderPx = Math.round(mOverlayIconBorderDp * mDensity);
-        mIconBorderHorizontalPx = Math.round(mIconBorderHorizontalDp * mDensity);
         mIconSizeQuickPx = Math.round(100 * mDensity);
         mIconBorderPx = Math.round(mIconBorderDp * mDensity);
         // Render the default thumbnail background
@@ -191,6 +189,10 @@ public class SwitchConfiguration {
         mMemDisplaySize = (int) context.getResources().getDimensionPixelSize(
                 R.dimen.ram_display_size);
         mLabelFontSizeSp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mLabelFontSize, context.getResources().getDisplayMetrics());
+        mVerticalSidebarPx = context.getResources().getDimensionPixelSize(R.dimen.vertical_bg_padding);
+        mHorizontalTopBottomPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.horizontal_bg_padding);
+        mHorizontalContentPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.horizontal_content_padding);
+        mDragHandleLowerLimitPx = context.getResources().getDimensionPixelSize(R.dimen.drage_handle_bottom_limit);
     }
 
     public void initDefaults(Context context) {
@@ -242,7 +244,7 @@ public class SwitchConfiguration {
 
         mIconSizePx = Math.round(mIconSize * mDensity);
         mMaxWidth = Math.round((mIconSize + mIconBorderDp) * mDensity);
-        mMaxHeight = Math.round((mIconSize + mIconBorderDp) * mDensity);
+        mMaxHeight = Math.round((mIconSize + mIconBorderDp / 2) * mDensity);
         // add a small gap
         mLabelFontSizePx = Math.round((mLabelFontSize + mIconBorderDp) * mDensity);
 
@@ -394,7 +396,7 @@ public class SwitchConfiguration {
     public int calcHorizontalDivider(boolean fullscreen) {
         int horizontalDividerWidth = 0;
         int width = fullscreen ? getCurrentDisplayWidth() : getCurrentOverlayWidth();
-        int columnWidth = mMaxWidth + mIconBorderHorizontalPx;
+        int columnWidth = mMaxWidth;
         int numColumns = width / columnWidth;
         if (numColumns > 1) {
             int equalWidth = width / numColumns;
@@ -402,19 +404,19 @@ public class SwitchConfiguration {
                 horizontalDividerWidth = equalWidth - columnWidth;
             }
         }
-        return horizontalDividerWidth;
+        return Math.max(horizontalDividerWidth, 10);
     }
 
     public int calcVerticalDivider(int height) {
         int verticalDividerHeight = 0;
-        /*int numRows = height / getItemMaxHeight();
+        int numRows = height / getItemMaxHeight();
         if (numRows > 1) {
             int equalHeight = height / numRows;
             if (equalHeight > getItemMaxHeight()) {
                 verticalDividerHeight = equalHeight - getItemMaxHeight();
             }
-        }*/
-        return verticalDividerHeight;
+        }
+        return Math.max(verticalDividerHeight, 10);
     }
 
     public int getItemMaxHeight() {
@@ -459,12 +461,20 @@ public class SwitchConfiguration {
         return SurfaceColors.SURFACE_3.getColor(new ContextThemeWrapper(mContext, R.style.AppTheme));
     }
 
+    public int getSystemPrimaryDarkerColor() {
+        return SurfaceColors.SURFACE_5.getColor(new ContextThemeWrapper(mContext, R.style.AppTheme));
+    }
+
     public int getLightPrimaryColor() {
         return SurfaceColors.SURFACE_1.getColor(new ContextThemeWrapper(mContext, R.style.AppThemeLight));
     }
 
     public int getLightPrimaryDarkColor() {
         return SurfaceColors.SURFACE_3.getColor(new ContextThemeWrapper(mContext, R.style.AppThemeLight));
+    }
+
+    public int getLightPrimaryDarkerColor() {
+        return SurfaceColors.SURFACE_5.getColor(new ContextThemeWrapper(mContext, R.style.AppThemeLight));
     }
 
     public int getDarkPrimaryColor() {
@@ -475,12 +485,16 @@ public class SwitchConfiguration {
         return SurfaceColors.SURFACE_3.getColor(new ContextThemeWrapper(mContext, R.style.AppThemeDark));
     }
 
+    public int getDarkPrimaryDarkerColor() {
+        return SurfaceColors.SURFACE_5.getColor(new ContextThemeWrapper(mContext, R.style.AppThemeDark));
+    }
+
     public int getSystemAccentColor() {
         return mContext.getResources().getColor(R.color.colorPrimary);
     }
 
     public int getTaskHeaderColor() {
-        return getButtonBackgroundColor();
+        return getTaskHeaderBackgroundColor();
     }
 
     public int getCurrentButtonTint(int color) {
@@ -524,6 +538,17 @@ public class SwitchConfiguration {
             return getDarkPrimaryColor();
         } else if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_SYSTEM) {
             return getSystemPrimaryColor();
+        }
+        return mContext.getResources().getColor(R.color.bg_transparent);
+    }
+
+    public int getTaskHeaderBackgroundColor() {
+        if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT) {
+            return getLightPrimaryDarkerColor();
+        } else if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_DARK) {
+            return getDarkPrimaryDarkerColor();
+        } else if (mBgStyle == SwitchConfiguration.BgStyle.SOLID_SYSTEM) {
+            return getSystemPrimaryDarkerColor();
         }
         return mContext.getResources().getColor(R.color.bg_transparent);
     }

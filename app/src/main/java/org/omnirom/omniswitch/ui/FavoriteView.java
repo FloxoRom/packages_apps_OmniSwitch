@@ -135,7 +135,7 @@ public class FavoriteView extends GridView {
         item.setEllipsize(TextUtils.TruncateAt.END);
         item.setGravity(Gravity.CENTER);
         item.setLayoutParams(getListItemParams());
-        item.setPadding(0, mConfiguration.mIconBorderPx, 0, 0);
+        item.setPadding(0, mConfiguration.mIconBorderPx / 2, 0, 0);
         item.setMaxLines(1);
         item.setTypeface(mLabelFont);
         if (mTransparent) {
@@ -168,7 +168,7 @@ public class FavoriteView extends GridView {
     }
 
     private void updateLayout() {
-        setColumnWidth(mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx);
+        setColumnWidth(mConfiguration.mMaxWidth);
         int dividerHeight = mConfiguration.calcVerticalDivider(getHeight());
         setVerticalSpacing(dividerHeight);
         requestLayout();

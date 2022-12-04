@@ -486,11 +486,11 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
     }
 
     private int getLowerHandleLimit() {
-        return mConfiguration.getCurrentDisplayHeight() - mConfiguration.mLevelHeight;
+        return mConfiguration.getCurrentDisplayHeight() - mConfiguration.mDragHandleLowerLimitPx;
     }
 
     private int getUpperHandleLimit() {
-        return mConfiguration.mLevelHeight / 2;
+        return getLowerHandleLimit() - mConfiguration.mDefaultHandleHeight / 2;
     }
 
     private double scaleValue(double value, double oldMin, double oldMax, double newMin, double newMax) {

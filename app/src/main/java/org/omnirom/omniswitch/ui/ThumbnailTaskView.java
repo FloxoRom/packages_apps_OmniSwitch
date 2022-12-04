@@ -249,7 +249,7 @@ public class ThumbnailTaskView extends View implements TaskDescription.ThumbChan
             taskIcon.setBounds(iconInset, iconInset, iconSizePx + iconInset, iconSizePx + iconInset);
             taskIcon.draw(canvas);
         }
-        if (getLabel() != null && mConfiguration.mShowLabels) {
+        if (getLabel() != null) {
             String label = TextUtils.ellipsize(getLabel(), textPaint, width - startTextPx - textInsetPx, TextUtils.TruncateAt.END).toString();
             if (sideHeader) {
                 canvas.save();

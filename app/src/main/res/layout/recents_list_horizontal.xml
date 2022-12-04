@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   Copyright (C) 2013-2016 The OmniROM Project
 
   This program is free software: you can redistribute it and/or modify
@@ -18,45 +17,52 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:paddingTop="@dimen/horizontal_bg_padding"
+    android:paddingBottom="@dimen/horizontal_bg_padding"
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/button_list_container_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone" >
+        android:visibility="gone">
 
         <HorizontalScrollView
             android:id="@+id/button_list_top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:scrollbars="none" >
+            android:scrollbars="none">
 
             <LinearLayout
                 android:id="@+id/button_list_items_top"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal" />
         </HorizontalScrollView>
     </LinearLayout>
+
+    <View
+        android:id="@+id/recents_or_appdrawer_padding_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/horizontal_bg_padding" />
 
     <include layout="@layout/recents_rambar" />
 
     <FrameLayout
         android:id="@+id/recents_or_appdrawer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:id="@+id/recents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp" >
+            android:paddingTop="@dimen/horizontal_content_padding"
+            android:paddingBottom="@dimen/horizontal_content_padding">
 
             <org.omnirom.omniswitch.ui.HorizontalListView
                 android:id="@+id/recent_list_horizontal"
@@ -76,9 +82,9 @@
 
             <ImageView
                 android:id="@+id/openFavorites"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="center_horizontal"
                 android:scaleType="centerInside" />
 
             <org.omnirom.omniswitch.ui.FavoriteViewHorizontal
@@ -91,15 +97,20 @@
         <org.omnirom.omniswitch.ui.AppDrawerView
             android:id="@+id/app_drawer"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/app_drawer_height_horizontal"
+            android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:numColumns="auto_fit"
+            android:paddingTop="@dimen/horizontal_content_padding"
+            android:paddingBottom="@dimen/horizontal_content_padding"
             android:smoothScrollbar="true"
             android:stretchMode="spacingWidthUniform"
-            android:visibility="gone"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp" />
+            android:visibility="gone" />
     </FrameLayout>
+
+    <View
+        android:id="@+id/recents_or_appdrawer_padding_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/horizontal_bg_padding" />
 
     <LinearLayout
         android:id="@+id/button_list_container_bottom"

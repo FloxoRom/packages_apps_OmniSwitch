@@ -17,19 +17,9 @@
  */
 package org.omnirom.omniswitch.ui;
 
-import java.util.List;
-
-import org.omnirom.omniswitch.PackageManager;
-import org.omnirom.omniswitch.R;
-import org.omnirom.omniswitch.SettingsActivity;
-import org.omnirom.omniswitch.SwitchConfiguration;
-import org.omnirom.omniswitch.SwitchManager;
-import org.omnirom.omniswitch.TaskDescription;
-import org.omnirom.omniswitch.Utils;
-
 import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.animation.Animator.AnimatorListener;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.ActivityManager;
@@ -37,30 +27,32 @@ import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Outline;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.text.format.Formatter;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.GridView;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.omnirom.omniswitch.R;
+import org.omnirom.omniswitch.SettingsActivity;
+import org.omnirom.omniswitch.SwitchConfiguration;
+import org.omnirom.omniswitch.SwitchManager;
+import org.omnirom.omniswitch.TaskDescription;
+import org.omnirom.omniswitch.Utils;
+
+import java.util.List;
 
 public class SwitchLayout extends AbstractSwitchLayout {
     private HorizontalListView mRecentListHorizontal;
@@ -78,7 +70,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
     private class RecentListAdapter extends ArrayAdapter<TaskDescription> {
 
         public RecentListAdapter(Context context, int resource,
-                List<TaskDescription> values) {
+                                 List<TaskDescription> values) {
             super(context, R.layout.package_item, resource, values);
         }
 
@@ -156,7 +148,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
         mRecentListHorizontal.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
-                    int position, long id) {
+                                    int position, long id) {
                 TaskDescription task = mRecentsManager.getTasks().get(position);
                 mRecentsManager.switchTask(task, mAutoClose, false);
             }
@@ -166,7 +158,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
                 .setOnItemLongClickListener(new OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> parent,
-                            View view, int position, long id) {
+                                                   View view, int position, long id) {
                         TaskDescription task = mRecentsManager.getTasks().get(
                                 position);
                         handleLongPressRecent(mRecentsManager.getTasks(), task, view);
@@ -178,7 +170,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
                 mRecentListHorizontal,
                 new SwipeDismissHorizontalListViewTouchListener.DismissCallbacks() {
                     public void onDismiss(HorizontalListView listView,
-                            int[] reverseSortedPositions) {
+                                          int[] reverseSortedPositions) {
                         Log.d(TAG, "onDismiss: "
                                 + mRecentsManager.getTasks().size() + ":"
                                 + reverseSortedPositions[0]);
@@ -208,7 +200,6 @@ public class SwitchLayout extends AbstractSwitchLayout {
         mRecentListHorizontal.setAdapter(mRecentListAdapter);
 
         mOpenFavorite = (ImageView) mView.findViewById(R.id.openFavorites);
-
         mOpenFavorite.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 toggleFavorites();
@@ -254,20 +245,15 @@ public class SwitchLayout extends AbstractSwitchLayout {
         mPopupView.setBackgroundColor(Color.BLACK);
         mPopupView.getBackground().setAlpha(0);
 
-        ViewGroup.MarginLayoutParams lp = new ViewGroup.MarginLayoutParams (
+        ViewGroup.MarginLayoutParams lp = new ViewGroup.MarginLayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         mView.setLayoutParams(lp);
         setViewTopMargin();
-    
+
         mPopupView.addView(mView);
 
-        mView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
+        mView.setOnTouchListener(mDragHandleListener);
         mPopupView.setOnTouchListener(mDragHandleListener);
         mPopupView.setOnKeyListener(new PopupKeyListener());
 
@@ -285,7 +271,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
     }
 
     @Override
-    protected synchronized void updateRecentsAppsList(boolean force,  boolean refresh) {
+    protected synchronized void updateRecentsAppsList(boolean force, boolean refresh) {
         if (DEBUG) {
             Log.d(TAG, "updateRecentsAppsList " + System.currentTimeMillis());
         }
@@ -343,7 +329,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
         ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         mRecentsOrAppDrawer.setLayoutParams(layoutParams);
-        mCurrentHeight = mRecentsOrAppDrawer.getHeight();
+        mCurrentHeight = mRecentsOrAppDrawer.getMeasuredHeight();
 
         mVirtualBackKey = false;
         showOpenFavoriteButton();
@@ -377,27 +363,16 @@ public class SwitchLayout extends AbstractSwitchLayout {
 
     @Override
     protected LinearLayout.LayoutParams getListItemParams() {
-        return new LinearLayout.LayoutParams(mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx,
+        return new LinearLayout.LayoutParams(mConfiguration.mMaxWidth,
                 mConfiguration.getItemMaxHeight());
     }
 
     private int getAppDrawerLines() {
         if (mConfiguration.mIconSizeDesc == SwitchConfiguration.IconSize.SMALL) {
-            if (mConfiguration.isLandscape()) {
-                return 4;
-            } else {
-                return 5;
-            }
+            return 4;
         }
         if (mConfiguration.mIconSizeDesc == SwitchConfiguration.IconSize.NORMAL) {
-            if (mConfiguration.isLandscape()) {
-                return 3;
-            } else {
-                return 4;
-            }
-        }
-        if (mConfiguration.isLandscape()) {
-            return 2;
+            return 3;
         }
         return 3;
     }
@@ -406,7 +381,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
     protected FrameLayout.LayoutParams getAppDrawerParams() {
         return new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, getAppDrawerLines()
-                        * mConfiguration.getItemMaxHeight());
+                * mConfiguration.getItemMaxHeight() + 2 * mConfiguration.mHorizontalContentPaddingPx);
     }
 
     @Override
@@ -419,7 +394,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
 
         if (mConfiguration.mDimBehind) {
             mPopupView.getBackground().setAlpha(
-                        (int) (255 * mConfiguration.mBackgroundOpacity));
+                    (int) (255 * mConfiguration.mBackgroundOpacity));
         } else {
             mPopupView.getBackground().setAlpha(0);
         }
@@ -460,8 +435,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mView.getLayoutParams();
         lp.topMargin = mConfiguration.getCurrentOffsetStart()
                 + mConfiguration.mDragHandleHeight / 2
-                - mConfiguration.getItemMaxHeight() / 2
-                - (mButtonsVisible ? mConfiguration.mActionSizePx : 0);
+                - getMaxViewHeight() / 2;
         mView.setLayoutParams(lp);
     }
 
@@ -481,7 +455,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
             mAppDrawerAnim.cancel();
         }
         mAppDrawer.setLayoutParams(getAppDrawerParams());
-        mCurrentHeight = mRecentsOrAppDrawer.getHeight();
+        mCurrentHeight = mRecentsOrAppDrawer.getMeasuredHeight();
         int recentsHeight = mCurrentHeight;
         int appDrawerHeight = getAppDrawerParams().height;
 
@@ -512,7 +486,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
         Animator rotateAnimator = interpolator(
                 mLinearInterpolator,
                 ObjectAnimator.ofFloat(mAllappsButton, View.ROTATION,
-                ROTATE_180_DEGREE, ROTATE_0_DEGREE));
+                        ROTATE_180_DEGREE, ROTATE_0_DEGREE));
 
         mAppDrawerAnim = new AnimatorSet();
         mAppDrawerAnim.playTogether(rotateAnimator, expandAnimator);
@@ -521,12 +495,15 @@ public class SwitchLayout extends AbstractSwitchLayout {
             @Override
             public void onAnimationEnd(Animator animation) {
             }
+
             @Override
             public void onAnimationStart(Animator animation) {
             }
+
             @Override
             public void onAnimationCancel(Animator animation) {
             }
+
             @Override
             public void onAnimationRepeat(Animator animation) {
             }
@@ -566,7 +543,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
         Animator rotateAnimator = interpolator(
                 mLinearInterpolator,
                 ObjectAnimator.ofFloat(mAllappsButton, View.ROTATION,
-                ROTATE_0_DEGREE, ROTATE_180_DEGREE));
+                        ROTATE_0_DEGREE, ROTATE_180_DEGREE));
 
         mAppDrawerAnim = new AnimatorSet();
         mAppDrawerAnim.playTogether(rotateAnimator, collapseAnimator);
@@ -582,12 +559,15 @@ public class SwitchLayout extends AbstractSwitchLayout {
                 mRecentsOrAppDrawer.setLayoutParams(layoutParams);
                 mCurrentHeight = mRecentsOrAppDrawer.getLayoutParams().height;
             }
+
             @Override
             public void onAnimationStart(Animator animation) {
             }
+
             @Override
             public void onAnimationCancel(Animator animation) {
             }
+
             @Override
             public void onAnimationRepeat(Animator animation) {
             }
@@ -698,6 +678,15 @@ public class SwitchLayout extends AbstractSwitchLayout {
         }
         mRecents.setBackgroundColor(mConfiguration.getViewBackgroundColor());
         mAppDrawer.setBackgroundColor(mConfiguration.getViewBackgroundColor());
+        mRecentsOrAppDrawer.setBackgroundColor(mConfiguration.getButtonBackgroundColor());
+
+        mView.findViewById(R.id.recents_or_appdrawer_padding_top).setBackgroundColor(mConfiguration.getButtonBackgroundColor());
+        mView.findViewById(R.id.recents_or_appdrawer_padding_bottom).setBackgroundColor(mConfiguration.getButtonBackgroundColor());
+
+        Drawable bgShape = mContext.getDrawable(R.drawable.all_round_rect_shape);
+        bgShape.setTint(mConfiguration.getButtonBackgroundColor());
+        mView.setBackground(bgShape);
+
         if (mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.TRANSPARENT) {
             if (!mConfiguration.mDimBehind) {
                 mRecents.getBackground().setAlpha(
@@ -717,7 +706,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
 
         ((ImageView) mOpenFavorite).setImageDrawable(BitmapUtils.colorize(mContext.getResources(),
                 mConfiguration.getCurrentButtonTint(
-                mConfiguration.getButtonBackgroundColor()),
+                        mConfiguration.getButtonBackgroundColor()),
                 mContext.getResources().getDrawable(R.drawable.ic_expand)));
         mOpenFavorite.setBackgroundResource(mConfiguration.getBackgroundRipple());
 
@@ -761,5 +750,11 @@ public class SwitchLayout extends AbstractSwitchLayout {
             Log.d(TAG, "notifiyRecentsListChanged");
         }
         mRecentListAdapter.notifyDataSetChanged();
+    }
+
+    private int getMaxViewHeight() {
+        return getAppDrawerLines() * mConfiguration.getItemMaxHeight()
+                + 4 * mConfiguration.mHorizontalTopBottomPaddingPx
+                + mConfiguration.mActionSizePx;
     }
 }

@@ -32,6 +32,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.PatternMatcher;
 import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -56,6 +57,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static android.content.pm.PackageManager.DONT_KILL_APP;
+
+import com.android.internal.statusbar.IStatusBarService;
 
 public class Utils {
     private static final String TAG = "OmniSwitch:Utils";
@@ -424,14 +427,14 @@ public class Utils {
     }
 
     public static void toggleTorch(Context context) {
-        /*IStatusBarService service = IStatusBarService.Stub.asInterface(ServiceManager.getService("statusbar"));
+        IStatusBarService service = IStatusBarService.Stub.asInterface(ServiceManager.getService("statusbar"));
         if (service != null) {
             try {
                 service.toggleCameraFlash();
             } catch (RemoteException e) {
                 // do nothing.
             }
-        }*/
+        }
     }
 
     public static void convertLegacyAppLists(Context context) {

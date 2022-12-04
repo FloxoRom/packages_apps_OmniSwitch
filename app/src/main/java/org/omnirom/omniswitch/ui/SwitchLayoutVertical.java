@@ -38,6 +38,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.Gravity;
@@ -253,12 +254,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         mView.setLayoutParams(lp);
         mPopupView.addView(mView);
 
-        mView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
+        mView.setOnTouchListener(mDragHandleListener);
         mPopupView.setOnTouchListener(mDragHandleListener);
         mPopupView.setOnKeyListener(new PopupKeyListener());
 
@@ -376,14 +372,20 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         int statusbarHeight = mWindowManager.getCurrentWindowMetrics().getWindowInsets().getInsets(WindowInsets.Type.statusBars()).top;
         int navbarHeight = mWindowManager.getCurrentWindowMetrics().getWindowInsets().getInsets(WindowInsets.Type.navigationBars()).bottom;
 
-        mFavoriteListView.setPaddingRelative(0, statusbarHeight, 0, navbarHeight);
-        mAppDrawer.setPaddingRelative(0, statusbarHeight, 0, navbarHeight);
-        mButtonList.setPaddingRelative(0, statusbarHeight, 0, navbarHeight);
-        mRecentList.setPaddingRelative(0, statusbarHeight, 0, navbarHeight);
+        mFavoriteListView.setPadding(0, statusbarHeight, 0, navbarHeight);
+        mAppDrawer.setPadding(0, statusbarHeight, 0, navbarHeight);
+        mButtonList.setPadding(0, statusbarHeight, 0, navbarHeight);
+        mRecentList.setPadding(0, statusbarHeight, 0, navbarHeight);
+
+        if (mConfiguration.mLocation == 0) {
+            mView.setPadding(mConfiguration.mVerticalSidebarPx, 0, 0, 0);
+        } else {
+            mView.setPadding(0, 0, mConfiguration.mVerticalSidebarPx, 0);
+        }
     }
 
     protected LinearLayout.LayoutParams getListParams() {
-        return new LinearLayout.LayoutParams(mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx,
+        return new LinearLayout.LayoutParams(mConfiguration.mMaxWidth,
                 LinearLayout.LayoutParams.MATCH_PARENT);
     }
 
@@ -394,24 +396,23 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
 
     @Override
     protected LinearLayout.LayoutParams getListItemParams() {
-        return new LinearLayout.LayoutParams(mConfiguration.mMaxWidth,
+        return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 mConfiguration.getItemMaxHeight());
     }
 
     private LinearLayout.LayoutParams getRecentListItemParams() {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                getCurrentThumbWidth(),
+        return new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 getCurrentThumbHeight());
-        return params;
     }
 
     private int getAppDrawerColumns() {
-        int columns = getRecentsWidth() / (mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx);
+        int columns = getRecentsWidth() / (mConfiguration.mMaxWidth);
         if (mConfiguration.mIconSizeDesc == SwitchConfiguration.IconSize.SMALL) {
-            return Math.max(4, columns);
+            return Math.max(3, columns);
         }
         if (mConfiguration.mIconSizeDesc == SwitchConfiguration.IconSize.NORMAL) {
-            return Math.max(3, columns);
+            return Math.max(2, columns);
         }
         return Math.max(2, columns);
     }
@@ -647,7 +648,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         if (mShowFavAnim != null) {
             mShowFavAnim.cancel();
         }
-        final int favoriteWidth = mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx;
+        final int favoriteWidth = mConfiguration.mMaxWidth;
         if (mShowFavorites) {
             ViewGroup.LayoutParams layoutParams = mFavoriteListView.getLayoutParams();
             layoutParams.width = 0;
@@ -748,6 +749,15 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
                 }
             }
         }
+        Drawable bgShape;
+        if (mConfiguration.mLocation == 0) {
+            bgShape = mContext.getDrawable(R.drawable.left_round_rect_shape);
+        } else {
+            bgShape = mContext.getDrawable(R.drawable.right_round_rect_shape);
+        }
+        bgShape.setTint(mConfiguration.getButtonBackgroundColor());
+        mView.setBackground(bgShape);
+
         mRecents.setBackgroundColor(mConfiguration.getViewBackgroundColor());
         mAppDrawer.setBackgroundColor(mConfiguration.getViewBackgroundColor());
         if (mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.TRANSPARENT) {
@@ -785,14 +795,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
     protected int getSlideEndValue() {
         if (mShowAppDrawer) {
             return getAppDrawerParams().width
-                    + (isButtonVisible() ? mConfiguration.mActionSizePx : 0);
-        }
-        return getDefaultViewWidth();
-    }
-
-    private int getSlideEndValue(boolean showAppDrawer) {
-        if (showAppDrawer) {
-            return getAppDrawerParams().width
+                    + mConfiguration.mVerticalSidebarPx
                     + (isButtonVisible() ? mConfiguration.mActionSizePx : 0);
         }
         return getDefaultViewWidth();
@@ -800,24 +803,26 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
  
     private int getRecentsWidth() {
         return getCurrentThumbWidth()
-                + (mShowFavorites ? (mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx) : 0);
+                + (mShowFavorites ? (mConfiguration.mMaxWidth) : 0);
     }
 
     private int getAppDrawerWidth() {
         return getAppDrawerColumns()
-                * (mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx);
+                * (mConfiguration.mMaxWidth);
     }
 
     private int getDefaultViewWidth() {
         return getCurrentThumbWidth()
-                + (mShowFavorites ? (mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx) : 0)
+                + mConfiguration.mVerticalSidebarPx
+                + (mShowFavorites ? (mConfiguration.mMaxWidth) : 0)
                 + (isButtonVisible() ? mConfiguration.mActionSizePx : 0);
     }
 
     private int getCurrentFavoritesWidth(int favoritesWidth) {
         return getCurrentThumbWidth()
-            + favoritesWidth
-            + (isButtonVisible() ? mConfiguration.mActionSizePx : 0);
+                + mConfiguration.mVerticalSidebarPx
+                + favoritesWidth
+                + (isButtonVisible() ? mConfiguration.mActionSizePx : 0);
     }
 
     private int getCurrentThumbWidth() {

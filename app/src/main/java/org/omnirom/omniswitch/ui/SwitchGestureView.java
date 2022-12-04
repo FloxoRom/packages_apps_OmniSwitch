@@ -1312,7 +1312,7 @@ public class SwitchGestureView {
 
     private int getListItemWidth(int level) {
         if (level == 1){
-            return (int)(mConfiguration.mThumbnailWidth * mThumbRatio) + mConfiguration.mIconBorderDp;
+            return (int)(mConfiguration.mThumbnailWidth * mThumbRatio) + mConfiguration.mIconBorderPx;
         }
         return mConfiguration.getCurrentOverlayWidth() / 3;
     }

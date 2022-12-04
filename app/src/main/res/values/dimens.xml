@@ -32,7 +32,11 @@
     <dimen name="action_button_size">48dp</dimen>
     <dimen name="top_widget_padding">10dp</dimen>
     <dimen name="top_widget_height">100dp</dimen>
-    <dimen name="app_drawer_height_horizontal">300dp</dimen>
+    <dimen name="drage_handle_bottom_limit">150dp</dimen>
     <dimen name="content_side_margin">6dp</dimen>
     <dimen name="color_preset_item_size">44dp</dimen>
+    <dimen name="bg_shape_radius">16dp</dimen>
+    <dimen name="vertical_bg_padding">16dp</dimen>
+    <dimen name="horizontal_bg_padding">8dp</dimen>
+    <dimen name="horizontal_content_padding">4dp</dimen>
 </resources>

@@ -75,12 +75,9 @@
                 android:id="@+id/favorite_list"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
                 android:clipToPadding="false"
                 android:divider="@null"
-                android:listSelector="@android:color/transparent"
-                android:paddingStart="4dp"
-                android:paddingBottom="4dp" />
+                android:listSelector="@android:color/transparent" />
         </LinearLayout>
 
         <org.omnirom.omniswitch.ui.AppDrawerView
@@ -91,10 +88,9 @@
             android:gravity="center_horizontal"
             android:listSelector="@android:color/transparent"
             android:numColumns="auto_fit"
-            android:paddingBottom="4dp"
             android:smoothScrollbar="true"
             android:stretchMode="spacingWidthUniform"
-            android:visibility="gone" />
+            android:visibility="gone"/>
     </FrameLayout>
 
     <LinearLayout

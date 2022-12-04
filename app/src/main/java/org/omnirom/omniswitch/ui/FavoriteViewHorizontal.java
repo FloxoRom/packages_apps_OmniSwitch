@@ -127,7 +127,7 @@ public class FavoriteViewHorizontal extends HorizontalListView {
         item.setEllipsize(TextUtils.TruncateAt.END);
         item.setGravity(Gravity.CENTER);
         item.setLayoutParams(getListItemParams());
-        item.setPadding(0, mConfiguration.mIconBorderPx, 0, 0);
+        item.setPadding(0, mConfiguration.mIconBorderPx / 2, 0, 0);
         item.setMaxLines(1);
         item.setTypeface(mLabelFont);
         if (mTransparent) {
@@ -159,7 +159,7 @@ public class FavoriteViewHorizontal extends HorizontalListView {
     }
 
     private LinearLayout.LayoutParams getListItemParams() {
-        return new LinearLayout.LayoutParams(mConfiguration.mMaxWidth + mConfiguration.mIconBorderHorizontalPx,
+        return new LinearLayout.LayoutParams(mConfiguration.mMaxWidth,
                 mConfiguration.getItemMaxHeight());
     }
 
