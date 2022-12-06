@@ -255,7 +255,7 @@ public class SwitchConfiguration {
         mDragHandleShow = prefs.getBoolean(
                 SettingsActivity.PREF_DRAG_HANDLE_ENABLE, true);
         mDimBehind = prefs.getBoolean(SettingsActivity.PREF_DIM_BEHIND, false);
-        mDefaultDragHandleWidth = Math.round(20 * mDensity);
+        mDefaultDragHandleWidth = Math.round(40 * mDensity);
         mDragHandleWidth = prefs.getInt(
                 SettingsActivity.PREF_HANDLE_WIDTH, mDefaultDragHandleWidth);
         mButtons = Utils.buttonStringToMap(prefs.getString(SettingsActivity.PREF_BUTTONS_NEW,

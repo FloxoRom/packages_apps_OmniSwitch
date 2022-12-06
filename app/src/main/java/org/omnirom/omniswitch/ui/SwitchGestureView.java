@@ -209,9 +209,9 @@ public class SwitchGestureView {
         ColorStateList rippleColor =
                 ColorStateList.valueOf(mContext.getResources().getColor(android.R.color.white));
         mDragHandleImage = new RippleDrawable(rippleColor, mContext.getResources().getDrawable(
-                R.drawable.drag_handle), null);
+                R.drawable.drag_handle_shape), null);
         mDragHandleHiddenImage = mContext.getResources().getDrawable(
-                R.drawable.drag_handle_overlay);
+                R.drawable.drag_handle_overlay_shape);
 
         LayoutInflater inflater = (LayoutInflater) mContext
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -437,6 +437,11 @@ public class SwitchGestureView {
                 mConfiguration.mDragHandleWidth,
                 mConfiguration.mDragHandleHeight);
         params.gravity = Gravity.CENTER;
+        if (mConfiguration.mLocation == 0) {
+            params.rightMargin = -mConfiguration.mDragHandleWidth / 2;
+        } else {
+            params.leftMargin = -mConfiguration.mDragHandleWidth / 2;
+        }
         return params;
     }
 

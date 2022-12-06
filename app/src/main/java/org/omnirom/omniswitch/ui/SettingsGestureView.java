@@ -106,7 +106,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         mDragHandleWidth = mConfiguration.mDefaultDragHandleWidth;
 
         mDragHandle = mContext.getResources().getDrawable(
-                R.drawable.drag_handle);
+                R.drawable.drag_handle_shape);
         mDragHandleStart = mContext.getResources().getDrawable(
                 R.drawable.drag_handle_marker);
         mDragHandleEnd = mContext.getResources().getDrawable(
@@ -386,6 +386,11 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
                 mDragHandleWidth,
                 (int) (mEndY - mStartY));
         params.gravity = mLocation == 1 ? Gravity.LEFT : Gravity.RIGHT;
+        if (mLocation == 1) {
+            params.leftMargin = -mDragHandleWidth/2;
+        } else {
+            params.rightMargin = -mDragHandleWidth/2;
+        }
         mDragButton.setLayoutParams(params);
 
         params = new LinearLayout.LayoutParams(
@@ -411,8 +416,10 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         Drawable d2 = mDragHandleEnd;
 
         mDragButton.setScaleType(ImageView.ScaleType.FIT_XY);
-        mDragButton.setImageDrawable(BitmapUtils.colorize(mContext.getResources(), getDragHandleColor(), d));
-        mDragButton.getDrawable().setColorFilter(getDragHandleColor(), Mode.SRC_ATOP);
+        Drawable dColor = d.mutate();
+        dColor.setTint(getDragHandleColor());
+
+        mDragButton.setImageDrawable(dColor);
         mDragButton.setRotation(mLocation == 1 ? 180 : 0);
 
         mDragButtonStart.setScaleType(ImageView.ScaleType.FIT_XY);
