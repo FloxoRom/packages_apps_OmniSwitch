@@ -24,12 +24,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.PixelFormat;
-import android.graphics.Point;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -53,6 +52,7 @@ import androidx.appcompat.app.AlertDialog;
 
 
 public class SettingsGestureView implements DialogInterface.OnDismissListener {
+    private static final String TAG = "OmniSwitch:SettingsGestureView";
     private WindowManager mWindowManager;
     private ImageView mDragButton;
     private ImageView mDragButtonStart;
@@ -95,8 +95,6 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         mDensity = mContext.getResources().getDisplayMetrics().density;
-        Point size = new Point();
-        mWindowManager.getDefaultDisplay().getSize(size);
         ViewConfiguration vc = ViewConfiguration.get(mContext);
         mSlop = vc.getScaledTouchSlop();
         mConfiguration = SwitchConfiguration.getInstance(mContext);
@@ -193,7 +191,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
                         float deltaY = event.getRawY() - mDownY;
                         if (Math.abs(deltaY) > mSlop) {
                             if (((mStartY + deltaY) < (mEndY - mDragHandleMinHeight))
-                                    && (mStartY + deltaY - mDragHandleLimiterHeight > 0)) {
+                                    && (mStartY + deltaY - mDragHandleLimiterHeight > getUpperHandleLimit())) {
                                 mDeltaY = deltaY;
                                 mDragButtonStart.setTranslationY(mDeltaY);
                             }
@@ -353,11 +351,15 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.TYPE_APPLICATION,
-                WindowManager.LayoutParams.FLAG_DIM_BEHIND,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_DIM_BEHIND
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
+                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
                 PixelFormat.TRANSLUCENT);
         lp.gravity = Gravity.CENTER;
         lp.dimAmount = 0.6f;
+        lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
         return lp;
     }
 
@@ -493,11 +495,11 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
     }
 
     private int getLowerHandleLimit() {
-        return mConfiguration.getCurrentDisplayHeight() - mConfiguration.mDragHandleLowerLimitPx;
+        return mConfiguration.getCurrentDisplayHeight() - mConfiguration.mDragHandleBottomLimitPx;
     }
 
     private int getUpperHandleLimit() {
-        return getLowerHandleLimit() - mConfiguration.mDefaultHandleHeight / 2;
+        return mConfiguration.mDragHandleTopLimitPx;
     }
 
     private double scaleValue(double value, double oldMin, double oldMax, double newMin, double newMax) {

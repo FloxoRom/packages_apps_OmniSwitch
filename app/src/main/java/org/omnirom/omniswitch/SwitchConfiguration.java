@@ -20,7 +20,6 @@ package org.omnirom.omniswitch;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.graphics.Point;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
@@ -115,7 +114,8 @@ public class SwitchConfiguration {
     public int mVerticalSidebarPx;
     public int mHorizontalTopBottomPaddingPx;
     public int mHorizontalContentPaddingPx;
-    public int mDragHandleLowerLimitPx;
+    public int mDragHandleBottomLimitPx;
+    public int mDragHandleTopLimitPx;
 
     // old pref slots
     private static final String PREF_DRAG_HANDLE_COLOR = "drag_handle_color";
@@ -192,7 +192,8 @@ public class SwitchConfiguration {
         mVerticalSidebarPx = context.getResources().getDimensionPixelSize(R.dimen.vertical_bg_padding);
         mHorizontalTopBottomPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.horizontal_bg_padding);
         mHorizontalContentPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.horizontal_content_padding);
-        mDragHandleLowerLimitPx = context.getResources().getDimensionPixelSize(R.dimen.drage_handle_bottom_limit);
+        mDragHandleBottomLimitPx = context.getResources().getDimensionPixelSize(R.dimen.drage_handle_bottom_limit);
+        mDragHandleTopLimitPx = context.getResources().getDimensionPixelSize(R.dimen.drage_handle_top_limit);
     }
 
     public void initDefaults(Context context) {
@@ -365,10 +366,6 @@ public class SwitchConfiguration {
 
     public int getDefaultOffsetStart() {
         return ((getCurrentDisplayHeight() / 2) - mDefaultHandleHeight / 2);
-    }
-
-    public int getDefaultHeightRelative() {
-        return mDefaultHandleHeight / (getCurrentDisplayHeight() / 100);
     }
 
     public int getCurrentOffsetEnd() {
