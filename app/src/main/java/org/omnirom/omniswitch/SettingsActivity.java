@@ -96,7 +96,8 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String PREF_APP_FILTER_TIME = "app_filter_time";
     public static final String PREF_THUMB_SIZE = "thumb_size";
     public static final String PREF_APP_FILTER_RUNNING = "app_filter_running";
-    public static final String PREF_HANDLE_WIDTH = "handle_width";
+    public static final String PREF_HANDLE_WIDTH_OLD = "handle_width";
+    public static final String PREF_HANDLE_WIDTH = "handle_width_new";
     public static final String PREF_LAUNCHER_MODE = "launcher_mode";
     public static final String PREF_LAUNCH_STATS = "launch_stats";
     public static final String PREF_LAUNCH_STATS_DELETE = "launch_stats_delete";

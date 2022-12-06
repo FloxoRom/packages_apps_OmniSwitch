@@ -255,9 +255,12 @@ public class SwitchConfiguration {
         mDragHandleShow = prefs.getBoolean(
                 SettingsActivity.PREF_DRAG_HANDLE_ENABLE, true);
         mDimBehind = prefs.getBoolean(SettingsActivity.PREF_DIM_BEHIND, false);
+
         mDefaultDragHandleWidth = Math.round(40 * mDensity);
+        Utils.convertLegacyDragHandleSize(mContext, Math.round(20 * mDensity));
         mDragHandleWidth = prefs.getInt(
                 SettingsActivity.PREF_HANDLE_WIDTH, mDefaultDragHandleWidth);
+
         mButtons = Utils.buttonStringToMap(prefs.getString(SettingsActivity.PREF_BUTTONS_NEW,
                 SettingsActivity.PREF_BUTTON_DEFAULT_NEW), SettingsActivity.PREF_BUTTON_DEFAULT_NEW);
         mLevelBackgroundColor = prefs.getBoolean(SettingsActivity.PREF_SPEED_SWITCHER_COLOR, true);
@@ -327,19 +330,12 @@ public class SwitchConfiguration {
         prefs.edit().clear().commit();
     }
 
-    // includes rotation
     public int getCurrentDisplayHeight() {
-        Point size = new Point();
-        mWindowManager.getDefaultDisplay().getSize(size);
-        int height = size.y;
-        return height;
+        return mWindowManager.getCurrentWindowMetrics().getBounds().height();
     }
 
     public int getCurrentDisplayWidth() {
-        Point size = new Point();
-        mWindowManager.getDefaultDisplay().getSize(size);
-        int width = size.x;
-        return width;
+        return mWindowManager.getCurrentWindowMetrics().getBounds().width();
     }
 
     public boolean isLandscape() {

@@ -417,12 +417,14 @@ public class SwitchGestureView {
                 WindowManager.LayoutParams.TYPE_PHONE,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                        | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                        | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
                 PixelFormat.TRANSLUCENT);
 
         lp.gravity = getGravity();
         lp.y = mConfiguration.getCurrentOffsetStart();
         lp.setTrustedOverlay();
+        lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
         return lp;
     }
 
@@ -447,14 +449,17 @@ public class SwitchGestureView {
 
     public WindowManager.LayoutParams getParamsFull() {
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
-                mConfiguration.getCurrentDisplayWidth(),
-                mConfiguration.getCurrentDisplayHeight(),
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_DIM_BEHIND,
+                WindowManager.LayoutParams.FLAG_DIM_BEHIND
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
                 PixelFormat.TRANSLUCENT);
         lp.gravity = Gravity.CENTER;
         lp.dimAmount = mConfiguration.mBackgroundOpacity;
         lp.setTrustedOverlay();
+        lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
         return lp;
     }
 

@@ -455,6 +455,20 @@ public class Utils {
         }
     }
 
+    public static void convertLegacyDragHandleSize(Context context, int oldDefaultValue) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (prefs.contains(SettingsActivity.PREF_HANDLE_WIDTH_OLD)) {
+            int oldValue = prefs.getInt(SettingsActivity.PREF_HANDLE_WIDTH_OLD, oldDefaultValue);
+            int newValue = oldValue * 2;
+            Log.d(TAG, "convert legacy drag handle size = " + oldValue + " new = " + newValue);
+
+            prefs.edit()
+                    .putInt(SettingsActivity.PREF_HANDLE_WIDTH, newValue)
+                    .apply();
+            prefs.edit().remove(SettingsActivity.PREF_HANDLE_WIDTH_OLD).apply();
+        }
+    }
+
     public static int getAttrColor(Context context, int attr) {
         TypedArray ta = context.obtainStyledAttributes(new int[]{attr});
         int color = ta.getColor(0, 0);

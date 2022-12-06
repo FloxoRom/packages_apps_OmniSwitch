@@ -59,10 +59,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
-import static android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
-import static android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-
 public class SwitchLayoutVertical extends AbstractSwitchLayout {
     private ListView mRecentList;
     private FavoriteViewVertical mFavoriteListView;
@@ -432,7 +428,8 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_PHONE,
-                FLAG_LAYOUT_IN_SCREEN|FLAG_TRANSLUCENT_NAVIGATION, PixelFormat.TRANSLUCENT);
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, PixelFormat.TRANSLUCENT);
 
         if (mConfiguration.mDimBehind) {
             mPopupView.getBackground().setAlpha(
@@ -442,7 +439,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         }
         params.gravity = getHorizontalGravity();
         params.setTrustedOverlay();
-        params.layoutInDisplayCutoutMode = LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
         return params;
     }
 
@@ -837,6 +834,9 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
 
     @Override
     protected void afterShowDone() {
+        // hackish - do it twice to fix first time open
+        // does nothing if already done before
+        resetButtonsPosition();
     }
 
     private void createMemoryDisplay() {
@@ -889,8 +889,8 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
     }
 
     private void resetButtonsPosition() {
-        // TODO on initial open after rotate this does not work
-        mButtonList.scrollTo(0, mButtonListContainer.getHeight());
+        // on initial open after rotate this does not work
+        mButtonList.fullScroll(View.FOCUS_DOWN);
     }
 
     private void createOpenFavoriteButton() {
