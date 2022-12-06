@@ -175,6 +175,9 @@ public class PackageManager {
     }
 
     public synchronized PackageItem getPackageItem(String pkgName) {
+        if (!mInitDone) {
+            updatePackageList();
+        }
         try {
             return mInstalledPackagesMap.get(pkgName);
         } catch (NullPointerException e) {
