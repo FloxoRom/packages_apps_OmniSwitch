@@ -63,7 +63,6 @@ public class ContextMenuUtils {
         final Context wrapper = new ContextThemeWrapper(context,
                 configuration.getPopupMenuStyle());
         final PopupMenu popup = new PopupMenu(wrapper, view);
-        //popup.setWindowLayoutType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
         popup.getMenuInflater().inflate(R.menu.favorite_popup_menu,
                 popup.getMenu());
         Map<Integer, ShortcutInfo> scMap = new HashMap<>();
@@ -129,7 +128,6 @@ public class ContextMenuUtils {
         final Context wrapper = new ContextThemeWrapper(context,
                 configuration.getPopupMenuStyle());
         final PopupMenu popup = new PopupMenu(wrapper, view);
-        //popup.setWindowLayoutType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
         popup.getMenuInflater().inflate(R.menu.package_popup_menu,
                 popup.getMenu());
         final List<String> favoritList = configuration.mFavoriteList;

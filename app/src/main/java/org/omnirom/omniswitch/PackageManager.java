@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import androidx.annotation.Nullable;
+
 public class PackageManager {
     private static final boolean DEBUG = false;
     private static final String TAG = "OmniSwitch:PackageManager";
@@ -174,16 +176,11 @@ public class PackageManager {
         RecentTasksLoader.getInstance(mContext).clearTaskInfoCache();
     }
 
-    public synchronized PackageItem getPackageItem(String pkgName) {
+    public synchronized @Nullable PackageItem getPackageItem(String pkgName) {
         if (!mInitDone) {
             updatePackageList();
         }
-        try {
-            return mInstalledPackagesMap.get(pkgName);
-        } catch (NullPointerException e) {
-            Log.d(TAG, "no PackageItem for " + pkgName);
-            throw new RuntimeException("no PackageItem for " + pkgName);
-        }
+        return mInstalledPackagesMap.get(pkgName);
     }
 
     public void removePackageIconCache(String packageName) {

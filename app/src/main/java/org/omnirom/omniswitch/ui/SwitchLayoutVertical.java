@@ -889,6 +889,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
     }
 
     private void resetButtonsPosition() {
+        // TODO on initial open after rotate this does not work
         mButtonList.scrollTo(0, mButtonListContainer.getHeight());
     }
 

@@ -900,10 +900,12 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         final Context wrapper = new ContextThemeWrapper(mContext,
                 mConfiguration.getPopupMenuStyle());
         final PopupMenu popup = new PopupMenu(wrapper, view);
-        //popup.setWindowLayoutType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
         popup.getMenuInflater().inflate(R.menu.recent_popup_menu,
                 popup.getMenu());
-        boolean addFavEnabled = !mFavoriteList.contains(ad.getPackageName());
+        String packageName = ad.getPackageName();
+        PackageManager.PackageItem packageItem = PackageManager
+                .getInstance(mContext).getPackageItem(packageName);
+        boolean addFavEnabled = packageItem != null && !mFavoriteList.contains(packageName);
         if (!addFavEnabled) {
             popup.getMenu().removeItem(R.id.package_add_favorite);
         }
@@ -913,7 +915,6 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         if (!Utils.isMultiStackEnabled(mContext) || !Utils.isDockingAvailable(mContext, tasks)) {
             popup.getMenu().removeItem(R.id.package_dock_task);
         }
-        String packageName = ad.getPackageName();
         final boolean isLockedApp = ad.isLocked();
         if (isLockedApp) {
             popup.getMenu().findItem(R.id.package_lock_app).setTitle(R.string.package_unlock_app_title);

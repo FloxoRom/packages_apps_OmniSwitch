@@ -168,37 +168,10 @@ public class Utils {
         }, 150);
     }
 
-    public static void toggleImmersiveMode(Context context) {
-        /*boolean immersive = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.IMMERSIVE_MODE, 0) == 1;
-
-        Settings.System.putInt(context.getContentResolver(),
-                Settings.System.IMMERSIVE_MODE, !immersive ? 1 : 0);*/
-    }
-
-    private static void removeFromFavorites(Context context, String item, List<String> favoriteList) {
-        if (favoriteList.contains(item)) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            favoriteList.remove(item);
-            prefs.edit().putString(SettingsActivity.PREF_FAVORITE_APPS,
-                    Utils.flattenCollection(favoriteList)).commit();
-        }
-    }
-
     public static void removeFromFavoritesWithPackageName(Context context, String packageName, List<String> favoriteList) {
         if (favoriteList.contains(packageName)) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             favoriteList.remove(packageName);
-            prefs.edit().putString(SettingsActivity.PREF_FAVORITE_APPS,
-                    Utils.flattenCollection(favoriteList)).commit();
-        }
-    }
-
-
-    private static void addToFavorites(Context context, String item, List<String> favoriteList) {
-        if (!favoriteList.contains(item)) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            favoriteList.add(item);
             prefs.edit().putString(SettingsActivity.PREF_FAVORITE_APPS,
                     Utils.flattenCollection(favoriteList)).commit();
         }
@@ -212,7 +185,6 @@ public class Utils {
                     Utils.flattenCollection(favoriteList)).commit();
         }
     }
-
 
     public static boolean isLockToAppEnabled(Context context) {
         try {
