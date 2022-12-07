@@ -103,12 +103,8 @@ public class BitmapUtils {
 
     public static Drawable colorize(Resources resources, int color,
             Drawable image) {
-        // remove any alpha
-        color = color & ~0xff000000;
-        color = color | 0xff000000;
-
         Drawable d = image.mutate();
-        d.setColorFilter(color, Mode.SRC_ATOP);
+        d.setTint(color);
         return d;
     }
 

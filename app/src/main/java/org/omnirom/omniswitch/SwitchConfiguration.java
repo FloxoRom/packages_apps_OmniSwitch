@@ -52,7 +52,7 @@ public class SwitchConfiguration {
     public int mOverlayIconSizePx = 30;
     public int mOverlayIconBorderDp = 2;
     public int mOverlayIconBorderPx = 2;
-    public int mIconBorderDp = 8; // in dp
+    public int mIconBorderDp = 10; // in dp
     public int mIconBorderPx;
     public float mDensity;
     public int mDensityDpi;

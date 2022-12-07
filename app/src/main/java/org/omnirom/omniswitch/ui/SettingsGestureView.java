@@ -351,11 +351,11 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 WindowManager.LayoutParams.FLAG_DIM_BEHIND
                         | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                         | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
-                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                        | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 PixelFormat.TRANSLUCENT);
         lp.gravity = Gravity.CENTER;
         lp.dimAmount = 0.6f;
@@ -546,6 +546,8 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         d.setButton(AlertDialog.BUTTON_NEGATIVE,
                 mContext.getResources().getString(R.string.cancel),
                 (DialogInterface.OnClickListener) null);
+        // must be shown above TYPE_APPLICATION_OVERLAY
+        d.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
         return d;
     }
 

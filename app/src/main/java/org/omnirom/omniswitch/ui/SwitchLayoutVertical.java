@@ -429,7 +429,9 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_PHONE,
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, PixelFormat.TRANSLUCENT);
+                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
+                        | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                PixelFormat.TRANSLUCENT);
 
         if (mConfiguration.mDimBehind) {
             mPopupView.getBackground().setAlpha(

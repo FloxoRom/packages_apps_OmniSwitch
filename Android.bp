@@ -35,7 +35,8 @@ android_app {
         "com.google.android.material_material",
         "OmniLib",
         "OmniLibCore",
-        "OmniPreferenceTheme"
+        "OmniPreferenceTheme",
+        "SystemUISharedLib"
     ],
     kotlincflags: ["-Xjvm-default=enable"],
     optimize: {

@@ -390,7 +390,10 @@ public class SwitchLayout extends AbstractSwitchLayout {
                 getCurrentOverlayWidth(),
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_PHONE,
-                0, PixelFormat.TRANSLUCENT);
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
+                        | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                PixelFormat.TRANSLUCENT);
 
         if (mConfiguration.mDimBehind) {
             mPopupView.getBackground().setAlpha(
@@ -401,6 +404,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
 
         params.gravity = getHorizontalGravity();
         params.setTrustedOverlay();
+        params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
         return params;
     }
 
