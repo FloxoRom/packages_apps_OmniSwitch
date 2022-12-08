@@ -645,15 +645,14 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
 
         if (buttonId == SettingsActivity.BUTTON_GOOGLE_ASSISTANT) {
             mGoogleAssistant = getActionButtonTemplate(mContext.getResources()
-                    .getDrawable(R.drawable.ic_google_assist));
+                    .getDrawable(R.drawable.ic_voice_assist));
             mGoogleAssistant.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     hide(true);
-                    ComponentName gsa = new ComponentName("com.google.android.googlequicksearchbox",
-                            "com.google.android.apps.gsa.staticplugins.opa.OpaActivity");
-                    final Intent assistIntent = new Intent();
-                    assistIntent.setComponent(gsa);
+                    final Intent assistIntent = new Intent(Intent.ACTION_VOICE_ASSIST);
                     if (Utils.canResolveIntent(mContext, assistIntent)) {
+                        assistIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                         mContext.startActivity(assistIntent);
                     }
                 }

@@ -41,7 +41,7 @@
         <item>@string/phone</item>
         <item>@string/camera</item>
         <item>@string/assist</item>
-        <item>@string/google_assistant</item>
+        <item>@string/voice_assist</item>
         <item>@string/flashlight</item>
     </string-array>
     <string-array name="gravity_entries" translatable="false">

@@ -300,7 +300,7 @@ public class Launcher extends Activity implements IEditFavoriteActivity,
             }
         });
 
-        ImageView voiceAssistButton = getEssentialButtonTemplate(R.drawable.ic_google_assist);
+        ImageView voiceAssistButton = getEssentialButtonTemplate(R.drawable.ic_voice_assist);
         voiceAssistButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -873,10 +873,9 @@ public class Launcher extends Activity implements IEditFavoriteActivity,
     }
 
     private Intent getGoogleAssistIntent() {
-        ComponentName gsa = new ComponentName("com.google.android.googlequicksearchbox",
-                "com.google.android.apps.gsa.staticplugins.opa.OpaActivity");
-        final Intent assistIntent = new Intent();
-        assistIntent.setComponent(gsa);
+        final Intent assistIntent = new Intent(Intent.ACTION_VOICE_ASSIST);
+        assistIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
         return assistIntent;
     }
 

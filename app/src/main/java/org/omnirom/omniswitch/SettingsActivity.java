@@ -563,7 +563,7 @@ public class SettingsActivity extends AppCompatActivity {
             mButtonImages[10] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_phone));
             mButtonImages[11] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_camera));
             mButtonImages[12] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_assist));
-            mButtonImages[13] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_google_assist));
+            mButtonImages[13] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_voice_assist));
             mButtonImages[14] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_qs_flashlight));
 
             mSpeedSwitchButtonEntries = getResources().getStringArray(R.array.speed_switch_button_entries);
