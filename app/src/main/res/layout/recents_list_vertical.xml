@@ -20,6 +20,22 @@
     android:orientation="horizontal">
 
     <LinearLayout
+        android:id="@+id/vertical_bg_padding_space_start"
+        android:layout_width="@dimen/vertical_bg_padding"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/vertical_layout_handle_start"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:scaleType="centerInside"
+            android:src="@drawable/switch_layout_handle_shape" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/button_list_container_top"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -90,7 +106,7 @@
             android:numColumns="auto_fit"
             android:smoothScrollbar="true"
             android:stretchMode="spacingWidthUniform"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </FrameLayout>
 
     <LinearLayout
@@ -98,5 +114,21 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/vertical_bg_padding_space_end"
+        android:layout_width="@dimen/vertical_bg_padding"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/vertical_layout_handle_end"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:scaleType="centerInside"
+            android:src="@drawable/switch_layout_handle_shape" />
+    </LinearLayout>
 
 </LinearLayout>

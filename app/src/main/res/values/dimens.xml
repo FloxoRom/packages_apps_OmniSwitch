@@ -39,7 +39,7 @@
     <dimen name="content_side_margin">6dp</dimen>
     <dimen name="color_preset_item_size">44dp</dimen>
     <dimen name="bg_shape_radius">16dp</dimen>
-    <dimen name="vertical_bg_padding">16dp</dimen>
+    <dimen name="vertical_bg_padding">24dp</dimen>
     <dimen name="horizontal_bg_padding">8dp</dimen>
     <dimen name="horizontal_content_padding">4dp</dimen>
 </resources>

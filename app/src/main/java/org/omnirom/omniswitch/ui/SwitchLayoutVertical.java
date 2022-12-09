@@ -374,9 +374,11 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         mRecentList.setPadding(0, statusbarHeight, 0, navbarHeight);
 
         if (mConfiguration.mLocation == 0) {
-            mView.setPadding(mConfiguration.mVerticalSidebarPx, 0, 0, 0);
+            mView.findViewById(R.id.vertical_bg_padding_space_start).setVisibility(View.VISIBLE);
+            mView.findViewById(R.id.vertical_bg_padding_space_end).setVisibility(View.GONE);
         } else {
-            mView.setPadding(0, 0, mConfiguration.mVerticalSidebarPx, 0);
+            mView.findViewById(R.id.vertical_bg_padding_space_end).setVisibility(View.VISIBLE);
+            mView.findViewById(R.id.vertical_bg_padding_space_start).setVisibility(View.GONE);
         }
     }
 
@@ -749,13 +751,19 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
             }
         }
         Drawable bgShape;
+        Drawable layoutHandle = mContext.getDrawable(R.drawable.switch_layout_handle_shape);
+        layoutHandle.setTint(mConfiguration.getCurrentButtonTint(mConfiguration.getButtonBackgroundColor()));
         if (mConfiguration.mLocation == 0) {
             bgShape = mContext.getDrawable(R.drawable.left_round_rect_shape);
+            bgShape.setTint(mConfiguration.getButtonBackgroundColor());
+            mView.findViewById(R.id.vertical_bg_padding_space_start).setBackground(bgShape);
+            ((ImageView)mView.findViewById(R.id.vertical_layout_handle_start)).setImageDrawable(layoutHandle);
         } else {
             bgShape = mContext.getDrawable(R.drawable.right_round_rect_shape);
+            bgShape.setTint(mConfiguration.getButtonBackgroundColor());
+            mView.findViewById(R.id.vertical_bg_padding_space_end).setBackground(bgShape);
+            ((ImageView)mView.findViewById(R.id.vertical_layout_handle_end)).setImageDrawable(layoutHandle);
         }
-        bgShape.setTint(mConfiguration.getButtonBackgroundColor());
-        mView.setBackground(bgShape);
 
         mRecents.setBackgroundColor(mConfiguration.getViewBackgroundColor());
         mAppDrawer.setBackgroundColor(mConfiguration.getViewBackgroundColor());
