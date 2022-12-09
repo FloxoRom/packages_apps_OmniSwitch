@@ -160,7 +160,7 @@ public class CheckboxListDialog extends AlertDialog implements
     }
 
     public CheckboxListDialog(Context context, String[] items, Drawable[] images, Map<Integer, Boolean> checked, ApplyRunnable applyRunnable, String title) {
-        super(context);
+        super(context, R.style.AlertDialogTheme);
         mTitle = title;
         mApplyRunnable = applyRunnable;
         mListItems = items;

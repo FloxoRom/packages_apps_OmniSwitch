@@ -136,7 +136,7 @@ public class FavoriteDialog extends AlertDialog implements
     }
 
     public FavoriteDialog(Context context, IEditFavoriteActivity editor, List<String> favoriteList) {
-        super(context);
+        super(context, R.style.AlertDialogTheme);
         mEditor = editor;
         mFavoriteList = favoriteList;
     }

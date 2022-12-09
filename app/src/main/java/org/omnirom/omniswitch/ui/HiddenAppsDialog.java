@@ -120,7 +120,7 @@ public class HiddenAppsDialog extends AlertDialog implements
     }
 
     public HiddenAppsDialog(Context context, IEditFavoriteActivity editor, Collection<String> hiddenAppsList) {
-        super(context);
+        super(context, R.style.AlertDialogTheme);
         mHiddenAppsList = hiddenAppsList;
         mEditor = editor;
         mConfiguration = SwitchConfiguration.getInstance(context);

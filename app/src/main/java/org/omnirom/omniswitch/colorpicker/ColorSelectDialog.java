@@ -70,7 +70,7 @@ public class ColorSelectDialog extends AlertDialog implements
     private Integer[] mPresetColors;
 
     public ColorSelectDialog(Context context, int initialColor, boolean withAlpha, Integer[] presetColors) {
-        super(context);
+        super(context, R.style.AlertDialogTheme);
         mContext = context;
         mWithAlpha = withAlpha;
         mPresetColors = presetColors;
