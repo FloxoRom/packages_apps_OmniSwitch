@@ -21,7 +21,8 @@
     android:background="?android:attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:paddingStart="6dp">
+    android:paddingStart="6dp"
+    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd">
 
     <ImageView
         android:id="@+id/app_icon"
@@ -49,7 +50,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginEnd="8dip"
         android:clickable="false"
         android:focusable="false" />
 

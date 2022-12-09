@@ -22,14 +22,12 @@ import android.content.DialogInterface;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -210,7 +208,8 @@ public class CheckboxListDialog extends AlertDialog implements
                 Boolean value = getValueAtPosition(position, mCheckedItems);
                 if (value != null) {
                     setValueAtPosition(position, mCheckedItems, !value);
-                    mListAdapter.notifyDataSetChanged();
+                    ((Switch) view.findViewById(R.id.item_check)).setChecked(!value);
+                    //mListAdapter.notifyDataSetChanged();
                 }
             }
         });

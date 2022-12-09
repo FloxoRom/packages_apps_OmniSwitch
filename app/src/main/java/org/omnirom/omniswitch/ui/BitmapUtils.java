@@ -103,9 +103,8 @@ public class BitmapUtils {
 
     public static Drawable colorize(Resources resources, int color,
             Drawable image) {
-        Drawable d = image.mutate();
-        d.setTint(color);
-        return d;
+        image.setTint(color);
+        return image;
     }
 
     public static Drawable getDefaultActivityIcon(Context context) {

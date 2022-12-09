@@ -37,15 +37,15 @@
     <color name="ic_wallpaper_icon_color">#FFFFFFFF</color>
     <color name="ic_widget_icon_color">#FFFFFFFF</color>
     <color name="cling_scrim_background">#80000000</color>
-    <color name="launcher_shortcut_color">@color/material_grey_100</color>
     <color name="launcher_navigaton_bar">#66000000</color>
     <color name="docked_task_bg_color">#ff757575</color>
     <color name="locked_task_bg_color">#ffb52a2a</color>
     <color name="text_color_dark">@color/material_grey_100</color>
-    <color name="text_color_light">@color/material_grey_900</color>
+    <color name="text_color_light">@color/material_grey_850</color>
     <color name="ic_launcher_background">#ff4caf50</color>
     <color name="system_default_accent">#ff009688</color>
     <color name="default_drag_handle_color">@color/omni_logo_color</color>
     <color name="colorPrimary">@android:color/system_accent1_600</color>
     <color name="omni_logo_color">#a1c729</color>
+    <color name="text_color_default">@android:color/black</color>
 </resources>

@@ -20,11 +20,8 @@ package org.omnirom.omniswitch;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -549,7 +546,7 @@ public class SettingsActivity extends AppCompatActivity {
         private void initButtons() {
             mButtonEntries = getResources().getStringArray(R.array.button_entries);
             mButtonImages = new Drawable[mButtonEntries.length];
-            int color = Utils.getAttrColor(getContext(), android.R.attr.textColorPrimary);
+            int color = getContext().getResources().getColor(R.color.text_color_default);
             mButtonImages[0] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.kill_all));
             mButtonImages[1] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.kill_other));
             mButtonImages[2] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_lastapp));
