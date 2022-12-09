@@ -230,7 +230,6 @@ public class CurrentWeatherView extends FrameLayout implements OmniJawsClient.Om
     }
 
     private Drawable applyTint(Drawable icon) {
-        icon = icon.mutate();
         icon.setTint(getTintColor());
         return icon;
     }

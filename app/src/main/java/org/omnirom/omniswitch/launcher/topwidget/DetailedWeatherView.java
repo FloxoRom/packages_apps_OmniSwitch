@@ -229,7 +229,6 @@ public class DetailedWeatherView extends FrameLayout {
     }
 
     private Drawable applyTint(Drawable icon) {
-        icon = icon.mutate();
         icon.setTint(getTintColor());
         return icon;
     }

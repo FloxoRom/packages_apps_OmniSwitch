@@ -418,10 +418,9 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         Drawable d2 = mDragHandleEnd;
 
         mDragButton.setScaleType(ImageView.ScaleType.FIT_XY);
-        Drawable dColor = d.mutate();
-        dColor.setTint(getDragHandleColor());
+        mDragHandle.setTint(getDragHandleColor());
 
-        mDragButton.setImageDrawable(dColor);
+        mDragButton.setImageDrawable(mDragHandle);
         mDragButton.setRotation(mLocation == 1 ? 180 : 0);
 
         mDragButtonStart.setScaleType(ImageView.ScaleType.FIT_XY);

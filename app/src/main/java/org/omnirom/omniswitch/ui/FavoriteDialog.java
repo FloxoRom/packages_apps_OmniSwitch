@@ -99,7 +99,7 @@ public class FavoriteDialog extends AlertDialog implements
             Drawable d = BitmapCache.getInstance(getContext())
                         .getPackageIconCached(getContext().getResources(), packageItem,
                         mConfiguration);
-            holder.image.setImageDrawable(d.mutate());
+            holder.image.setImageDrawable(d);
             return convertView;
         }
     }
@@ -305,7 +305,7 @@ public class FavoriteDialog extends AlertDialog implements
                 Drawable d = BitmapCache.getInstance(getContext())
                         .getPackageIconCached(getContext().getResources(), applicationInfo,
                         mConfiguration);
-                holder.image.setImageDrawable(d.mutate());
+                holder.image.setImageDrawable(d);
                 holder.check.setChecked(mChangedFavoriteListSet
                         .contains(applicationInfo.getPackageName()));
 

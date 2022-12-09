@@ -90,10 +90,10 @@ public class BitmapCache {
             d = getPackageIconUncached(resources, packageItem, configuration);
             addBitmapToMemoryCache(key, d);
         }
-        return d;
+        return d.getConstantState().newDrawable().mutate();
     }
 
-    public Drawable getPackageIconUncached(Resources resources, PackageManager.PackageItem packageItem, SwitchConfiguration configuration) {
+    private Drawable getPackageIconUncached(Resources resources, PackageManager.PackageItem packageItem, SwitchConfiguration configuration) {
         Drawable icon = PackageManager.getInstance(mContext).getPackageIcon(packageItem);
         if (getIconPackHelper().isIconPackLoaded()){
             int iconId = IconPackHelper.getInstance(mContext).getResourceIdForActivityIcon(packageItem.getActivityInfo());

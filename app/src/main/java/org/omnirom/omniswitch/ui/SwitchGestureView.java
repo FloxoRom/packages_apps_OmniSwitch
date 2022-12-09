@@ -943,7 +943,7 @@ public class SwitchGestureView {
             }
             item.setIntent(packageItem.getIntent());
             item.setLabel(packageItem.getTitle().toString());
-            Drawable d = BitmapCache.getInstance(mContext).getPackageIconUncached(mContext.getResources(),
+            Drawable d = BitmapCache.getInstance(mContext).getPackageIconCached(mContext.getResources(),
                     packageItem, mConfiguration);
             d.setBounds(0, 0, mConfiguration.mIconSizeQuickPx, mConfiguration.mIconSizeQuickPx);
             item.setOriginalImage(d);

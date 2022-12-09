@@ -111,7 +111,7 @@ public class HiddenAppsDialog extends AlertDialog implements
             Drawable d = BitmapCache.getInstance(getContext())
                     .getPackageIconCached(getContext().getResources(), applicationInfo,
                             mConfiguration);
-            holder.image.setImageDrawable(d.mutate());
+            holder.image.setImageDrawable(d);
             holder.check.setChecked(mHiddenAppsList
                     .contains(applicationInfo.getPackageName()));
 

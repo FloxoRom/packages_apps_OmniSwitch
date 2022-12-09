@@ -196,10 +196,6 @@ public class ContextMenuUtils {
     }
 
     private static Drawable resizeShortcutIcon(Context context, Drawable icon, SwitchConfiguration configuration) {
-        if (icon instanceof LayerDrawable) {
-            icon = BitmapUtils.getBitmapDrawable(context.getResources(), icon);
-        }
-        icon = BitmapUtils.resize(context.getResources(), icon, configuration.mShortcutIconSizeDp, 0, configuration.mDensity);
-        return icon;
+        return BitmapUtils.resize(context.getResources(), icon, configuration.mShortcutIconSizeDp, 0, configuration.mDensity);
     }
 }

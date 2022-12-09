@@ -197,7 +197,7 @@ public class BitmapUtils {
         return new BitmapDrawable(resources, bmp);
     }
 
-    public static BitmapDrawable getBitmapDrawable(Resources resources, Drawable image) {
+    private static BitmapDrawable getBitmapDrawable(Resources resources, Drawable image) {
         if (image instanceof BitmapDrawable) {
             return (BitmapDrawable) image;
         }

@@ -178,12 +178,10 @@ public class ThumbnailTaskView extends View implements TaskDescription.ThumbChan
     }
 
     private Drawable getIcon() {
-        if (getTask() != null) {
-            Drawable d = getTask().getIcon();
-            if (d != null) {
-                return BitmapUtils.resize(getContext().getResources(), d,
-                        mConfiguration.mOverlayIconSizeDp, 0, mConfiguration.mDensity);
-            }
+        if (getTask() != null && getTask().getIcon() != null) {
+            Drawable d = getTask().getIcon().getConstantState().newDrawable().mutate();
+            return BitmapUtils.resize(getContext().getResources(), d,
+                    mConfiguration.mOverlayIconSizeDp, 0, mConfiguration.mDensity);
         }
         return null;
     }
