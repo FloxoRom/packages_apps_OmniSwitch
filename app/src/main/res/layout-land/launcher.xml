@@ -46,11 +46,11 @@
             android:layout_gravity="center_horizontal"
             android:orientation="vertical" >
 
-            <include layout="@layout/app_drawer_panel"
+            <include layout="@layout/launcher_app_drawer_panel"
                 android:id="@+id/app_drawer_panel"
                 android:visibility="gone" />
 
-            <include layout="@layout/favorite_panel"
+            <include layout="@layout/launcher_favorite_panel"
                 android:id="@+id/favorite_panel"
                 android:visibility="gone"/>
 
