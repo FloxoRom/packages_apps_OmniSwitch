@@ -74,8 +74,6 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String PREF_BUTTON_CONFIG = "button_config";
     public static final String PREF_BUTTONS_NEW = "buttons_new";
     public static final String PREF_BUTTON_DEFAULT_NEW = "0:1,1:1,2:1,3:0,4:1,5:1,6:0,7:1,8:1,9:0,10:0,11:0,12:0,13:0,14:0";
-    public static final String PREF_AUTO_HIDE_HANDLE = "auto_hide_handle";
-    public static final String PREF_DRAG_HANDLE_ENABLE = "drag_handle_enable";
     public static final String PREF_ENABLE = "enable";
     public static final String PREF_DIM_BEHIND = "dim_behind";
     public static final String PREF_ICONPACK = "iconpack";

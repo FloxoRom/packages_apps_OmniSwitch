@@ -86,19 +86,11 @@ public class SwitchGestureView {
     private boolean mShowing;
     private boolean mEnabled = true;
     private Drawable mDragHandleImage;
-    private Drawable mDragHandleHiddenImage; // transparent image to detect touches for auto hide trigger
+    private Drawable mDragHandleHiddenImage;
     private SwitchConfiguration mConfiguration;
     private boolean mHidden = true;
     private Handler mHandler;
     private SwitchManager mRecentsManager;
-    private Runnable mAutoHideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (!mHidden) {
-                updateDragHandleImage(false);
-            }
-        }
-    };
     private LinearInterpolator mLinearInterpolator = new LinearInterpolator();
     private Animator mToggleDragHandleAnim;
     private List<View> mRecentList;
@@ -146,8 +138,7 @@ public class SwitchGestureView {
     private InputChannelCompat.InputEventReceiver mInputEventReceiver;
     private int[] mDragButtonLocation = new int[2];
 
-    private Set<String> mDragHandleShowSettings = Set.of(SettingsActivity.PREF_DRAG_HANDLE_ENABLE,
-            SettingsActivity.PREF_DRAG_HANDLE_LOCATION,
+    private Set<String> mDragHandleShowSettings = Set.of(SettingsActivity.PREF_DRAG_HANDLE_LOCATION,
             SettingsActivity.PREF_HANDLE_HEIGHT,
             SettingsActivity.PREF_HANDLE_WIDTH,
             SettingsActivity.PREF_HANDLE_POS_START_RELATIVE,
@@ -254,12 +245,8 @@ public class SwitchGestureView {
         list.addView(listLayout);
         mAllLists[2] = list;
 
-        ColorStateList rippleColor =
-                ColorStateList.valueOf(mContext.getResources().getColor(android.R.color.white));
-        mDragHandleImage = mContext.getResources().getDrawable(
-                R.drawable.drag_handle_shape);
-        mDragHandleHiddenImage = mContext.getResources().getDrawable(
-                R.drawable.drag_handle_overlay_shape);
+        mDragHandleImage = mContext.getDrawable(R.drawable.drag_handle_shape);
+        mDragHandleHiddenImage = mContext.getDrawable(R.drawable.drag_handle_overlay_shape);
 
         LayoutInflater inflater = (LayoutInflater) mContext
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -448,11 +435,6 @@ public class SwitchGestureView {
                     case MotionEvent.ACTION_UP:
                         mFlingEnable = false;
                         mHandler.removeCallbacks(mLongPressRunnable);
-                        if (mHidden && mConfiguration.mAutoHide) {
-                            updateDragHandleImage(true);
-                            mHandler.postDelayed(mAutoHideRunnable, SwitchConfiguration.AUTO_HIDE_DEFAULT);
-                            return true;
-                        }
 
                         if (mMoveStarted) {
                             mRecentsManager.finishSlideLayout();
@@ -625,15 +607,11 @@ public class SwitchGestureView {
     }
 
     private void updateButton(boolean reload) {
-        if (mConfiguration.mAutoHide) {
+        if (reload) {
+            // to catch location/rotation changes
             updateDragHandleImage(false);
-        } else {
-            if (reload) {
-                // to catch location/rotation changes
-                updateDragHandleImage(false);
-            }
-            updateDragHandleImage(true);
         }
+        updateDragHandleImage(true);
     }
 
     private void colorizeDragHandleImage() {
@@ -656,14 +634,8 @@ public class SwitchGestureView {
 
         mHidden = !shown;
 
-        if (mConfiguration.mAutoHide) {
-            if (mHidden) {
-                current = mDragHandleHiddenImage;
-            }
-        } else {
-            if (!shown) {
-                current = mDragHandleHiddenImage;
-            }
+        if (!shown) {
+            current = mDragHandleHiddenImage;
         }
         toggleDragHandle(shown, current);
     }
@@ -736,7 +708,6 @@ public class SwitchGestureView {
             Log.d(TAG, "overlayShown");
         }
         mHandler.removeCallbacks(mLongPressRunnable);
-        mHandler.removeCallbacks(mAutoHideRunnable);
         updateDragHandleImage(false);
         mEnabled = false;
     }
@@ -745,11 +716,8 @@ public class SwitchGestureView {
         if (DEBUG) {
             Log.d(TAG, "overlayHidden");
         }
-        if (mConfiguration.mAutoHide) {
-            updateDragHandleImage(false);
-        } else {
-            updateDragHandleImage(true);
-        }
+        updateDragHandleImage(true);
+
         mEnabled = true;
     }
 
@@ -842,9 +810,8 @@ public class SwitchGestureView {
             mView.addView(mDragButton, getDragHandleLayoutParamsSmall());
             mWindowManager.addView(mView, getParamsSmall());
 
-            if (!mConfiguration.mAutoHide) {
-                updateDragHandleImage(true);
-            }
+            updateDragHandleImage(true);
+
             mRecentsManager.getLayout().resetRecentsState();
             // run back trigger if required
             if (mVirtualBackKey && !mConfiguration.mRestrictedMode) {
@@ -895,7 +862,6 @@ public class SwitchGestureView {
         if (DEBUG) {
             Log.d(TAG, "loadRecentItems:");
         }
-        mHandler.removeCallbacks(mAutoHideRunnable);
         mRecentList.clear();
         int i = 0;
         Iterator<TaskDescription> nextTask = mRecentsManager.getTasks().iterator();

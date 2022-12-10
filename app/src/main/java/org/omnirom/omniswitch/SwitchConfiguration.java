@@ -64,8 +64,6 @@ public class SwitchConfiguration {
     public int mDefaultDragHandleWidth;
     public boolean mShowLabels = true;
     public int mDragHandleColor;
-    public boolean mAutoHide;
-    public static final int AUTO_HIDE_DEFAULT = 3000; // 3s
     public boolean mDragHandleShow = true;
     public boolean mRestrictedMode;
     public int mLevelHeight; // in px
@@ -251,10 +249,6 @@ public class SwitchConfiguration {
 
         mDragHandleColor = prefs.getInt(
                 SettingsActivity.PREF_DRAG_HANDLE_COLOR_NEW, getDefaultDragHandleColor());
-        mAutoHide = prefs.getBoolean(SettingsActivity.PREF_AUTO_HIDE_HANDLE,
-                false);
-        mDragHandleShow = prefs.getBoolean(
-                SettingsActivity.PREF_DRAG_HANDLE_ENABLE, true);
         mDimBehind = prefs.getBoolean(SettingsActivity.PREF_DIM_BEHIND, false);
 
         mDefaultDragHandleWidth = Math.round(40 * mDensity);

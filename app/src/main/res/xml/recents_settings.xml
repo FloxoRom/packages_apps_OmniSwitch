@@ -151,31 +151,18 @@
     <PreferenceCategory
         android:key="category_drag_handle"
         android:title="@string/category_drag_handle_title">
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="drag_handle_enable"
-            android:summary="@string/drag_handle_enable_summary"
-            android:title="@string/drag_handle_enable_title" />
 
         <Preference
-            android:dependency="drag_handle_enable"
             android:key="adjust_handle"
             android:summary="@string/adjust_handle_summary"
             android:title="@string/adjust_handle_title_new" />
 
-        <SwitchPreference
-            android:defaultValue="false"
-            android:dependency="drag_handle_enable"
-            android:key="auto_hide_handle"
-            android:summary="@string/auto_hide_handle_summary"
-            android:title="@string/auto_hide_handle" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="category_speed_switcher"
         android:title="@string/category_speed_switcher_title">
         <SwitchPreference
             android:defaultValue="true"
-            android:dependency="drag_handle_enable"
             android:key="speed_switcher"
             android:summary="@string/speed_switcher_enable_summary"
             android:title="@string/speed_switcher_enable_title" />
