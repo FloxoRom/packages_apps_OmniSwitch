@@ -69,6 +69,7 @@ import org.omnirom.omniswitch.Utils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class SwitchGestureView {
     private final static String TAG = "OmniSwitch:SwitchGestureView";
@@ -145,6 +146,14 @@ public class SwitchGestureView {
     private InputChannelCompat.InputEventReceiver mInputEventReceiver;
     private int[] mDragButtonLocation = new int[2];
 
+    private Set<String> mDragHandleShowSettings = Set.of(SettingsActivity.PREF_DRAG_HANDLE_ENABLE,
+            SettingsActivity.PREF_DRAG_HANDLE_LOCATION,
+            SettingsActivity.PREF_HANDLE_HEIGHT,
+            SettingsActivity.PREF_HANDLE_WIDTH,
+            SettingsActivity.PREF_HANDLE_POS_START_RELATIVE,
+            SettingsActivity.PREF_DRAG_HANDLE_COLOR_NEW,
+            SettingsActivity.PREF_DRAG_HANDLE_DYNAMIC_COLOR);
+
     private GestureDetector mGestureDetector;
     private GestureDetector.OnGestureListener mGestureListener = new GestureDetector.OnGestureListener() {
         @Override
@@ -167,8 +176,32 @@ public class SwitchGestureView {
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            float distanceX = Math.abs(mInitDownPoint[0] - e2.getRawX());
-            if (distanceX > mSlop) {
+            float distanceX = mInitDownPoint[0] - e2.getRawX();
+            float distanceY = mInitDownPoint[1] - e2.getRawY();
+
+            if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > mSlop) {
+                if (DEBUG) {
+                    Log.d(TAG, "onFling cancel distanceY > mSlop");
+                }
+                return false;
+            }
+            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > mSlop * 2) {
+                // this is an open only fling so velocityX must match
+                if (mConfiguration.mLocation == 0) {
+                    if (velocityX > 0) {
+                        if (DEBUG) {
+                            Log.d(TAG, "onFling cancel velocityX > 0");
+                        }
+                        return false;
+                    }
+                } else {
+                    if (velocityX < 0) {
+                        if (DEBUG) {
+                            Log.d(TAG, "onFling cancel velocityX < 0");
+                        }
+                        return false;
+                    }
+                }
                 if (DEBUG) {
                     Log.d(TAG, "onFling open " + velocityX);
                 }
@@ -367,41 +400,48 @@ public class SwitchGestureView {
                         if (mHidden) {
                             return true;
                         }
-                        mFlingEnable = false;
-                        if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > mSlop) {
-                            if (DEBUG) {
-                                Log.d(TAG, "mDragButton cancel distanceY > mSlop");
-                            }
-                            mHandler.removeCallbacks(mLongPressRunnable);
-                            cancelGesture(event);
-                            return true;
+                        if (DEBUG) {
+                            Log.d(TAG, "ACTION_MOVE " + Math.abs(distanceX) + " " + Math.abs(distanceY));
                         }
-                        if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > mSlop) {
-                            if (DEBUG) {
-                                Log.d(TAG, "mDragButton start move");
-                            }
-                            mHandler.removeCallbacks(mLongPressRunnable);
-                            if (mLastX > xRaw) {
-                                // move left
-                                if (mConfiguration.mLocation == 0) {
-                                    mFlingEnable = true;
-                                    mMoveStarted = true;
-                                    mRecentsManager.showHidden();
+
+                        if (!mMoveStarted) {
+                            if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > mSlop) {
+                                if (DEBUG) {
+                                    Log.d(TAG, "mDragButton cancel distanceY > mSlop");
                                 }
-                            } else {
-                                // move right
-                                if (mConfiguration.mLocation != 0) {
-                                    mFlingEnable = true;
-                                    mMoveStarted = true;
-                                    mRecentsManager.showHidden();
+                                mHandler.removeCallbacks(mLongPressRunnable);
+                                cancelGesture(event);
+                                return true;
+                            }
+                            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > mSlop) {
+                                mHandler.removeCallbacks(mLongPressRunnable);
+                                if (mLastX > xRaw) {
+                                    // move left
+                                    if (mConfiguration.mLocation == 0) {
+                                        if (DEBUG) {
+                                            Log.d(TAG, "mMoveStarted " + distanceX + " " + distanceY);
+                                        }
+                                        mFlingEnable = true;
+                                        mMoveStarted = true;
+                                        mRecentsManager.showHidden();
+                                    }
+                                } else {
+                                    // move right
+                                    if (mConfiguration.mLocation != 0) {
+                                        if (DEBUG) {
+                                            Log.d(TAG, "mMoveStarted " + distanceX + " " + distanceY);
+                                        }
+                                        mFlingEnable = true;
+                                        mMoveStarted = true;
+                                        mRecentsManager.showHidden();
+                                    }
                                 }
                             }
-                            if (mMoveStarted) {
-                                // Capture inputs
-                                mInputMonitor.pilferPointers();
-                                mInputEventReceiver.setBatchingEnabled(true);
-                                mRecentsManager.slideLayout(distanceX);
-                            }
+                        } else {
+                            // Capture inputs
+                            mInputMonitor.pilferPointers();
+                            mInputEventReceiver.setBatchingEnabled(true);
+                            mRecentsManager.slideLayout(distanceX);
                         }
                         mLastX = xRaw;
                         break;
@@ -633,21 +673,22 @@ public class SwitchGestureView {
             Log.d(TAG, "updatePrefs");
         }
 
-        if (mConfiguration.mDragHandleShow) {
-            colorizeDragHandleImage();
-            updateButton(true);
-        }
+        if (key != null) {
+            if (key.equals(SettingsActivity.PREF_SPEED_SWITCHER_BUTTON_NEW) || key.equals(SettingsActivity.PREF_FAVORITE_APPS)) {
+                if (mConfiguration.mSpeedSwitcher) {
+                    buildFavoriteItems(mConfiguration.mFavoriteList);
+                    buildActionList();
+                }
+            }
 
-        if (mConfiguration.mSpeedSwitcher) {
-            buildFavoriteItems(mConfiguration.mFavoriteList);
-            buildActionList();
-        }
-
-        if (key == null || key.equals(SettingsActivity.PREF_DRAG_HANDLE_ENABLE)) {
-            if (mConfiguration.mDragHandleShow) {
-                show();
-            } else {
-                hide();
+            if (mDragHandleShowSettings.contains(key)) {
+                if (mConfiguration.mDragHandleShow) {
+                    colorizeDragHandleImage();
+                    updateButton(true);
+                    show();
+                } else {
+                    hide();
+                }
             }
         }
     }

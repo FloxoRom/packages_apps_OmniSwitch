@@ -151,6 +151,10 @@ public class SwitchService extends Service {
             if (mConfiguration.mLaunchStatsEnabled) {
                 SwitchStatistics.getInstance(this).loadStatistics();
             }
+
+            if (mConfiguration.mDragHandleShow){
+                mManager.getSwitchGestureView().show();
+            }
             mIsRunning = true;
         } catch(Exception e) {
             Log.e(TAG, "onCreate", e);

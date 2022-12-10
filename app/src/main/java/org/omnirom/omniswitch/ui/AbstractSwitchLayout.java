@@ -173,6 +173,22 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
             if (DEBUG) {
                 Log.d(TAG, "onFling close");
             }
+            // this is an close only fling so velocityX must match
+            if (mConfiguration.mLocation == 0) {
+                if (velocityX < 0) {
+                    if (DEBUG) {
+                        Log.d(TAG, "onFling cancel velocityX < 0");
+                    }
+                    return false;
+                }
+            } else {
+                if (velocityX > 0) {
+                    if (DEBUG) {
+                        Log.d(TAG, "onFling cancel velocityX > 0");
+                    }
+                    return false;
+                }
+            }
             finishOverlaySlide(false, true);
             return false;
         }
@@ -216,23 +232,23 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                     mMoveStarted = false;
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    mFlingEnable = false;
-                    if (Math.abs(distanceX) > mSlop) {
-                        if (mLastX > xRaw) {
-                            // move left
-                            if (mConfiguration.mLocation != 0) {
-                                mFlingEnable = true;
-                                mMoveStarted = true;
-                            }
-                        } else {
-                            // move right
-                            if (mConfiguration.mLocation == 0) {
-                                mFlingEnable = true;
-                                mMoveStarted = true;
+                    if (!mMoveStarted) {
+                        if (Math.abs(distanceX) > mSlop) {
+                            if (mLastX > xRaw) {
+                                // move left
+                                if (mConfiguration.mLocation != 0) {
+                                    mFlingEnable = true;
+                                    mMoveStarted = true;
+                                }
+                            } else {
+                                // move right
+                                if (mConfiguration.mLocation == 0) {
+                                    mFlingEnable = true;
+                                    mMoveStarted = true;
+                                }
                             }
                         }
-                    }
-                    if (mMoveStarted) {
+                    } else {
                         if (distanceX > 0) {
                             // move left
                             if (mConfiguration.mLocation != 0) {

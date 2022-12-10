@@ -104,7 +104,6 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String PREF_LOCKED_APPS_LIST = "locked_apps_list";
     public static final String PREF_LOCKED_APPS_SORT = "locked_apps_sort";
     public static final String PREF_DRAG_HANDLE_DYNAMIC_COLOR = "drag_handle_dynamic_color";
-    public static final String PREF_COLOR_CHANGED = "color_changed";
     public static final String PREF_BLOCK_APPS_ON_SPLITSCREEN = "block_apps_on_splitscreen";
     private static final String PREF_HIDDEN_APPS_CONFIG = "hidden_apps_config";
     public static final String PREF_HIDDEN_APPS = "hidden_apps_new";
