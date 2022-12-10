@@ -92,7 +92,7 @@ import java.util.List;
 
 public class Launcher extends Activity implements IEditFavoriteActivity,
         WallpaperManager.OnColorsChangedListener {
-    private static final String TAG = "Launcher";
+    private static final String TAG = "OmniSwitch:Launcher";
     private static final boolean DEBUG = false;
     public static final String WECLOME_SCREEN_DISMISSED = "weclome_screen_dismissed";
     // false= collapsed true = expanded

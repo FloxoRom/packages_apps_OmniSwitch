@@ -66,6 +66,8 @@ public class SwitchService extends Service {
     private static boolean mCommitSuicide;
     private static boolean mPreloadDone;
     private OverlayMonitor mOverlayMonitor;
+    private PackageReceiver mPackageReceiver;
+    private LocaleChangeReceiver mLocaleReceiver;
 
     public static boolean isRunning() {
         return mIsRunning;
@@ -111,8 +113,22 @@ public class SwitchService extends Service {
             filter.addAction(RecentsReceiver.ACTION_HANDLE_SHOW);
             filter.addAction(Intent.ACTION_USER_SWITCHED);
             filter.addAction(Intent.ACTION_SHUTDOWN);
-
             registerReceiver(mReceiver, filter);
+
+            mPackageReceiver = new PackageReceiver();
+            IntentFilter pkgFilter = new IntentFilter();
+            // TODO - changed comes always after added so maybe we can skip added
+            pkgFilter.addAction(Intent.ACTION_PACKAGE_CHANGED);
+            //pkgFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
+            pkgFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+            pkgFilter.addDataScheme("package");
+            registerReceiver(mPackageReceiver, pkgFilter);
+
+            mLocaleReceiver = new LocaleChangeReceiver();
+            IntentFilter localeFilter = new IntentFilter();
+            localeFilter.addAction(Intent.ACTION_LOCALE_CHANGED);
+            registerReceiver(mLocaleReceiver, localeFilter);
+
             PackageManager.getInstance(this).updatePackageList();
 
             updatePrefs(mPrefs, null);
@@ -149,6 +165,8 @@ public class SwitchService extends Service {
 
         try {
             unregisterReceiver(mReceiver);
+            unregisterReceiver(mPackageReceiver);
+            unregisterReceiver(mLocaleReceiver);
             mPrefs.unregisterOnSharedPreferenceChangeListener(mPrefsListener);
         } catch(IllegalArgumentException e) {
             // ignored on purpose

@@ -57,7 +57,7 @@ import java.util.List;
 import java.util.Set;
 
 public class AppDrawerView extends GridView {
-    private static final String TAG = "AppDrawerView";
+    private static final String TAG = "OmniSwitch:AppDrawerView";
     private static final boolean DEBUG = false;
 
     protected SwitchConfiguration mConfiguration;

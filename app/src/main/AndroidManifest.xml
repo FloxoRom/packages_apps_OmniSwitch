@@ -72,22 +72,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name="org.omnirom.omniswitch.PackageReceiver"
-                  android:exported="false" >
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_CHANGED" />
-                <action android:name="android.intent.action.PACKAGE_REMOVED" />
-                <action android:name="android.intent.action.PACKAGE_ADDED" />
-                <data android:scheme="package" />
-            </intent-filter>
-        </receiver>
-        <!-- to update labels -->
-        <receiver android:name="org.omnirom.omniswitch.LocaleChangeReceiver"
-                  android:exported="false" >
-            <intent-filter>
-                <action android:name="android.intent.action.LOCALE_CHANGED"/>
-            </intent-filter>
-        </receiver>
         <activity
             android:name="org.omnirom.omniswitch.launcher.Launcher"
             android:launchMode="singleTask"
