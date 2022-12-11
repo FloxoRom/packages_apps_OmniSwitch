@@ -483,11 +483,15 @@ public class SwitchGestureView {
         if (mDragButtonLocation[0] == 0 && mDragButtonLocation[1] == 0) {
             updateDragButtonLocation();
         }
-        boolean isWithinInsets = isWithinDragButton((int) ev.getX(), (int) ev.getY());
-        if (isWithinInsets || mMoveStarted) {
-            mDragButtonListener.onTouch(mDragButton, ev);
-        } else if (mLongPress) {
+        if (mLongPress) {
             mViewListener.onTouch(mView, ev);
+        } else if (mMoveStarted) {
+            mDragButtonListener.onTouch(mDragButton, ev);
+        } else {
+            boolean isWithinInsets = isWithinDragButton((int) ev.getX(), (int) ev.getY());
+            if (isWithinInsets) {
+                mDragButtonListener.onTouch(mDragButton, ev);
+            }
         }
     }
 
