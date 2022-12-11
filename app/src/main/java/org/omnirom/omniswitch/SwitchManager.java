@@ -182,7 +182,6 @@ public class SwitchManager {
         mLoadedTasks.clear();
         mLoadedTasks.addAll(taskList);
         mLayout.update();
-        mGestureView.update();
     }
 
     public void switchTask(TaskDescription ad, boolean close, boolean customAnim) {

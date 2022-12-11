@@ -158,42 +158,7 @@
             android:title="@string/adjust_handle_title_new" />
 
     </PreferenceCategory>
-    <PreferenceCategory
-        android:key="category_speed_switcher"
-        android:title="@string/category_speed_switcher_title">
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="speed_switcher"
-            android:summary="@string/speed_switcher_enable_summary"
-            android:title="@string/speed_switcher_enable_title" />
 
-        <SwitchPreference
-            android:defaultValue="true"
-            android:dependency="speed_switcher"
-            android:key="speed_switch_color"
-            android:summary="@string/speed_switch_color_summary"
-            android:title="@string/speed_switch_color" />
-        <SwitchPreference
-            android:defaultValue="true"
-            android:dependency="speed_switcher"
-            android:key="speed_switch_limit"
-            android:summary="@string/speed_switch_limit_summary"
-            android:title="@string/speed_switch_limit" />
-
-        <ListPreference
-            android:defaultValue="10"
-            android:dependency="speed_switcher"
-            android:key="speed_switch_items_new"
-            android:title="@string/speed_switch_item"
-            android:entries="@array/speed_switch_items_entries"
-            android:entryValues="@array/speed_switch_items_values"/>
-
-        <Preference
-            android:dependency="speed_switcher"
-            android:key="speed_switch_button_config"
-            android:summary="@string/speed_switch_button_summary"
-            android:title="@string/speed_switch_button_title" />
-    </PreferenceCategory>
     <PreferenceCategory
         android:key="category_favorite"
         android:title="@string/category_favorite_title">

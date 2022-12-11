@@ -77,14 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String PREF_ENABLE = "enable";
     public static final String PREF_DIM_BEHIND = "dim_behind";
     public static final String PREF_ICONPACK = "iconpack";
-    public static final String PREF_SPEED_SWITCHER = "speed_switcher";
     public static final String PREF_SHOW_FAVORITE = "show_favorite";
-    public static final String PREF_SPEED_SWITCHER_COLOR = "speed_switch_color";
-    public static final String PREF_SPEED_SWITCHER_LIMIT = "speed_switch_limit";
-    public static final String PREF_SPEED_SWITCHER_BUTTON_CONFIG = "speed_switch_button_config";
-    public static final String PREF_SPEED_SWITCHER_BUTTON_NEW = "speed_switch_button_new";
-    public static final String PREF_SPEED_SWITCHER_BUTTON_DEFAULT_NEW = "0:0,1:0,2:1,3:1,4:1,5:1,6:1,7:0";
-    public static final String PREF_SPEED_SWITCHER_ITEMS = "speed_switch_items_new";
     public static final String PREF_BUTTON_POS = "button_pos";
     public static final String PREF_BG_STYLE = "bg_style";
     public static final String PREF_LAYOUT_STYLE = "layout_style";
@@ -136,15 +129,6 @@ public class SettingsActivity extends AppCompatActivity {
     public static int BUTTON_GOOGLE_ASSISTANT = 13;
     public static int BUTTON_FLASHLIGHT = 14;
 
-    public static int BUTTON_SPEED_SWITCH_HOME = 0;
-    public static int BUTTON_SPEED_SWITCH_BACK = 1;
-    public static int BUTTON_SPEED_SWITCH_KILL_CURRENT = 2;
-    public static int BUTTON_SPEED_SWITCH_KILL_ALL = 3;
-    public static int BUTTON_SPEED_SWITCH_KILL_OTHER = 4;
-    public static int BUTTON_SPEED_SWITCH_LOCK_APP = 5;
-    public static int BUTTON_SPEED_SWITCH_TOGGLE_APP = 6;
-    public static int BUTTON_SPEED_SWITCH_MENU = 7;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -188,11 +172,6 @@ public class SettingsActivity extends AppCompatActivity {
         private String mButtons;
         private Switch mToggleServiceSwitch;
         private SharedPreferences.OnSharedPreferenceChangeListener mPrefsListener;
-        private Preference mSpeedSwitchButtonConfig;
-        private String[] mSpeedSwitchButtonEntries;
-        private Drawable[] mSpeedSwitchButtonImages;
-        private String mSpeedSwitchButtons;
-        private ListPreference mSpeedSwitchItems;
         private ListPreference mButtonPos;
         private ListPreference mBgStyle;
         private ListPreference mLayoutStyle;
@@ -231,16 +210,6 @@ public class SettingsActivity extends AppCompatActivity {
             mButtonConfig = (Preference) findPreference(PREF_BUTTON_CONFIG);
             mButtons = mPrefs.getString(PREF_BUTTONS_NEW, PREF_BUTTON_DEFAULT_NEW);
             mFavoriteAppsConfig = (Preference) findPreference(PREF_FAVORITE_APPS_CONFIG);
-
-            mSpeedSwitchItems = (ListPreference) findPreference(PREF_SPEED_SWITCHER_ITEMS);
-            mSpeedSwitchItems.setOnPreferenceChangeListener(this);
-            idx = mSpeedSwitchItems.findIndexOfValue(mPrefs.getString(PREF_SPEED_SWITCHER_ITEMS,
-                    mSpeedSwitchItems.getEntryValues()[0].toString()));
-            mSpeedSwitchItems.setValueIndex(idx);
-            mSpeedSwitchItems.setSummary(mSpeedSwitchItems.getEntries()[idx]);
-
-            mSpeedSwitchButtonConfig = (Preference) findPreference(PREF_SPEED_SWITCHER_BUTTON_CONFIG);
-            mSpeedSwitchButtons = mPrefs.getString(PREF_SPEED_SWITCHER_BUTTON_NEW, PREF_SPEED_SWITCHER_BUTTON_DEFAULT_NEW);
 
             mButtonPos = (ListPreference) findPreference(PREF_BUTTON_POS);
             mButtonPos.setOnPreferenceChangeListener(this);
@@ -379,13 +348,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
 
-        private class SpeedSwitchButtonsApplyRunnable implements CheckboxListDialog.ApplyRunnable {
-            public void apply(Map<Integer, Boolean> buttons) {
-                mSpeedSwitchButtons = Utils.buttonMapToString(buttons);
-                mPrefs.edit().putString(PREF_SPEED_SWITCHER_BUTTON_NEW, mSpeedSwitchButtons).commit();
-            }
-        }
-
         @Override
         public boolean onPreferenceTreeClick(@NonNull Preference preference) {
             if (preference == mAdjustHandle) {
@@ -400,13 +362,6 @@ public class SettingsActivity extends AppCompatActivity {
                 Map<Integer, Boolean> buttons = Utils.buttonStringToMap(mButtons, PREF_BUTTON_DEFAULT_NEW);
                 CheckboxListDialog dialog = new CheckboxListDialog(getContext(),
                         mButtonEntries, mButtonImages, buttons, new ButtonsApplyRunnable(),
-                        getResources().getString(R.string.buttons_title));
-                dialog.show();
-                return true;
-            } else if (preference == mSpeedSwitchButtonConfig) {
-                Map<Integer, Boolean> buttons = Utils.buttonStringToMap(mSpeedSwitchButtons, PREF_SPEED_SWITCHER_BUTTON_DEFAULT_NEW);
-                CheckboxListDialog dialog = new CheckboxListDialog(getContext(),
-                        mSpeedSwitchButtonEntries, mSpeedSwitchButtonImages, buttons, new SpeedSwitchButtonsApplyRunnable(),
                         getResources().getString(R.string.buttons_title));
                 dialog.show();
                 return true;
@@ -514,12 +469,6 @@ public class SettingsActivity extends AppCompatActivity {
                     Toast.makeText(getContext(), R.string.launcher_mode_enable_check, Toast.LENGTH_LONG).show();
                 }
                 return true;
-            } else if (preference == mSpeedSwitchItems) {
-                String value = (String) newValue;
-                int idx = mSpeedSwitchItems.findIndexOfValue(value);
-                mSpeedSwitchItems.setSummary(mSpeedSwitchItems.getEntries()[idx]);
-                mSpeedSwitchItems.setValueIndex(idx);
-                return true;
             }
             return false;
         }
@@ -559,17 +508,6 @@ public class SettingsActivity extends AppCompatActivity {
             mButtonImages[12] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_assist));
             mButtonImages[13] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_voice_assist));
             mButtonImages[14] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_qs_flashlight));
-
-            mSpeedSwitchButtonEntries = getResources().getStringArray(R.array.speed_switch_button_entries);
-            mSpeedSwitchButtonImages = new Drawable[mSpeedSwitchButtonEntries.length];
-            mSpeedSwitchButtonImages[0] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_sysbar_home));
-            mSpeedSwitchButtonImages[1] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_sysbar_back));
-            mSpeedSwitchButtonImages[2] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.kill_current));
-            mSpeedSwitchButtonImages[3] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.kill_all));
-            mSpeedSwitchButtonImages[4] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.kill_other));
-            mSpeedSwitchButtonImages[5] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_pin));
-            mSpeedSwitchButtonImages[6] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_lastapp));
-            mSpeedSwitchButtonImages[7] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_menu));
         }
 
         @Override

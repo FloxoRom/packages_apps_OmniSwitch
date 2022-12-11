@@ -71,15 +71,10 @@ public class SwitchConfiguration {
     public int mThumbnailWidth; // in px
     public int mThumbnailHeight; // in px
     public Map<Integer, Boolean> mButtons;
-    public boolean mLevelBackgroundColor = true;
-    public boolean mLimitLevelChangeX = true;
-    public Map<Integer, Boolean> mSpeedSwitchButtons;
-    public int mLimitItemsX = 10;
     public float mLabelFontSize = 14f;
     public float mLabelFontSizeSp;
     public int mButtonPos = 1; // 0 = top 1 = bottom
     public List<String> mFavoriteList = new ArrayList<String>();
-    public boolean mSpeedSwitcher = true;
     public boolean mFilterActive = true;
     public boolean mFilterRunning;
     public long mFilterTime;
@@ -258,11 +253,6 @@ public class SwitchConfiguration {
 
         mButtons = Utils.buttonStringToMap(prefs.getString(SettingsActivity.PREF_BUTTONS_NEW,
                 SettingsActivity.PREF_BUTTON_DEFAULT_NEW), SettingsActivity.PREF_BUTTON_DEFAULT_NEW);
-        mLevelBackgroundColor = prefs.getBoolean(SettingsActivity.PREF_SPEED_SWITCHER_COLOR, true);
-        mLimitLevelChangeX = prefs.getBoolean(SettingsActivity.PREF_SPEED_SWITCHER_LIMIT, true);
-        mSpeedSwitchButtons = Utils.buttonStringToMap(prefs.getString(SettingsActivity.PREF_SPEED_SWITCHER_BUTTON_NEW,
-                SettingsActivity.PREF_SPEED_SWITCHER_BUTTON_DEFAULT_NEW), SettingsActivity.PREF_SPEED_SWITCHER_BUTTON_DEFAULT_NEW);
-        mLimitItemsX = Integer.parseInt(prefs.getString(SettingsActivity.PREF_SPEED_SWITCHER_ITEMS, "10"));
         String buttonPos = prefs.getString(SettingsActivity.PREF_BUTTON_POS, "1");
         mButtonPos = Integer.valueOf(buttonPos);
 
@@ -283,7 +273,6 @@ public class SwitchConfiguration {
         mFavoriteList.clear();
         String favoriteListString = prefs.getString(SettingsActivity.PREF_FAVORITE_APPS, "");
         Utils.parseCollection(favoriteListString, mFavoriteList);
-        mSpeedSwitcher = prefs.getBoolean(SettingsActivity.PREF_SPEED_SWITCHER, true);
         String filterTimeString = prefs.getString(SettingsActivity.PREF_APP_FILTER_TIME, "0");
         mFilterTime = Integer.valueOf(filterTimeString);
         if (mFilterTime != 0) {

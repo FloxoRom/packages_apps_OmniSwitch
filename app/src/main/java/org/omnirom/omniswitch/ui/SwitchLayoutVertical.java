@@ -492,7 +492,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
 
     private ThumbnailTaskView getRecentItemTemplate() {
         ThumbnailTaskView item = new ThumbnailTaskView(mContext);
-        item.setCanSideHeader(true);
+        item.setCanSideHeader(mConfiguration.mSideHeader);
         item.setLayoutParams(getRecentListItemParams());
         item.setBackgroundResource(mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT ? R.drawable.ripple_dark
                 : R.drawable.ripple_light);
