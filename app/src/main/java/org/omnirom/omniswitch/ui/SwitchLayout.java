@@ -29,8 +29,10 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -78,18 +80,16 @@ public class SwitchLayout extends AbstractSwitchLayout {
         public View getView(int position, View convertView, ViewGroup parent) {
             TaskDescription ad = getItem(position);
 
-            PackageTextView item = null;
+            ThumbnailTaskView item = null;
             if (convertView == null) {
-                item = getPackageItemTemplate();
+                item = getRecentItemTemplate();
             } else {
-                item = (PackageTextView) convertView;
+                item = (ThumbnailTaskView) convertView;
             }
-            item.setTask(ad);
-            item.setTaskInfo(mConfiguration);
-            if (ad.isLocked()) {
-                item.setTextColor(Color.WHITE);
-            } else {
-                item.setTextColor(mConfiguration.getCurrentTextTint(mConfiguration.getViewBackgroundColor()));
+            item.setTask(ad, ad.isNeedsUpdate());
+
+            if (ad.isNeedsUpdate()) {
+                ad.setNeedsUpdate(false);
             }
             return item;
         }
@@ -314,7 +314,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
     protected synchronized void initView() {
         updateListLayout();
 
-        mNoRecentApps.setLayoutParams(getListParams());
+        mNoRecentApps.setLayoutParams(getRecentListParams());
         mRecents.setVisibility(View.VISIBLE);
         mShowAppDrawer = false;
         mAppDrawer.setVisibility(View.GONE);
@@ -329,7 +329,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
         ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         mRecentsOrAppDrawer.setLayoutParams(layoutParams);
-        mCurrentHeight = mRecentsOrAppDrawer.getMeasuredHeight();
+        mCurrentHeight = getRecentsHeight();
 
         mVirtualBackKey = false;
         showOpenFavoriteButton();
@@ -348,11 +348,8 @@ public class SwitchLayout extends AbstractSwitchLayout {
         mFavoriteListHorizontal.setPadding(dividerWith / 2, 0,
                 dividerWith / 2, 0);
 
-        mRecentListHorizontal.setLayoutParams(getListParams());
+        mRecentListHorizontal.setLayoutParams(getRecentListParams());
         mRecentListHorizontal.scrollTo(0);
-        mRecentListHorizontal.setDividerWidth(dividerWith);
-        mRecentListHorizontal.setPadding(dividerWith / 2, 0,
-                dividerWith / 2, 0);
     }
 
     private LinearLayout.LayoutParams getListParams() {
@@ -377,11 +374,18 @@ public class SwitchLayout extends AbstractSwitchLayout {
         return 3;
     }
 
+    protected int getAppDrawerHeight() {
+        return getAppDrawerLines()
+                * mConfiguration.getItemMaxHeight() + 2 * mConfiguration.mHorizontalContentPaddingPx;
+    }
+
     @Override
     protected FrameLayout.LayoutParams getAppDrawerParams() {
-        return new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT, getAppDrawerLines()
-                * mConfiguration.getItemMaxHeight() + 2 * mConfiguration.mHorizontalContentPaddingPx);
+        int appDrawerHeight = getAppDrawerHeight();
+        int recentsHeight = getRecentsHeight();
+        appDrawerHeight = Math.max(appDrawerHeight, recentsHeight);
+        return new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                appDrawerHeight);
     }
 
     @Override
@@ -462,10 +466,11 @@ public class SwitchLayout extends AbstractSwitchLayout {
         if (mAppDrawerAnim != null) {
             mAppDrawerAnim.cancel();
         }
-        mAppDrawer.setLayoutParams(getAppDrawerParams());
-        mCurrentHeight = mRecentsOrAppDrawer.getMeasuredHeight();
+        FrameLayout.LayoutParams lp = getAppDrawerParams();
+        mAppDrawer.setLayoutParams(lp);
+        mCurrentHeight = getRecentsHeight();
         int recentsHeight = mCurrentHeight;
-        int appDrawerHeight = getAppDrawerParams().height;
+        int appDrawerHeight = lp.height;
 
         mAppDrawer.setTranslationY(-appDrawerHeight);
         mAppDrawer.setVisibility(View.VISIBLE);
@@ -524,7 +529,8 @@ public class SwitchLayout extends AbstractSwitchLayout {
         if (mShowFavAnim != null) {
             mShowFavAnim.cancel();
         }
-        int appDrawerHeight = getAppDrawerParams().height;
+        ViewGroup.LayoutParams lp = mAppDrawer.getLayoutParams();
+        int appDrawerHeight = lp.height;
         int recentsHeight = mCurrentHeight;
 
         ValueAnimator collapseAnimator = ValueAnimator.ofInt(0, appDrawerHeight);
@@ -565,7 +571,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
                 ViewGroup.LayoutParams layoutParams = mRecentsOrAppDrawer.getLayoutParams();
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                 mRecentsOrAppDrawer.setLayoutParams(layoutParams);
-                mCurrentHeight = mRecentsOrAppDrawer.getLayoutParams().height;
+                mCurrentHeight = getRecentsHeight();
             }
 
             @Override
@@ -764,5 +770,42 @@ public class SwitchLayout extends AbstractSwitchLayout {
         return getAppDrawerLines() * mConfiguration.getItemMaxHeight()
                 + 4 * mConfiguration.mHorizontalTopBottomPaddingPx
                 + mConfiguration.mActionSizePx;
+    }
+
+    private int getCurrentThumbWidth() {
+        return (int)(mConfiguration.mThumbnailWidth * mConfiguration.mThumbRatio) +
+                ( mConfiguration.mSideHeader ? mConfiguration.getOverlayHeaderWidth() : 0);
+    }
+
+    private int getCurrentThumbHeight() {
+        return (int)(mConfiguration.mThumbnailHeight * mConfiguration.mThumbRatio) +
+                (mConfiguration.mSideHeader ? 0 : mConfiguration.getOverlayHeaderWidth());
+    }
+
+    private LinearLayout.LayoutParams getRecentListParams() {
+        return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                getCurrentThumbHeight());
+    }
+
+    private LinearLayout.LayoutParams getRecentListItemParams() {
+        return new LinearLayout.LayoutParams(getCurrentThumbWidth(),
+                LinearLayout.LayoutParams.MATCH_PARENT);
+    }
+
+    private ThumbnailTaskView getRecentItemTemplate() {
+        ThumbnailTaskView item = new ThumbnailTaskView(mContext);
+        item.setSideHeader(mConfiguration.mSideHeader);
+        item.setLayoutParams(getRecentListItemParams());
+        item.setBackgroundResource(mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT ? R.drawable.ripple_dark
+                : R.drawable.ripple_light);
+        item.setThumbRatio(mConfiguration.mThumbRatio);
+        return item;
+    }
+
+    private int getRecentsHeight() {
+        return getCurrentThumbHeight()
+                + mOpenFavorite.getHeight()
+                + (mShowFavorites ? (mConfiguration.getItemMaxHeight()) : 0)
+                + 2 * mConfiguration.mHorizontalContentPaddingPx;
     }
 }

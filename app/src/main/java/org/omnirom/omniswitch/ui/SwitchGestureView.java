@@ -63,10 +63,12 @@ import org.omnirom.omniswitch.RecentTasksLoader;
 import org.omnirom.omniswitch.SettingsActivity;
 import org.omnirom.omniswitch.SwitchConfiguration;
 import org.omnirom.omniswitch.SwitchManager;
+import org.omnirom.omniswitch.SwitchService;
 import org.omnirom.omniswitch.TaskDescription;
 import org.omnirom.omniswitch.Utils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -96,12 +98,15 @@ public class SwitchGestureView {
     private InputChannelCompat.InputEventReceiver mInputEventReceiver;
     private int[] mDragButtonLocation = new int[2];
 
-    private Set<String> mDragHandleShowSettings = Set.of(SettingsActivity.PREF_DRAG_HANDLE_LOCATION,
-            SettingsActivity.PREF_HANDLE_HEIGHT,
-            SettingsActivity.PREF_HANDLE_WIDTH,
-            SettingsActivity.PREF_HANDLE_POS_START_RELATIVE,
-            SettingsActivity.PREF_DRAG_HANDLE_COLOR_NEW,
-            SettingsActivity.PREF_DRAG_HANDLE_DYNAMIC_COLOR);
+    private static final HashSet<String> mDragHandleShowSettings = new HashSet<>();
+    static {
+        mDragHandleShowSettings.add(SettingsActivity.PREF_DRAG_HANDLE_LOCATION);
+        mDragHandleShowSettings.add(SettingsActivity.PREF_HANDLE_HEIGHT);
+        mDragHandleShowSettings.add(SettingsActivity.PREF_HANDLE_WIDTH);
+        mDragHandleShowSettings.add(SettingsActivity.PREF_HANDLE_POS_START_RELATIVE);
+        mDragHandleShowSettings.add(SettingsActivity.PREF_DRAG_HANDLE_COLOR_NEW);
+        mDragHandleShowSettings.add(SettingsActivity.PREF_DRAG_HANDLE_DYNAMIC_COLOR);
+    }
 
     private GestureDetector mGestureDetector;
     private GestureDetector.OnGestureListener mGestureListener = new GestureDetector.OnGestureListener() {
