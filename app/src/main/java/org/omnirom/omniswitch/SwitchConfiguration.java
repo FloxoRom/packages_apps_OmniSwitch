@@ -296,6 +296,7 @@ public class SwitchConfiguration {
         mBlockSplitscreenBreakers = prefs.getBoolean(SettingsActivity.PREF_BLOCK_APPS_ON_SPLITSCREEN, true);
         mColorfulHeader = prefs.getBoolean(SettingsActivity.PREF_COLOR_TASK_HEADER, false);
         mButtonHide = prefs.getBoolean(SettingsActivity.PREF_BUTTON_HIDE, false);
+        mSideHeader = prefs.getBoolean(SettingsActivity.PREF_THUMB_HEADER_SIDE, true);
 
         mHiddenAppsList.clear();
         String hiddenListString = prefs.getString(SettingsActivity.PREF_HIDDEN_APPS, "");

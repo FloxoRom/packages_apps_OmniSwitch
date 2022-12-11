@@ -235,4 +235,6 @@
         <string name="flashlight">Flashlight</string>
         <string name="notification_channel_name">OmniSwitch status</string>
         <string name="notification_channel_description"></string>
+        <string name="thumb_header_position_side_summary">Position of header on thumbnails</string>
+        <string name="thumb_header_position_side_title">Thumbnail side header</string>
 </resources>

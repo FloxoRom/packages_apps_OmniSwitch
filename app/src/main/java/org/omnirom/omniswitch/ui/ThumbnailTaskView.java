@@ -20,12 +20,9 @@ package org.omnirom.omniswitch.ui;
 import org.omnirom.omniswitch.SwitchConfiguration;
 import org.omnirom.omniswitch.TaskDescription;
 import org.omnirom.omniswitch.ThumbnailData;
-import org.omnirom.omniswitch.Utils;
 import org.omnirom.omniswitch.RecentTasksLoader;
-import org.omnirom.omniswitch.R;
 
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -37,7 +34,6 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.os.Handler;
 import android.text.TextPaint;
-import android.util.AttributeSet;
 import android.view.View;
 import android.util.Log;
 
@@ -48,7 +44,7 @@ public class ThumbnailTaskView extends View implements TaskDescription.ThumbChan
     private TaskDescription mTask;
     private Runnable mAction;
     private Handler mHandler = new Handler();
-    private boolean mCanSideHeader;
+    private boolean mSideHeader;
     private float mThumbRatio = 1.0f;
     private static Bitmap sDefaultThumb;
     private SwitchConfiguration mConfiguration;
@@ -135,8 +131,8 @@ public class ThumbnailTaskView extends View implements TaskDescription.ThumbChan
         return -1;
     }
 
-    public void setCanSideHeader(boolean mCanSideHeader) {
-        this.mCanSideHeader = mCanSideHeader;
+    public void setSideHeader(boolean sideHeader) {
+        this.mSideHeader = sideHeader;
     }
 
     private void loadTaskThumb() {
@@ -192,7 +188,7 @@ public class ThumbnailTaskView extends View implements TaskDescription.ThumbChan
         final int textInsetPx = Math.round(5 * mConfiguration.mDensity);
         final int width = (int)(mConfiguration.mThumbnailWidth * mThumbRatio);
         final int height = (int)(mConfiguration.mThumbnailHeight * mThumbRatio);
-        final boolean sideHeader = mCanSideHeader ? mConfiguration.mSideHeader : false;
+        final boolean sideHeader = mSideHeader ? mConfiguration.mSideHeader : false;
         final int iconBorderSizePx = mConfiguration.getOverlayHeaderWidth();
         Resources resources = getContext().getResources();
 

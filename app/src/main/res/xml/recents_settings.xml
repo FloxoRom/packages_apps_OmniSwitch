@@ -134,6 +134,11 @@
             android:key="bottom_favorites"
             android:summary="@string/bottom_favorites_summary"
             android:title="@string/bottom_favorites_title" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="thumb_header_position_side"
+            android:summary="@string/thumb_header_position_side_summary"
+            android:title="@string/thumb_header_position_side_title" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="app_filter_category"
