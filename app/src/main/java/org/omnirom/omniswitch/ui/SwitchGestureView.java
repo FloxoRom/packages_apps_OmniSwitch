@@ -101,6 +101,8 @@ public class SwitchGestureView {
             if (DEBUG) {
                 Log.d(TAG, "mLongPressRunnable");
             }
+            // Capture inputs
+            mInputMonitor.pilferPointers();
             mRecentsManager.hideHidden();
             mLongPress = true;
             mHandleRecentsUpdate = true;
@@ -292,8 +294,6 @@ public class SwitchGestureView {
                         if (!mShowingSpeedSwitcher) {
                             break;
                         }
-                        mInputMonitor.pilferPointers();
-                        mInputEventReceiver.setBatchingEnabled(true);
 
                         if (!isValidCoordinate((int) xRaw, (int) yRaw)) {
                             if (mLevel != -2 && mLevel != 2) {
@@ -356,7 +356,6 @@ public class SwitchGestureView {
                 }
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
-                        mInputEventReceiver.setBatchingEnabled(false);
                         mShowingSpeedSwitcher = false;
                         mHandleRecentsUpdate = false;
                         mLongPress = false;
@@ -424,10 +423,11 @@ public class SwitchGestureView {
                                     }
                                 }
                             }
+                            if (mMoveStarted) {
+                                // Capture inputs
+                                mInputMonitor.pilferPointers();
+                            }
                         } else {
-                            // Capture inputs
-                            mInputMonitor.pilferPointers();
-                            mInputEventReceiver.setBatchingEnabled(true);
                             mRecentsManager.slideLayout(distanceX);
                         }
                         mLastX = xRaw;
