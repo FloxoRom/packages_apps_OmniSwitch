@@ -389,7 +389,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 getCurrentOverlayWidth(),
                 WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.TYPE_NAVIGATION_BAR_PANEL,
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                         | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
                         | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
@@ -404,6 +404,10 @@ public class SwitchLayout extends AbstractSwitchLayout {
 
         params.gravity = getHorizontalGravity();
         params.setTrustedOverlay();
+        params.windowAnimations = 0;
+        params.privateFlags |=
+                (WindowManager.LayoutParams.SYSTEM_FLAG_SHOW_FOR_ALL_USERS
+                        | WindowManager.LayoutParams.PRIVATE_FLAG_EXCLUDE_FROM_SCREEN_MAGNIFICATION);
         params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
         return params;
     }

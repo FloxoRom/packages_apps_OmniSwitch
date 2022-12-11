@@ -75,32 +75,23 @@ public class SwitchGestureView {
     private final static String TAG = "OmniSwitch:SwitchGestureView";
     private static final boolean DEBUG = false;
 
-    private static final int FLIP_DURATION_DEFAULT = 200;
-
     private Context mContext;
     private WindowManager mWindowManager;
     private ImageView mDragButton;
     private FrameLayout mView;
-    private float[] mDownPoint = new float[2];
     private float[] mInitDownPoint = new float[2];
     private boolean mShowing;
     private boolean mEnabled = true;
     private Drawable mDragHandleImage;
-    private Drawable mDragHandleHiddenImage;
     private SwitchConfiguration mConfiguration;
-    private boolean mHidden = true;
-    private Handler mHandler;
     private SwitchManager mRecentsManager;
-    private LinearInterpolator mLinearInterpolator = new LinearInterpolator();
-    private Animator mToggleDragHandleAnim;
-    private float mSlop;
+    private float mDetectSlop;
+    private float mFlingSlop;
+    private float mDefaultSlop;
     private boolean mFlingEnable = true;
     private float mLastX;
-    private float mThumbRatio = 1.2f;
     private boolean mMoveStarted;
-    private PackageTextView mLockToAppButton;
     private View.OnTouchListener mDragButtonListener;
-    //private View.OnTouchListener mViewListener;
     private InputMonitor mInputMonitor;
     private InputChannelCompat.InputEventReceiver mInputEventReceiver;
     private int[] mDragButtonLocation = new int[2];
@@ -137,13 +128,13 @@ public class SwitchGestureView {
             float distanceX = mInitDownPoint[0] - e2.getRawX();
             float distanceY = mInitDownPoint[1] - e2.getRawY();
 
-            if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > mSlop) {
+            if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > mDefaultSlop) {
                 if (DEBUG) {
                     Log.d(TAG, "onFling cancel distanceY > mSlop");
                 }
                 return false;
             }
-            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > mSlop * 2) {
+            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > mFlingSlop) {
                 // this is an open only fling so velocityX must match
                 if (mConfiguration.mLocation == 0) {
                     if (velocityX > 0) {
@@ -163,7 +154,10 @@ public class SwitchGestureView {
                 if (DEBUG) {
                     Log.d(TAG, "onFling open " + velocityX);
                 }
+                resetInitDownPoint();
                 mEnabled = false;
+                mMoveStarted = false;
+                mFlingEnable = false;
                 mRecentsManager.openSlideLayout(true);
             }
             return false;
@@ -181,15 +175,15 @@ public class SwitchGestureView {
         mWindowManager = (WindowManager) mContext
                 .getSystemService(Context.WINDOW_SERVICE);
         mConfiguration = SwitchConfiguration.getInstance(mContext);
-        mHandler = new Handler();
         ViewConfiguration vc = ViewConfiguration.get(context);
-        mSlop = vc.getScaledTouchSlop() * 0.5f;
+        mDefaultSlop = vc.getScaledTouchSlop();
+        mDetectSlop = mDefaultSlop * 0.5f;
+        mFlingSlop = mDefaultSlop * 2f;
 
         mGestureDetector = new GestureDetector(context, mGestureListener);
         mGestureDetector.setIsLongpressEnabled(false);
 
         mDragHandleImage = mContext.getDrawable(R.drawable.drag_handle_shape);
-        mDragHandleHiddenImage = mContext.getDrawable(R.drawable.drag_handle_overlay_shape);
 
         LayoutInflater inflater = (LayoutInflater) mContext
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -205,16 +199,15 @@ public class SwitchGestureView {
                 int action = event.getAction();
                 float xRaw = event.getRawX();
                 float yRaw = event.getRawY();
-                float distanceX = mInitDownPoint[0] - xRaw;
-                float distanceY = mInitDownPoint[1] - yRaw;
 
                 if (DEBUG) {
                     Log.d(TAG, "mDragButton onTouch " + action + ":" + (int) xRaw + ":" + (int) yRaw + " mEnabled=" + mEnabled +
                             " mFlingEnable=" + mFlingEnable + " mMoveStarted=" + mMoveStarted);
                 }
-                if (mFlingEnable && !mHidden) {
+                if (mFlingEnable && isDownPointValid()) {
                     mGestureDetector.onTouchEvent(event);
                 }
+                // MUST be after mGestureDetector - it will set mEnabled = false on fling detected
                 if (!mEnabled) {
                     return true;
                 }
@@ -228,8 +221,6 @@ public class SwitchGestureView {
                         RecentTasksLoader.getInstance(mContext).setSwitchManager(mRecentsManager);
                         RecentTasksLoader.getInstance(mContext).preloadTasks();
 
-                        mDownPoint[0] = xRaw;
-                        mDownPoint[1] = yRaw;
                         mInitDownPoint[0] = xRaw;
                         mInitDownPoint[1] = yRaw;
                         mLastX = xRaw;
@@ -238,24 +229,32 @@ public class SwitchGestureView {
                         mEnabled = true;
                         mFlingEnable = false;
                         mMoveStarted = false;
+                        resetInitDownPoint();
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if (mHidden) {
+                        if (!isDownPointValid()) {
+                            if (DEBUG) {
+                                Log.d(TAG, "ACTION_MOVE ignored cause we dont have ACTION_DOWN");
+                            }
                             return true;
                         }
+
+                        float distanceX = mInitDownPoint[0] - xRaw;
+                        float distanceY = mInitDownPoint[1] - yRaw;
+
                         if (DEBUG) {
                             Log.d(TAG, "ACTION_MOVE " + Math.abs(distanceX) + " " + Math.abs(distanceY));
                         }
 
                         if (!mMoveStarted) {
-                            if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > mSlop) {
+                            if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > mDefaultSlop) {
                                 if (DEBUG) {
                                     Log.d(TAG, "mDragButton cancel distanceY > mSlop");
                                 }
                                 cancelGesture(event);
                                 return true;
                             }
-                            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > mSlop) {
+                            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > mDetectSlop) {
                                 if (mLastX > xRaw) {
                                     // move left
                                     if (mConfiguration.mLocation == 0) {
@@ -289,21 +288,28 @@ public class SwitchGestureView {
                         break;
                     case MotionEvent.ACTION_UP:
                         mFlingEnable = false;
-
-                        if (mMoveStarted) {
-                            mRecentsManager.finishSlideLayout();
+                        if (!isDownPointValid()) {
+                            if (DEBUG) {
+                                Log.d(TAG, "ACTION_UP ignored cause we dont have ACTION_DOWN");
+                            }
                         } else {
-                            mRecentsManager.hideHidden();
+                            if (mMoveStarted) {
+                                mRecentsManager.finishSlideLayout();
+                            } else {
+                                mRecentsManager.hideHidden();
+                            }
                         }
                         mMoveStarted = false;
+                        resetInitDownPoint();
                         break;
                 }
                 return true;
             }
         };
+        resetInitDownPoint();
         mView.addView(mDragButton, getDragHandleLayoutParamsSmall());
-
-        updateButton(false);
+        updateDragHandleImage();
+        mEnabled = true;
     }
 
     private void disposeInputChannel() {
@@ -341,7 +347,7 @@ public class SwitchGestureView {
             mDragButtonListener.onTouch(mDragButton, ev);
         } else {
             boolean isWithinInsets = isWithinDragButton((int) ev.getX(), (int) ev.getY());
-            if (isWithinInsets) {
+            if (isWithinInsets && mEnabled) {
                 mDragButtonListener.onTouch(mDragButton, ev);
             }
         }
@@ -373,6 +379,15 @@ public class SwitchGestureView {
         mDragButtonLocation[1] = 0;
     }
 
+    private void resetInitDownPoint() {
+        mInitDownPoint[0] = -1f;
+        mInitDownPoint[1] = -1f;
+    }
+
+    private boolean isDownPointValid() {
+        return mInitDownPoint[0] != -1 && mInitDownPoint[1] != -1f;
+    }
+
     private void cancelGesture(MotionEvent ev) {
         // Send action cancel to reset all the touch events
         MotionEvent cancelEv = MotionEvent.obtain(ev);
@@ -395,7 +410,7 @@ public class SwitchGestureView {
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
                 mConfiguration.mDragHandleWidth,
                 mConfiguration.mDragHandleHeight,
-                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.TYPE_NAVIGATION_BAR_PANEL,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                         | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
@@ -405,6 +420,10 @@ public class SwitchGestureView {
         lp.gravity = getGravity();
         lp.y = mConfiguration.getCurrentOffsetStart();
         lp.setTrustedOverlay();
+        lp.windowAnimations = 0;
+        lp.privateFlags |=
+                (WindowManager.LayoutParams.SYSTEM_FLAG_SHOW_FOR_ALL_USERS
+                        | WindowManager.LayoutParams.PRIVATE_FLAG_EXCLUDE_FROM_SCREEN_MAGNIFICATION);
         lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
         return lp;
     }
@@ -445,34 +464,14 @@ public class SwitchGestureView {
         return lp;
     }
 
-    private void updateButton(boolean reload) {
-        if (reload) {
-            // to catch location/rotation changes
-            updateDragHandleImage(false);
-        }
-        updateDragHandleImage(true);
-    }
-
-    private void colorizeDragHandleImage() {
-        mDragHandleImage.setTint(mConfiguration.getDragHandleColor());
-    }
-
-    private void updateDragHandleImage(boolean shown) {
-        if ((mHidden && !shown) || (!mHidden && shown)) {
-            return;
-        }
+    private void updateDragHandleImage() {
         if (DEBUG) {
-            Log.d(TAG, "updateDragHandleImage " + shown);
+            Log.d(TAG, "updateDragHandleImage");
         }
 
-        Drawable current = mDragHandleImage;
-
-        mHidden = !shown;
-
-        if (!shown) {
-            current = mDragHandleHiddenImage;
-        }
-        toggleDragHandle(shown, current);
+        mDragButton.setRotation(mConfiguration.mLocation == 0 ? 0f : 180f);
+        mDragHandleImage.setTint(mConfiguration.getDragHandleColor());
+        mDragButton.setImageDrawable(mDragHandleImage);
     }
 
     public void updatePrefs(SharedPreferences prefs, String key) {
@@ -482,9 +481,8 @@ public class SwitchGestureView {
 
         if (key != null) {
             if (mDragHandleShowSettings.contains(key)) {
+                updateDragHandleImage();
                 if (mConfiguration.mDragHandleShow) {
-                    colorizeDragHandleImage();
-                    updateButton(true);
                     show();
                 } else {
                     hide();
@@ -535,7 +533,6 @@ public class SwitchGestureView {
         if (DEBUG) {
             Log.d(TAG, "overlayShown");
         }
-        updateDragHandleImage(false);
         mEnabled = false;
     }
 
@@ -543,8 +540,6 @@ public class SwitchGestureView {
         if (DEBUG) {
             Log.d(TAG, "overlayHidden");
         }
-        updateDragHandleImage(true);
-
         mEnabled = true;
     }
 
@@ -561,64 +556,6 @@ public class SwitchGestureView {
             // recalc next time needed
             resetDragButtonLocation();
         }
-    }
-
-    private Animator start(Animator a) {
-        a.start();
-        return a;
-    }
-
-    private Animator interpolator(TimeInterpolator ti, Animator a) {
-        a.setInterpolator(ti);
-        return a;
-    }
-
-    private void toggleDragHandle(final boolean show, final Drawable current) {
-        if (mToggleDragHandleAnim != null) {
-            mToggleDragHandleAnim.cancel();
-        }
-
-        mDragButton.setRotation(mConfiguration.mLocation == 0 ? 0f : 180f);
-
-        if (show) {
-            mDragButton.setTranslationX(mConfiguration.mLocation == 0 ? mConfiguration.mDragHandleWidth : -mConfiguration.mDragHandleWidth);
-            mDragButton.setImageDrawable(current);
-            mToggleDragHandleAnim = start(interpolator(mLinearInterpolator,
-                    ObjectAnimator.ofFloat(mDragButton, View.TRANSLATION_X,
-                            mConfiguration.mLocation == 0 ? mConfiguration.mDragHandleWidth :
-                                    -mConfiguration.mDragHandleWidth,
-                            0f))
-                    .setDuration(FLIP_DURATION_DEFAULT));
-        } else {
-            mDragButton.setTranslationX(0f);
-            mToggleDragHandleAnim = start(interpolator(mLinearInterpolator,
-                    ObjectAnimator.ofFloat(mDragButton, View.TRANSLATION_X, 1f,
-                            mConfiguration.mLocation == 0 ? mConfiguration.mDragHandleWidth :
-                                    -mConfiguration.mDragHandleWidth))
-                    .setDuration(FLIP_DURATION_DEFAULT));
-        }
-
-        mToggleDragHandleAnim.addListener(new AnimatorListener() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (!show) {
-                    mDragButton.setImageDrawable(current);
-                    mDragButton.setTranslationX(0f);
-                }
-            }
-
-            @Override
-            public void onAnimationStart(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-            }
-        });
     }
 
     private boolean canDrawOverlayViews() {
