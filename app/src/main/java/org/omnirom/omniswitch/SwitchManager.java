@@ -33,7 +33,6 @@ import android.app.ActivityOptions;
 import android.app.ActivityTaskManager;
 import android.app.IActivityManager;
 import android.app.TaskStackBuilder;
-import static android.app.WindowConfiguration.WINDOWING_MODE_SPLIT_SCREEN_PRIMARY;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -582,28 +581,4 @@ public class SwitchManager {
         }
     }
 
-    public void dockTask(TaskDescription ad, boolean close) {
-        if (ad.isKilled()) {
-            return;
-        }
-
-        if(close){
-            hide(true);
-        }
-        try {
-            ActivityOptions options = makeSplitScreenOptions(true);
-            ActivityManagerNative.getDefault().startActivityFromRecents(
-                        ad.getPersistentTaskId(), options.toBundle());
-            if (DEBUG){
-                Log.d(TAG, "dock task " + ad.getLabel());
-            }
-        } catch (Exception e) {
-        }
-    }
-
-    private ActivityOptions makeSplitScreenOptions(boolean dockTopLeft) {
-        final ActivityOptions options = ActivityOptions.makeBasic();
-        options.setLaunchWindowingMode(WINDOWING_MODE_SPLIT_SCREEN_PRIMARY);
-        return options;
-    }
 }

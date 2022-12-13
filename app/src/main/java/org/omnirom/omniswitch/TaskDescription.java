@@ -39,11 +39,8 @@ public final class TaskDescription {
     private CharSequence mLabel;
     private boolean mLocked;
     private boolean mNeedsUpdate;
-    private boolean mSupportsSplitScreen;
     private int mActivityPrimaryColor;
-    private int mActivityBackgroundColor;
     private boolean mUseLightOnPrimaryColor;
-    private boolean mMultiWindowMode;
     private String mPackageName;
 
     public static interface ThumbChangeListener {
@@ -52,13 +49,11 @@ public final class TaskDescription {
     }
 
     public TaskDescription(int _taskId, int _persistentTaskId, String packageName,
-            Intent _intent, boolean supportsSplitScreen, boolean multiWindowMode) {
+            Intent _intent) {
         intent = _intent;
         taskId = _taskId;
         mPackageName = packageName;
         persistentTaskId = _persistentTaskId;
-        mSupportsSplitScreen = supportsSplitScreen;
-        mMultiWindowMode = multiWindowMode;
     }
 
     public Drawable getIcon() {
@@ -154,14 +149,6 @@ public final class TaskDescription {
         mNeedsUpdate = value;
     }
 
-    public boolean isSupportsSplitScreen() {
-        return mSupportsSplitScreen;
-    }
-
-    public void setTaskBackgroundColor(int backgroundColor) {
-        mActivityBackgroundColor = backgroundColor;
-    }
-
     public void setTaskPrimaryColor(int activityColor) {
         mActivityPrimaryColor = activityColor;
         mUseLightOnPrimaryColor = Utils.computeContrastBetweenColors(mActivityPrimaryColor, Color.WHITE) > 3f;
@@ -171,15 +158,7 @@ public final class TaskDescription {
         return mActivityPrimaryColor;
     }
 
-    public int getTaskBackgroundColor() {
-        return mActivityBackgroundColor;
-    }
-
     public boolean useLightOnPrimaryColor() {
         return mUseLightOnPrimaryColor;
-    }
-
-    public boolean isMultiWindowMode() {
-        return mMultiWindowMode;
     }
 }

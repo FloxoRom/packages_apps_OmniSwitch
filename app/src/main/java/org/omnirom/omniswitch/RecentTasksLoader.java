@@ -128,15 +128,11 @@ public class RecentTasksLoader {
         int persistentTaskId = recentInfo.persistentId;
         Intent baseIntent = recentInfo.baseIntent;
         String packageName = baseIntent.getComponent().getPackageName();
-        boolean supportsSplitScreenMultiWindow = recentInfo.supportsSplitScreenMultiWindow;
-        boolean multiWindowMode = android.app.WindowConfiguration.inMultiWindowMode(
-                recentInfo.configuration.windowConfiguration.getWindowingMode());
 
         if (DEBUG)
             Log.v(TAG, "creating activity desc for id=" + persistentTaskId);
         TaskDescription ad = new TaskDescription(taskId,
-                persistentTaskId, packageName, baseIntent,
-                supportsSplitScreenMultiWindow, multiWindowMode);
+                persistentTaskId, packageName, baseIntent);
         return ad;
     }
 
@@ -283,7 +279,6 @@ public class RecentTasksLoader {
 
                     if (taskDescription != null) {
                         item.setTaskPrimaryColor(taskDescription.getPrimaryColor());
-                        item.setTaskBackgroundColor(taskDescription.getBackgroundColor());
                     }
 
                     // Don't load the current home activity.

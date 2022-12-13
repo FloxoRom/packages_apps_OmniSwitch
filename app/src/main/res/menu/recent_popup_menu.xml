@@ -29,9 +29,6 @@
         android:id="@+id/package_lock_task"
         android:title="@string/package_lock_task_title"/>
     <item
-        android:id="@+id/package_dock_task"
-        android:title="@string/package_dock_task_title"/>
-    <item
         android:id="@+id/package_lock_app"
         android:title="@string/package_lock_app_title"/>
     <item

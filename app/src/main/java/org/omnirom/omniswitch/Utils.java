@@ -210,15 +210,6 @@ public class Utils {
         return false;
     }
 
-    public static boolean isDockingAvailable(Context context, final List<TaskDescription> tasks) {
-        for (TaskDescription ad : tasks) {
-            if (ad.isMultiWindowMode()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public static void updateFavoritesList(Context context, SwitchConfiguration config, List<String> favoriteList) {
         favoriteList.clear();
         favoriteList.addAll(config.mFavoriteList);
