@@ -379,7 +379,7 @@ public class RecentTasksLoader {
 
     private ThumbnailData getThumbnail(int taskId) {
         try {
-            TaskSnapshot snapshot = ActivityTaskManager.getService().getTaskSnapshot(taskId, true);
+            TaskSnapshot snapshot = ActivityTaskManager.getService().getTaskSnapshot(taskId, true, true);
             if (snapshot != null) {
                 if (DEBUG) {
                     Log.d(TAG, "getThumbnail " + taskId);
