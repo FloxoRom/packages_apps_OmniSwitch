@@ -73,6 +73,13 @@ public class SwitchService extends Service {
         return mIsRunning;
     }
 
+    private BroadcastReceiver mScreenReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mManager.hide(true);
+        }
+    };
+
     @Override
     public void onCreate() {
         try {
@@ -129,6 +136,10 @@ public class SwitchService extends Service {
             localeFilter.addAction(Intent.ACTION_LOCALE_CHANGED);
             registerReceiver(mLocaleReceiver, localeFilter);
 
+            IntentFilter screenFilter = new IntentFilter();
+            screenFilter.addAction(Intent.ACTION_SCREEN_OFF);
+            registerReceiver(mScreenReceiver, screenFilter);
+
             PackageManager.getInstance(this).updatePackageList();
 
             updatePrefs(mPrefs, null);
@@ -171,6 +182,7 @@ public class SwitchService extends Service {
             unregisterReceiver(mReceiver);
             unregisterReceiver(mPackageReceiver);
             unregisterReceiver(mLocaleReceiver);
+            unregisterReceiver(mScreenReceiver);
             mPrefs.unregisterOnSharedPreferenceChangeListener(mPrefsListener);
         } catch(IllegalArgumentException e) {
             // ignored on purpose
