@@ -365,12 +365,13 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         }
 
         int statusbarHeight = mWindowManager.getCurrentWindowMetrics().getWindowInsets().getInsets(WindowInsets.Type.statusBars()).top;
-        int navbarHeight = mWindowManager.getCurrentWindowMetrics().getWindowInsets().getInsets(WindowInsets.Type.navigationBars()).bottom;
+        int bottomMargin = mContext.getResources().getDimensionPixelSize(R.dimen.vertical_bottom_margin);
+        //int navbarHeight = mWindowManager.getCurrentWindowMetrics().getWindowInsets().getInsets(WindowInsets.Type.navigationBars()).bottom;
 
-        mFavoriteListView.setPadding(0, statusbarHeight, 0, navbarHeight);
-        mAppDrawer.setPadding(0, statusbarHeight, 0, navbarHeight);
-        mButtonList.setPadding(0, statusbarHeight, 0, navbarHeight);
-        mRecentList.setPadding(0, statusbarHeight, 0, navbarHeight);
+        mFavoriteListView.setPadding(0, statusbarHeight, 0, bottomMargin);
+        mAppDrawer.setPadding(0, statusbarHeight, 0, bottomMargin);
+        mButtonList.setPadding(0, statusbarHeight, 0, bottomMargin);
+        mRecentList.setPadding(0, statusbarHeight, 0, bottomMargin);
 
         if (mConfiguration.mLocation == 0) {
             mView.findViewById(R.id.vertical_bg_padding_space_start).setVisibility(View.VISIBLE);

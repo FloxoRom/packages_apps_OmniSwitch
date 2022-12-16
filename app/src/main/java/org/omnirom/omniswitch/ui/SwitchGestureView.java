@@ -139,7 +139,7 @@ public class SwitchGestureView {
                 }
                 return false;
             }
-            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > mFlingSlop) {
+            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > mDefaultSlop) {
                 // this is an open only fling so velocityX must match
                 if (mConfiguration.mLocation == 0) {
                     if (velocityX > 0) {
@@ -218,6 +218,7 @@ public class SwitchGestureView {
                 }
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
+                        mInputEventReceiver.setBatchingEnabled(false);
                         mFlingEnable = false;
                         mMoveStarted = false;
 
@@ -285,6 +286,7 @@ public class SwitchGestureView {
                             if (mMoveStarted) {
                                 // Capture inputs
                                 mInputMonitor.pilferPointers();
+                                mInputEventReceiver.setBatchingEnabled(true);
                             }
                         } else {
                             mRecentsManager.slideLayout(distanceX);
