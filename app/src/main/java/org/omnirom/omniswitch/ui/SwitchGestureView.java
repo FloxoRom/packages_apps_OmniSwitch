@@ -21,6 +21,7 @@ import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
+import android.app.StatusBarManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -34,6 +35,8 @@ import android.hardware.input.InputManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
@@ -56,6 +59,10 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.systemui.shared.system.InputChannelCompat;
+
+import com.android.internal.logging.InstanceId;
+import com.android.internal.statusbar.IStatusBarService;
+import com.android.internal.statusbar.ISessionListener;
 
 import org.omnirom.omniswitch.PackageManager;
 import org.omnirom.omniswitch.R;
@@ -97,6 +104,7 @@ public class SwitchGestureView {
     private InputMonitor mInputMonitor;
     private InputChannelCompat.InputEventReceiver mInputEventReceiver;
     private int[] mDragButtonLocation = new int[2];
+    private boolean mSessionKeyguard;
 
     private static final HashSet<String> mDragHandleShowSettings = new HashSet<>();
     static {
@@ -171,6 +179,24 @@ public class SwitchGestureView {
         @Override
         public boolean onDown(MotionEvent e) {
             return true;
+        }
+    };
+
+    private ISessionListener mSessionListener = new ISessionListener.Stub() {
+        @Override
+        public void onSessionStarted(int sessionType, InstanceId instance) {
+            if (DEBUG) {
+                Log.d(TAG, "onSessionStarted ");
+            }
+            mSessionKeyguard = true;
+        }
+
+        @Override
+        public void onSessionEnded(int sessionType, InstanceId instance) {
+            if (DEBUG) {
+                Log.d(TAG, "onSessionEnded ");
+            }
+            mSessionKeyguard = false;
         }
     };
 
@@ -316,6 +342,7 @@ public class SwitchGestureView {
         resetInitDownPoint();
         mView.addView(mDragButton, getDragHandleLayoutParamsSmall());
         updateDragHandleImage();
+        initStatusBarSession();
         mEnabled = true;
     }
 
@@ -342,6 +369,7 @@ public class SwitchGestureView {
 
     private void onInputEvent(InputEvent ev) {
         if (!(ev instanceof MotionEvent)) return;
+        if (mSessionKeyguard) return;
         MotionEvent event = (MotionEvent) ev;
         onMotionEvent(event);
     }
@@ -417,7 +445,7 @@ public class SwitchGestureView {
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
                 mConfiguration.mDragHandleWidth,
                 mConfiguration.mDragHandleHeight,
-                WindowManager.LayoutParams.TYPE_NAVIGATION_BAR_PANEL,
+                WindowManager.LayoutParams.TYPE_PHONE,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                         | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
@@ -513,6 +541,8 @@ public class SwitchGestureView {
         mWindowManager.addView(mView, getParamsSmall());
 
         createInputChannel();
+        registerStatusBarSessionListener();
+
         // recalc next time needed
         resetDragButtonLocation();
 
@@ -531,6 +561,7 @@ public class SwitchGestureView {
         mWindowManager.removeView(mView);
 
         disposeInputChannel();
+        unregisterStatusBarSessionListener();
 
         mShowing = false;
         mEnabled = false;
@@ -567,5 +598,44 @@ public class SwitchGestureView {
 
     private boolean canDrawOverlayViews() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(mContext);
+    }
+
+    private void registerStatusBarSessionListener() {
+        if (DEBUG) {
+            Log.d(TAG, "registerSessionListener");
+        }
+        IStatusBarService service = IStatusBarService.Stub.asInterface(ServiceManager.getService("statusbar"));
+        if (service != null) {
+            try {
+                service.registerSessionListener(StatusBarManager.SESSION_KEYGUARD, mSessionListener);
+            } catch (RemoteException e) {
+            }
+        }
+    }
+
+    private void unregisterStatusBarSessionListener() {
+        if (DEBUG) {
+            Log.d(TAG, "unregisterSessionListener");
+        }
+        IStatusBarService service = IStatusBarService.Stub.asInterface(ServiceManager.getService("statusbar"));
+        if (service != null) {
+            try {
+                service.unregisterSessionListener(StatusBarManager.SESSION_KEYGUARD, mSessionListener);
+            } catch (RemoteException e) {
+            }
+        }
+    }
+
+    private void initStatusBarSession() {
+        IStatusBarService service = IStatusBarService.Stub.asInterface(ServiceManager.getService("statusbar"));
+        if (service != null) {
+            try {
+                mSessionKeyguard = service.getSessionStatus(StatusBarManager.SESSION_KEYGUARD);
+                if (DEBUG) {
+                    Log.d(TAG, "initStatusBarSession mSessionKeyguard = " + mSessionKeyguard);
+                }
+            } catch (RemoteException e) {
+            }
+        }
     }
 }
