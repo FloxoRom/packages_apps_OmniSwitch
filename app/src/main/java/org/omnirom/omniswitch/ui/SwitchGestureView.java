@@ -342,7 +342,6 @@ public class SwitchGestureView {
         resetInitDownPoint();
         mView.addView(mDragButton, getDragHandleLayoutParamsSmall());
         updateDragHandleImage();
-        initStatusBarSession();
         mEnabled = true;
     }
 
@@ -541,6 +540,7 @@ public class SwitchGestureView {
         mWindowManager.addView(mView, getParamsSmall());
 
         createInputChannel();
+        initStatusBarSession();
         registerStatusBarSessionListener();
 
         // recalc next time needed
