@@ -145,7 +145,7 @@
         <string name="package_right_task_title">Right</string>
         <string name="package_full_task_title">Full size</string>
         <string name="shortcut_label_toggle_overlay">Toggle overlay</string>
-        <string name="adjust_handle_title_new">Configure drag handle</string>
+        <string name="adjust_handle_title_new">Drag handle</string>
         <string name="adjust_handle_summary">Configure position size and color</string>
         <string name="settings_button_text">Settings</string>
         <string name="wallpaper_button_text">Wallpaper</string>
@@ -237,4 +237,5 @@
         <string name="notification_channel_description"></string>
         <string name="thumb_header_position_side_summary">Position of header on thumbnails</string>
         <string name="thumb_header_position_side_title">Thumbnail side header</string>
+        <string name="drag_handle_config_note">Note: If you use gesture system navigation make sure to configure the height of the back region so it does not conflict with the drag handle area.</string>
 </resources>
