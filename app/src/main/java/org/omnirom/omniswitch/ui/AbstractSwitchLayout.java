@@ -41,6 +41,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -126,10 +127,8 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     protected float mCurrentDistance;
     private float[] mDownPoint = new float[2];
     protected boolean mEnabled;
-    private boolean mFlingEnable = true;
     private float mLastX;
     private boolean mMoveStarted;
-    protected GestureDetector mGestureDetector;
     protected AppDrawerView mAppDrawer;
     private boolean mHandleRecentsUpdate;
     protected boolean mShowing;
@@ -146,58 +145,8 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     protected AnimatorSet mShowFavAnim;
     protected AnimatorSet mAppDrawerAnim;
     private Typeface mLabelFont;
-
-    protected GestureDetector.OnGestureListener mGestureListener = new GestureDetector.OnGestureListener() {
-        @Override
-        public boolean onSingleTapUp(MotionEvent e) {
-            return false;
-        }
-
-        @Override
-        public void onShowPress(MotionEvent e) {
-        }
-
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2,
-                                float distanceX, float distanceY) {
-            return false;
-        }
-
-        @Override
-        public void onLongPress(MotionEvent e) {
-        }
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                               float velocityY) {
-            if (DEBUG) {
-                Log.d(TAG, "onFling close");
-            }
-            // this is an close only fling so velocityX must match
-            if (mConfiguration.mLocation == 0) {
-                if (velocityX < 0) {
-                    if (DEBUG) {
-                        Log.d(TAG, "onFling cancel velocityX < 0");
-                    }
-                    return false;
-                }
-            } else {
-                if (velocityX > 0) {
-                    if (DEBUG) {
-                        Log.d(TAG, "onFling cancel velocityX > 0");
-                    }
-                    return false;
-                }
-            }
-            finishOverlaySlide(false, true);
-            return false;
-        }
-
-        @Override
-        public boolean onDown(MotionEvent e) {
-            return true;
-        }
-    };
+    private VelocityTracker mVelocityTracker;
+    private boolean mFlingClose;
 
     protected View.OnTouchListener mDragHandleListener = new View.OnTouchListener() {
         @Override
@@ -209,27 +158,33 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
 
             if (DEBUG) {
                 Log.d(TAG, "mView onTouch " + action + ":" + (int) xRaw + ":"
-                        + (int) yRaw + " " + mEnabled + " " + mFlingEnable);
+                        + (int) yRaw + " " + mEnabled);
             }
-            if (mFlingEnable) {
-                mGestureDetector.onTouchEvent(event);
-            }
+
             if (!mEnabled) {
                 return true;
             }
+
+            if (mVelocityTracker == null) {
+                mVelocityTracker = VelocityTracker.obtain();
+            }
+            mVelocityTracker.addMovement(event);
+
             switch (action) {
                 case MotionEvent.ACTION_DOWN:
                     mDownPoint[0] = xRaw;
                     mDownPoint[1] = yRaw;
                     mEnabled = true;
-                    mFlingEnable = false;
                     mLastX = xRaw;
                     mMoveStarted = false;
+                    mFlingClose = false;
                     break;
                 case MotionEvent.ACTION_CANCEL:
                     mEnabled = true;
-                    mFlingEnable = false;
                     mMoveStarted = false;
+                    mFlingClose = false;
+                    mVelocityTracker.recycle();
+                    mVelocityTracker = null;
                     break;
                 case MotionEvent.ACTION_MOVE:
                     if (!mMoveStarted) {
@@ -237,40 +192,49 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                             if (mLastX > xRaw) {
                                 // move left
                                 if (mConfiguration.mLocation != 0) {
-                                    mFlingEnable = true;
                                     mMoveStarted = true;
                                 }
                             } else {
                                 // move right
                                 if (mConfiguration.mLocation == 0) {
-                                    mFlingEnable = true;
                                     mMoveStarted = true;
                                 }
                             }
                         }
                     } else {
-                        if (distanceX > 0) {
-                            // move left
-                            if (mConfiguration.mLocation != 0) {
-                                slideLayoutHide(-distanceX);
-                            }
-                        } else {
-                            // move right
-                            if (mConfiguration.mLocation == 0) {
-                                slideLayoutHide(-distanceX);
-                            }
+                        mVelocityTracker.computeCurrentVelocity(1000);
+                        float xVelocity = mVelocityTracker.getXVelocity();
+                        boolean isSlow = Math.abs(xVelocity) < 500;
+
+                        if (DEBUG) {
+                            Log.d(TAG, "xVelocity " + xVelocity + " isSlow = " + isSlow);
                         }
+                        if (mConfiguration.mLocation == 0) {
+                            mFlingClose = xVelocity > 0;
+                        } else {
+                            mFlingClose = xVelocity < 0;
+                        }
+                        mFlingClose = mFlingClose || finishSlideLayout();
+                        if (DEBUG) {
+                            Log.d(TAG, "mFlingClose = " + mFlingClose);
+                        }
+                        slideLayoutHide(-distanceX);
                     }
                     mLastX = xRaw;
                     break;
                 case MotionEvent.ACTION_UP:
-                    mFlingEnable = false;
                     if (mMoveStarted) {
-                        finishSlideLayoutHide();
+                        if (mFlingClose) {
+                            mRecentsManager.canceSlideLayout(true);
+                        } else {
+                            mRecentsManager.openSlideLayout(true);
+                        }
                     } else {
                         hide(false);
                     }
                     mMoveStarted = false;
+                    mVelocityTracker.recycle();
+                    mVelocityTracker = null;
                     break;
             }
             return true;
@@ -348,8 +312,6 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         mActionList = new ArrayList<View>();
         mFavoriteListAdapter = new FavoriteListAdapter(mContext,
                 android.R.layout.simple_list_item_single_choice, mFavoriteList);
-        mGestureDetector = new GestureDetector(context, mGestureListener);
-        mGestureDetector.setIsLongpressEnabled(false);
         updateFavoritesList();
     }
 
@@ -795,26 +757,8 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         }
     }
 
-    public void finishSlideLayoutHide() {
-        if (DEBUG) {
-            Log.d(TAG, "finishSlideLayoutHide " + mCurrentDistance);
-        }
-        if (mCurrentDistance > getSlideEndValue() / 2) {
-            finishOverlaySlide(false, false);
-        } else {
-            finishOverlaySlide(true, false);
-        }
-    }
-
-    public void finishSlideLayout() {
-        if (DEBUG) {
-            Log.d(TAG, "finishSlideLayout " + mCurrentDistance);
-        }
-        if (mCurrentDistance > getSlideEndValue() / 2) {
-            finishOverlaySlide(true, false);
-        } else {
-            finishOverlaySlide(false, false);
-        }
+    public boolean finishSlideLayout() {
+        return mCurrentDistance > getSlideEndValue() / 2;
     }
 
     @Override
@@ -823,8 +767,8 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     }
 
     @Override
-    public void canceSlideLayout() {
-        finishOverlaySlide(false, false);
+    public void canceSlideLayout(boolean fromFling) {
+        finishOverlaySlide(false, fromFling);
     }
 
     public void slideLayout(float distanceX) {

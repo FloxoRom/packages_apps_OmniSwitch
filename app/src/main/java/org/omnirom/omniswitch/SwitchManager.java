@@ -446,16 +446,16 @@ public class SwitchManager {
         mLayout.slideLayout(distanceX);
     }
 
-    public void finishSlideLayout() {
-        mLayout.finishSlideLayout();
+    public boolean finishSlideLayout() {
+        return mLayout.finishSlideLayout();
     }
 
     public void openSlideLayout(boolean fromFling) {
         mLayout.openSlideLayout(fromFling);
     }
 
-    public void canceSlideLayout() {
-        mLayout.canceSlideLayout();
+    public void canceSlideLayout(boolean fromFling) {
+        mLayout.canceSlideLayout(fromFling);
     }
 
     public List<TaskDescription> getTasks() {

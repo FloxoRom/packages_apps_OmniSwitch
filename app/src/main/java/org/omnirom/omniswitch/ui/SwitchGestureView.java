@@ -17,68 +17,44 @@
  */
 package org.omnirom.omniswitch.ui;
 
-import android.animation.Animator;
-import android.animation.Animator.AnimatorListener;
-import android.animation.ObjectAnimator;
-import android.animation.TimeInterpolator;
 import android.app.StatusBarManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.hardware.input.InputManager;
 import android.os.Build;
-import android.os.Handler;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.util.Log;
+import android.util.MathUtils;
 import android.view.Choreographer;
-import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.InputEvent;
 import android.view.InputMonitor;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.WindowManager;
-import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
-
-import com.android.systemui.shared.system.InputChannelCompat;
 
 import com.android.internal.logging.InstanceId;
-import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.ISessionListener;
+import com.android.internal.statusbar.IStatusBarService;
+import com.android.systemui.shared.system.InputChannelCompat;
 
-import org.omnirom.omniswitch.PackageManager;
 import org.omnirom.omniswitch.R;
 import org.omnirom.omniswitch.RecentTasksLoader;
 import org.omnirom.omniswitch.SettingsActivity;
 import org.omnirom.omniswitch.SwitchConfiguration;
 import org.omnirom.omniswitch.SwitchManager;
-import org.omnirom.omniswitch.SwitchService;
-import org.omnirom.omniswitch.TaskDescription;
-import org.omnirom.omniswitch.Utils;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 public class SwitchGestureView {
     private final static String TAG = "OmniSwitch:SwitchGestureView";
@@ -95,9 +71,7 @@ public class SwitchGestureView {
     private SwitchConfiguration mConfiguration;
     private SwitchManager mRecentsManager;
     private float mDetectSlop;
-    private float mFlingSlop;
     private float mDefaultSlop;
-    private boolean mFlingEnable = true;
     private float mLastX;
     private boolean mMoveStarted;
     private View.OnTouchListener mDragButtonListener;
@@ -105,8 +79,13 @@ public class SwitchGestureView {
     private InputChannelCompat.InputEventReceiver mInputEventReceiver;
     private int[] mDragButtonLocation = new int[2];
     private boolean mSessionKeyguard;
+    private final int mLongPressTimeout;
+    private boolean mFlingOpen;
+    private VelocityTracker mVelocityTracker;
+    private float mTotalTouchDelta;
 
     private static final HashSet<String> mDragHandleShowSettings = new HashSet<>();
+
     static {
         mDragHandleShowSettings.add(SettingsActivity.PREF_DRAG_HANDLE_LOCATION);
         mDragHandleShowSettings.add(SettingsActivity.PREF_HANDLE_HEIGHT);
@@ -115,72 +94,6 @@ public class SwitchGestureView {
         mDragHandleShowSettings.add(SettingsActivity.PREF_DRAG_HANDLE_COLOR_NEW);
         mDragHandleShowSettings.add(SettingsActivity.PREF_DRAG_HANDLE_DYNAMIC_COLOR);
     }
-
-    private GestureDetector mGestureDetector;
-    private GestureDetector.OnGestureListener mGestureListener = new GestureDetector.OnGestureListener() {
-        @Override
-        public boolean onSingleTapUp(MotionEvent e) {
-            return false;
-        }
-
-        @Override
-        public void onShowPress(MotionEvent e) {
-        }
-
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            return false;
-        }
-
-        @Override
-        public void onLongPress(MotionEvent e) {
-        }
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            float distanceX = mInitDownPoint[0] - e2.getRawX();
-            float distanceY = mInitDownPoint[1] - e2.getRawY();
-
-            if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > mDefaultSlop) {
-                if (DEBUG) {
-                    Log.d(TAG, "onFling cancel distanceY > mSlop");
-                }
-                return false;
-            }
-            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > mDefaultSlop) {
-                // this is an open only fling so velocityX must match
-                if (mConfiguration.mLocation == 0) {
-                    if (velocityX > 0) {
-                        if (DEBUG) {
-                            Log.d(TAG, "onFling cancel velocityX > 0");
-                        }
-                        return false;
-                    }
-                } else {
-                    if (velocityX < 0) {
-                        if (DEBUG) {
-                            Log.d(TAG, "onFling cancel velocityX < 0");
-                        }
-                        return false;
-                    }
-                }
-                if (DEBUG) {
-                    Log.d(TAG, "onFling open " + velocityX);
-                }
-                resetInitDownPoint();
-                mEnabled = false;
-                mMoveStarted = false;
-                mFlingEnable = false;
-                mRecentsManager.openSlideLayout(true);
-            }
-            return false;
-        }
-
-        @Override
-        public boolean onDown(MotionEvent e) {
-            return true;
-        }
-    };
 
     private ISessionListener mSessionListener = new ISessionListener.Stub() {
         @Override
@@ -209,10 +122,7 @@ public class SwitchGestureView {
         ViewConfiguration vc = ViewConfiguration.get(context);
         mDefaultSlop = vc.getScaledTouchSlop();
         mDetectSlop = mDefaultSlop * 0.5f;
-        mFlingSlop = mDefaultSlop * 2f;
-
-        mGestureDetector = new GestureDetector(context, mGestureListener);
-        mGestureDetector.setIsLongpressEnabled(false);
+        mLongPressTimeout = ViewConfiguration.getLongPressTimeout();
 
         mDragHandleImage = mContext.getDrawable(R.drawable.drag_handle_shape);
 
@@ -233,20 +143,24 @@ public class SwitchGestureView {
 
                 if (DEBUG) {
                     Log.d(TAG, "mDragButton onTouch " + action + ":" + (int) xRaw + ":" + (int) yRaw + " mEnabled=" + mEnabled +
-                            " mFlingEnable=" + mFlingEnable + " mMoveStarted=" + mMoveStarted);
+                            " mMoveStarted=" + mMoveStarted);
                 }
-                if (mFlingEnable && isDownPointValid()) {
-                    mGestureDetector.onTouchEvent(event);
-                }
-                // MUST be after mGestureDetector - it will set mEnabled = false on fling detected
+
                 if (!mEnabled) {
                     return true;
                 }
+
+                if (mVelocityTracker == null) {
+                    mVelocityTracker = VelocityTracker.obtain();
+                }
+                mVelocityTracker.addMovement(event);
+
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
                         mInputEventReceiver.setBatchingEnabled(false);
-                        mFlingEnable = false;
                         mMoveStarted = false;
+                        mFlingOpen = false;
+                        mTotalTouchDelta = 0;
 
                         mRecentsManager.clearTasks();
                         RecentTasksLoader.getInstance(mContext).cancelLoadingTasks();
@@ -259,9 +173,11 @@ public class SwitchGestureView {
                         break;
                     case MotionEvent.ACTION_CANCEL:
                         mEnabled = true;
-                        mFlingEnable = false;
                         mMoveStarted = false;
+                        mFlingOpen = false;
                         resetInitDownPoint();
+                        mVelocityTracker.recycle();
+                        mVelocityTracker = null;
                         break;
                     case MotionEvent.ACTION_MOVE:
                         if (!isDownPointValid()) {
@@ -273,15 +189,30 @@ public class SwitchGestureView {
 
                         float distanceX = mInitDownPoint[0] - xRaw;
                         float distanceY = mInitDownPoint[1] - yRaw;
-
+                        float lastDistanceX  = mInitDownPoint[0] - mLastX;
+                        float delta = Math.abs(distanceX) - Math.abs(lastDistanceX);
+                        if (Math.abs(delta) > 0) {
+                            if (Math.signum(delta) == Math.signum(mTotalTouchDelta)) {
+                                mTotalTouchDelta += delta;
+                            } else {
+                                mTotalTouchDelta = delta;
+                            }
+                        }
                         if (DEBUG) {
-                            Log.d(TAG, "ACTION_MOVE " + Math.abs(distanceX) + " " + Math.abs(distanceY));
+                            Log.d(TAG, "ACTION_MOVE " + Math.abs(distanceX) + " " + Math.abs(distanceY) + " " + delta + " " + mTotalTouchDelta);
                         }
 
                         if (!mMoveStarted) {
+                            if ((event.getEventTime() - event.getDownTime()) > mLongPressTimeout) {
+                                if (DEBUG) {
+                                    Log.d(TAG, "mDragButton cancel - long press");
+                                }
+                                cancelGesture(event);
+                                return true;
+                            }
                             if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > mDefaultSlop) {
                                 if (DEBUG) {
-                                    Log.d(TAG, "mDragButton cancel distanceY > mSlop");
+                                    Log.d(TAG, "mDragButton cancel - distanceY > mSlop");
                                 }
                                 cancelGesture(event);
                                 return true;
@@ -293,8 +224,8 @@ public class SwitchGestureView {
                                         if (DEBUG) {
                                             Log.d(TAG, "mMoveStarted " + distanceX + " " + distanceY);
                                         }
-                                        mFlingEnable = true;
                                         mMoveStarted = true;
+                                        mFlingOpen = true;
                                         mRecentsManager.showHidden();
                                     }
                                 } else {
@@ -303,8 +234,8 @@ public class SwitchGestureView {
                                         if (DEBUG) {
                                             Log.d(TAG, "mMoveStarted " + distanceX + " " + distanceY);
                                         }
-                                        mFlingEnable = true;
                                         mMoveStarted = true;
+                                        mFlingOpen = true;
                                         mRecentsManager.showHidden();
                                     }
                                 }
@@ -315,25 +246,47 @@ public class SwitchGestureView {
                                 mInputEventReceiver.setBatchingEnabled(true);
                             }
                         } else {
+                            mVelocityTracker.computeCurrentVelocity(1000);
+                            float xVelocity = mVelocityTracker.getXVelocity();
+                            boolean isSlow = Math.abs(xVelocity) < 500;
+
+                            if (DEBUG) {
+                                Log.d(TAG, "xVelocity " + xVelocity + " isSlow = " + isSlow);
+                            }
+                            if (mConfiguration.mLocation == 0) {
+                                mFlingOpen = xVelocity < 0;
+                            } else {
+                                mFlingOpen = xVelocity > 0;
+                            }
+                            mFlingOpen = mFlingOpen || mRecentsManager.finishSlideLayout();
+                            if (DEBUG) {
+                                Log.d(TAG, "mFlingOpen = " + mFlingOpen);
+                            }
                             mRecentsManager.slideLayout(distanceX);
                         }
                         mLastX = xRaw;
                         break;
                     case MotionEvent.ACTION_UP:
-                        mFlingEnable = false;
                         if (!isDownPointValid()) {
                             if (DEBUG) {
                                 Log.d(TAG, "ACTION_UP ignored cause we dont have ACTION_DOWN");
                             }
                         } else {
                             if (mMoveStarted) {
-                                mRecentsManager.finishSlideLayout();
+                                if (mFlingOpen) {
+                                    mRecentsManager.openSlideLayout(true);
+                                } else {
+                                    mRecentsManager.canceSlideLayout(true);
+                                }
                             } else {
                                 mRecentsManager.hideHidden();
                             }
                         }
                         mMoveStarted = false;
+                        mFlingOpen = false;
                         resetInitDownPoint();
+                        mVelocityTracker.recycle();
+                        mVelocityTracker = null;
                         break;
                 }
                 return true;
@@ -377,6 +330,7 @@ public class SwitchGestureView {
         if (mDragButtonLocation[0] == 0 && mDragButtonLocation[1] == 0) {
             updateDragButtonLocation();
         }
+
         if (mMoveStarted) {
             mDragButtonListener.onTouch(mDragButton, ev);
         } else {

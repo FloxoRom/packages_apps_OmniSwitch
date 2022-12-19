@@ -45,11 +45,11 @@ public interface ISwitchLayout {
 
     void slideLayout(float distanceX);
 
-    void finishSlideLayout();
-
     void openSlideLayout(boolean fromFling);
 
-    void canceSlideLayout();
+    void canceSlideLayout(boolean fromFling);
+
+    boolean finishSlideLayout();
 
     void shutdownService();
 
