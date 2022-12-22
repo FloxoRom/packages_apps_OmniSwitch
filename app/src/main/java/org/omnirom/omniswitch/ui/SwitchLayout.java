@@ -391,7 +391,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
     @Override
     protected WindowManager.LayoutParams getParams() {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                getCurrentOverlayWidth(),
+                (int)getCurrentOverlayWidth(),
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_NAVIGATION_BAR_PANEL,
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
@@ -728,12 +728,12 @@ public class SwitchLayout extends AbstractSwitchLayout {
     }
 
     @Override
-    protected int getCurrentOverlayWidth() {
+    protected float getCurrentOverlayWidth() {
         return mConfiguration.getCurrentOverlayWidth();
     }
 
     @Override
-    protected int getSlideEndValue() {
+    protected float getSlideEndValue() {
         return mConfiguration.getCurrentOverlayWidth();
     }
 

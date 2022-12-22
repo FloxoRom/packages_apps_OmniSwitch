@@ -365,13 +365,14 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         }
 
         int statusbarHeight = mWindowManager.getCurrentWindowMetrics().getWindowInsets().getInsets(WindowInsets.Type.statusBars()).top;
-        int bottomMargin = mContext.getResources().getDimensionPixelSize(R.dimen.vertical_bottom_margin);
         //int navbarHeight = mWindowManager.getCurrentWindowMetrics().getWindowInsets().getInsets(WindowInsets.Type.navigationBars()).bottom;
+        int bottomMargin = mContext.getResources().getDimensionPixelSize(R.dimen.vertical_bottom_margin);
+        int topMargin = Math.max(statusbarHeight, bottomMargin);
 
-        mFavoriteListView.setPadding(0, statusbarHeight, 0, bottomMargin);
-        mAppDrawer.setPadding(0, statusbarHeight, 0, bottomMargin);
-        mButtonList.setPadding(0, statusbarHeight, 0, bottomMargin);
-        mRecentList.setPadding(0, statusbarHeight, 0, bottomMargin);
+        mFavoriteListView.setPadding(0, topMargin, 0, bottomMargin);
+        mAppDrawer.setPadding(0, topMargin, 0, bottomMargin);
+        mButtonList.setPadding(0, topMargin, 0, bottomMargin);
+        mRecentList.setPadding(0, topMargin, 0, bottomMargin);
 
         if (mConfiguration.mLocation == 0) {
             mView.findViewById(R.id.vertical_bg_padding_space_start).setVisibility(View.VISIBLE);
@@ -797,12 +798,12 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
     }
 
     @Override
-    protected int getCurrentOverlayWidth() {
+    protected float getCurrentOverlayWidth() {
         return mConfiguration.getCurrentDisplayWidth();
     }
 
     @Override
-    protected int getSlideEndValue() {
+    protected float getSlideEndValue() {
         if (mShowAppDrawer) {
             return getAppDrawerParams().width
                     + mConfiguration.mVerticalSidebarPx

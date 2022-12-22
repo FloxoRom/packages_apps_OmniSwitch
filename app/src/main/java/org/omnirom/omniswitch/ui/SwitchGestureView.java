@@ -254,11 +254,10 @@ public class SwitchGestureView {
                                 Log.d(TAG, "xVelocity " + xVelocity + " isSlow = " + isSlow);
                             }
                             if (mConfiguration.mLocation == 0) {
-                                mFlingOpen = xVelocity < 0;
+                                mFlingOpen = xVelocity < 0 && !isSlow;
                             } else {
-                                mFlingOpen = xVelocity > 0;
+                                mFlingOpen = xVelocity > 0 && !isSlow;
                             }
-                            mFlingOpen = mFlingOpen || mRecentsManager.finishSlideLayout();
                             if (DEBUG) {
                                 Log.d(TAG, "mFlingOpen = " + mFlingOpen);
                             }
@@ -276,7 +275,11 @@ public class SwitchGestureView {
                                 if (mFlingOpen) {
                                     mRecentsManager.openSlideLayout(true);
                                 } else {
-                                    mRecentsManager.canceSlideLayout(true);
+                                    if (mRecentsManager.finishSlideLayout()) {
+                                        mRecentsManager.openSlideLayout(true);
+                                    } else {
+                                        mRecentsManager.canceSlideLayout(true);
+                                    }
                                 }
                             } else {
                                 mRecentsManager.hideHidden();

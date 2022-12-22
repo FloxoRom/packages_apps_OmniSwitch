@@ -35,7 +35,6 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -210,11 +209,10 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                             Log.d(TAG, "xVelocity " + xVelocity + " isSlow = " + isSlow);
                         }
                         if (mConfiguration.mLocation == 0) {
-                            mFlingClose = xVelocity > 0;
+                            mFlingClose = xVelocity > 0 && !isSlow;
                         } else {
-                            mFlingClose = xVelocity < 0;
+                            mFlingClose = xVelocity < 0 && !isSlow;
                         }
-                        mFlingClose = mFlingClose || finishSlideLayout();
                         if (DEBUG) {
                             Log.d(TAG, "mFlingClose = " + mFlingClose);
                         }
@@ -227,7 +225,11 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                         if (mFlingClose) {
                             mRecentsManager.canceSlideLayout(true);
                         } else {
-                            mRecentsManager.openSlideLayout(true);
+                            if (mRecentsManager.finishSlideLayout()) {
+                                mRecentsManager.canceSlideLayout(true);
+                            } else {
+                                mRecentsManager.openSlideLayout(true);
+                            }
                         }
                     } else {
                         hide(false);
@@ -723,25 +725,36 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
 
     public void slideLayoutHide(float distanceX) {
         if (DEBUG) {
-            Log.d(TAG, "slideLayoutHide " + distanceX);
+            Log.d(TAG, "slideLayoutHide " + getSlideEndPoint() + " " + distanceX);
         }
         mCurrentDistance = Math.abs(distanceX);
         if (mConfiguration.mLocation == 0) {
             mCurrentSlideWidth = getSlideEndPoint() + distanceX;
+            if (mCurrentSlideWidth > getSlideEndPoint()) {
+                mView.setTranslationX(mCurrentSlideWidth);
+            } else {
+                mCurrentSlideWidth = getSlideEndPoint();
+                mView.setTranslationX(mCurrentSlideWidth);
+            }
         } else {
             mCurrentSlideWidth = distanceX;
+            if (mCurrentSlideWidth < 0) {
+                mView.setTranslationX(mCurrentSlideWidth);
+            } else {
+                mCurrentSlideWidth = 0;
+                mView.setTranslationX(mCurrentSlideWidth);
+            }
         }
-        mView.setTranslationX(mCurrentSlideWidth);
         if (DEBUG) {
             Log.d(TAG, "slideLayoutHide " + mCurrentSlideWidth);
         }
     }
 
-    protected abstract int getCurrentOverlayWidth();
+    protected abstract float getCurrentOverlayWidth();
 
-    protected abstract int getSlideEndValue();
+    protected abstract float getSlideEndValue();
 
-    protected int getSlideEndPoint() {
+    protected float getSlideEndPoint() {
         if (mConfiguration.mLocation == 0) {
             return getCurrentOverlayWidth() - getSlideEndValue();
         } else {
@@ -749,7 +762,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         }
     }
 
-    protected int getSlideStartPoint() {
+    protected float getSlideStartPoint() {
         if (mConfiguration.mLocation == 0) {
             return getCurrentOverlayWidth();
         } else {
@@ -758,7 +771,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
     }
 
     public boolean finishSlideLayout() {
-        return mCurrentDistance > getSlideEndValue() / 2;
+        return mCurrentDistance > getSlideEndValue() * .5f;
     }
 
     @Override
@@ -812,7 +825,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         mEnabled = false;
 
         if (show) {
-            int endValue = getSlideEndPoint();
+            float endValue = getSlideEndPoint();
 
             mToggleOverlayAnim = start(interpolator(
                     mDecelerateInterpolator,
@@ -820,7 +833,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                             mCurrentSlideWidth, endValue)).setDuration(
                     fromFling ? SHOW_DURATION_FAST : SHOW_DURATION));
         } else {
-            int endValue = getSlideStartPoint();
+            float endValue = getSlideStartPoint();
 
             mToggleOverlayAnim = start(interpolator(
                     mAccelerateInterpolator,
@@ -951,8 +964,8 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
         }
 
         if (show) {
-            int endValue = getSlideEndPoint();
-            int startValue = getSlideStartPoint();
+            float endValue = getSlideEndPoint();
+            float startValue = getSlideStartPoint();
 
             mView.setTranslationX(startValue);
             mToggleOverlayAnim = start(interpolator(
@@ -960,8 +973,8 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                     ObjectAnimator.ofFloat(mView, View.TRANSLATION_X,
                             startValue, endValue)).setDuration(SHOW_DURATION));
         } else {
-            int endValue = getSlideStartPoint();
-            int startValue = getSlideEndPoint();
+            float endValue = getSlideStartPoint();
+            float startValue = getSlideEndPoint();
 
             mView.setTranslationX(startValue);
             mToggleOverlayAnim = start(interpolator(
@@ -1117,7 +1130,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
 
         preShow();
 
-        int startValue = 0;
+        float startValue = 0;
         if (mConfiguration.mLocation == 0) {
             startValue = getCurrentOverlayWidth();
         } else {
@@ -1278,13 +1291,6 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                 return true;
             }
         });
-    }
-
-    /* if quick switcher was triggerd update() will be called
-    but the values never reset since hideDone() is not called */
-    public void resetRecentsState() {
-        mTaskLoadDone = false;
-        mUpdateNoRecentsTasksDone = false;
     }
 
     protected abstract FrameLayout.LayoutParams getAppDrawerParams();
