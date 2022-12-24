@@ -97,8 +97,6 @@
         <item>@string/six_hours</item>
         <item>@string/twelve_hours</item>
         <item>@string/one_day</item>
-        <item>@string/two_days</item>
-        <item>@string/one_week</item>
     </string-array>
     <string-array name="app_filter_time_values" translatable="false">
         <item>0</item>
@@ -107,8 +105,6 @@
         <item>6</item>
         <item>12</item>
         <item>24</item>
-        <item>48</item>
-        <item>168</item>
     </string-array>
     <string-array name="thumb_size_entries" translatable="false">
         <item>@string/thumb_size_small</item>
