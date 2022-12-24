@@ -238,7 +238,7 @@ public class RecentTasksLoader {
                 Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
 
                 final List<ActivityManager.RecentTaskInfo> recentTasks = mActivityManager
-                        .getRecentTasks(maxNumTasks == 0 ? ActivityManager.getMaxRecentTasksStatic() : maxNumTasks,
+                        .getRecentTasks(maxNumTasks == 0 ? Integer.MAX_VALUE : maxNumTasks,
                                 ActivityManager.RECENT_IGNORE_UNAVAILABLE |
                                         ActivityManager.RECENT_WITH_EXCLUDED);
 
