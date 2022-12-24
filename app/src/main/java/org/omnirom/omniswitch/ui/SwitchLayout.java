@@ -142,6 +142,8 @@ public class SwitchLayout extends AbstractSwitchLayout {
 
         mRecentListHorizontal = (HorizontalListView) mView
                 .findViewById(R.id.recent_list_horizontal);
+        final int listMargin = Math.round(1 * mConfiguration.mDensity);
+        mRecentListHorizontal.setDividerWidth(listMargin);
 
         mNoRecentApps = (TextView) mView.findViewById(R.id.no_recent_apps);
 
