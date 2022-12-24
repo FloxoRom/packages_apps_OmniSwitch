@@ -68,6 +68,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
     protected Runnable mUpdateRamBarTask;
     private FrameLayout mRecentsOrAppDrawer;
     private int mCurrentHeight;
+    private ThumbnailTaskView.ThumbnailTaskViewOutline mOutlineProvider;
 
     private class RecentListAdapter extends ArrayAdapter<TaskDescription> {
 
@@ -131,6 +132,8 @@ public class SwitchLayout extends AbstractSwitchLayout {
                         0);
             }
         };
+
+        mOutlineProvider = new ThumbnailTaskView.ThumbnailTaskViewOutline(mConfiguration.mThumbnnailOutlineRadiusPx);
     }
 
     @Override
@@ -800,6 +803,8 @@ public class SwitchLayout extends AbstractSwitchLayout {
         item.setBackgroundResource(mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT ? R.drawable.ripple_dark
                 : R.drawable.ripple_light);
         item.setThumbRatio(mConfiguration.mThumbRatio);
+        item.setOutlineProvider(mOutlineProvider);
+        item.setClipToOutline(true);
         return item;
     }
 

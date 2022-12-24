@@ -43,4 +43,6 @@
     <dimen name="horizontal_bg_padding">8dp</dimen>
     <dimen name="horizontal_content_padding">4dp</dimen>
     <dimen name="vertical_bottom_margin">8dp</dimen>
+    <dimen name="thumbnail_outline_radius">8dp</dimen>
+
 </resources>

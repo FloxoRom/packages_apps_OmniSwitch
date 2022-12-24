@@ -27,6 +27,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Rect;
@@ -36,6 +37,7 @@ import android.os.Handler;
 import android.text.TextPaint;
 import android.view.View;
 import android.util.Log;
+import android.view.ViewOutlineProvider;
 
 public class ThumbnailTaskView extends View implements TaskDescription.ThumbChangeListener {
     private static final String TAG = "ThumbnailTaskView";
@@ -48,6 +50,18 @@ public class ThumbnailTaskView extends View implements TaskDescription.ThumbChan
     private float mThumbRatio = 1.0f;
     private static Bitmap sDefaultThumb;
     private SwitchConfiguration mConfiguration;
+
+    public static class ThumbnailTaskViewOutline extends ViewOutlineProvider {
+        public int mRadius;
+
+        public ThumbnailTaskViewOutline(int radius) {
+            mRadius = radius;
+        }
+        @Override
+        public void getOutline(View view, Outline outline) {
+            outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), mRadius);
+        }
+    }
 
     public ThumbnailTaskView(Context context) {
         super(context);
