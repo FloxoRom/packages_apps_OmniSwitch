@@ -29,10 +29,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
-import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -777,12 +775,12 @@ public class SwitchLayout extends AbstractSwitchLayout {
     }
 
     private int getCurrentThumbWidth() {
-        return (int)(mConfiguration.mThumbnailWidth * mConfiguration.mThumbRatio) +
+        return (int)(mConfiguration.mThumbnailWidth * mConfiguration.mThumbSizeRatio) +
                 ( mConfiguration.mSideHeader ? mConfiguration.getOverlayHeaderWidth() : 0);
     }
 
     private int getCurrentThumbHeight() {
-        return (int)(mConfiguration.mThumbnailHeight * mConfiguration.mThumbRatio) +
+        return (int)(mConfiguration.mThumbnailHeight * mConfiguration.mThumbSizeRatio) +
                 (mConfiguration.mSideHeader ? 0 : mConfiguration.getOverlayHeaderWidth());
     }
 
@@ -802,7 +800,7 @@ public class SwitchLayout extends AbstractSwitchLayout {
         item.setLayoutParams(getRecentListItemParams());
         item.setBackgroundResource(mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT ? R.drawable.ripple_dark
                 : R.drawable.ripple_light);
-        item.setThumbRatio(mConfiguration.mThumbRatio);
+        item.setThumbRatio(mConfiguration.mThumbSizeRatio);
         item.setOutlineProvider(mOutlineProvider);
         item.setClipToOutline(true);
         return item;

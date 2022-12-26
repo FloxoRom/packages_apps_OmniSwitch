@@ -24,6 +24,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
+import android.view.Surface;
 import android.view.WindowManager;
 
 import com.google.android.material.elevation.SurfaceColors;
@@ -86,7 +87,7 @@ public class SwitchConfiguration {
     public int mMaxHeight;
     public int mMemDisplaySize;
     public int mLayoutStyle;
-    public float mThumbRatio = 1.0f;
+    public float mThumbSizeRatio = 1.0f;
     public IconSize mIconSizeDesc = IconSize.NORMAL;
     public BgStyle mBgStyle = BgStyle.SOLID_LIGHT;
     public boolean mLaunchStatsEnabled;
@@ -110,6 +111,7 @@ public class SwitchConfiguration {
     public int mDragHandleBottomLimitPx;
     public int mDragHandleTopLimitPx;
     public int mThumbnnailOutlineRadiusPx;
+    private int mRotation = Surface.ROTATION_0;
 
     // old pref slots
     private static final String PREF_DRAG_HANDLE_COLOR = "drag_handle_color";
@@ -142,27 +144,29 @@ public class SwitchConfiguration {
         mContext = context;
         mWindowManager = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
-        setDensityConfiguration(context);
+        setConfiguration(context);
         updatePrefs(PreferenceManager.getDefaultSharedPreferences(context), "");
     }
 
     public boolean onConfigurationChanged(Context context) {
         final float newDensity = context.getResources().getDisplayMetrics().density;
+        final int newRotation = context.getDisplay().getRotation();
         if (DEBUG) {
-            Log.d(TAG, "onConfigurationChanged " + mDensity + " " + newDensity);
+            Log.d(TAG, "onConfigurationChanged " + mDensity + " " + newDensity + " " + mRotation + " " + newRotation);
         }
-        if (newDensity != mDensity) {
-            setDensityConfiguration(context);
+        if (newDensity != mDensity || newRotation != mRotation) {
+            setConfiguration(context);
             return true;
         }
         return false;
     }
 
-    private void setDensityConfiguration(Context context) {
+    private void setConfiguration(Context context) {
+        mRotation =  context.getDisplay().getRotation();
         mDensity = context.getResources().getDisplayMetrics().density;
         mDensityDpi = context.getResources().getDisplayMetrics().densityDpi;
         if (DEBUG) {
-            Log.d(TAG, "setDensityConfiguration " + mDensity);
+            Log.d(TAG, "setConfiguration " + mDensity);
         }
 
         mDefaultHandleHeight = Math.round(100 * mDensity);
@@ -284,7 +288,7 @@ public class SwitchConfiguration {
         String layoutStyle = prefs.getString(SettingsActivity.PREF_LAYOUT_STYLE, "1");
         mLayoutStyle = Integer.valueOf(layoutStyle);
         String thumbSize = prefs.getString(SettingsActivity.PREF_THUMB_SIZE, "1.0");
-        mThumbRatio = Float.valueOf(thumbSize);
+        mThumbSizeRatio = Float.valueOf(thumbSize);
         mFilterRunning = prefs.getBoolean(SettingsActivity.PREF_APP_FILTER_RUNNING, false);
         mLaunchStatsEnabled = prefs.getBoolean(SettingsActivity.PREF_LAUNCH_STATS, false);
         mRevertRecents = prefs.getBoolean(SettingsActivity.PREF_REVERT_RECENTS, false);

@@ -217,8 +217,18 @@ public class ThumbnailTaskView extends View implements TaskDescription.ThumbChan
                 sideHeader ? height : height + iconBorderSizePx,
                 Bitmap.Config.ARGB_8888);
 
-        int bSize = taskThumb.getWidth() > taskThumb.getHeight() ? taskThumb.getHeight() : taskThumb.getWidth();
-        Rect src = new Rect(0, 0, bSize, bSize);
+        int thumbWidth = 0;
+        int thumbHeight = 0;
+        if (taskThumb.getWidth() > taskThumb.getHeight()) {
+            float thumbRation = (float) mConfiguration.mThumbnailWidth / (float) mConfiguration.mThumbnailHeight;
+            thumbHeight = taskThumb.getHeight();
+            thumbWidth = (int) (thumbHeight * thumbRation);
+        } else {
+            float thumbRation = (float) mConfiguration.mThumbnailHeight / (float) mConfiguration.mThumbnailWidth;
+            thumbWidth = taskThumb.getWidth();
+            thumbHeight = (int) (thumbWidth * thumbRation);
+        }
+        Rect src = new Rect(0, 0, thumbWidth, thumbHeight);
         Rect dest = new Rect(sideHeader ? iconBorderSizePx : 0, sideHeader ? 0 : iconBorderSizePx,
                 width + (sideHeader ? iconBorderSizePx : 0), height + (sideHeader ? 0 : iconBorderSizePx));
         canvas.drawBitmap(taskThumb, src, dest, null);

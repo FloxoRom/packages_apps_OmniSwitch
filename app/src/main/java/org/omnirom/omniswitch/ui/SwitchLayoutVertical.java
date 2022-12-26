@@ -503,7 +503,7 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
         item.setLayoutParams(getRecentListItemParams());
         item.setBackgroundResource(mConfiguration.mBgStyle == SwitchConfiguration.BgStyle.SOLID_LIGHT ? R.drawable.ripple_dark
                 : R.drawable.ripple_light);
-        item.setThumbRatio(mConfiguration.mThumbRatio);
+        item.setThumbRatio(mConfiguration.mThumbSizeRatio);
         item.setOutlineProvider(mOutlineProvider);
         item.setClipToOutline(true);
         return item;
@@ -842,12 +842,12 @@ public class SwitchLayoutVertical extends AbstractSwitchLayout {
     }
 
     private int getCurrentThumbWidth() {
-        return (int)(mConfiguration.mThumbnailWidth * mConfiguration.mThumbRatio) +
+        return (int)(mConfiguration.mThumbnailWidth * mConfiguration.mThumbSizeRatio) +
                ( mConfiguration.mSideHeader ? mConfiguration.getOverlayHeaderWidth() : 0);
     }
 
     private int getCurrentThumbHeight() {
-        return (int)(mConfiguration.mThumbnailHeight * mConfiguration.mThumbRatio) +
+        return (int)(mConfiguration.mThumbnailHeight * mConfiguration.mThumbSizeRatio) +
                 (mConfiguration.mSideHeader ? 0 : mConfiguration.getOverlayHeaderWidth());
     }
 
