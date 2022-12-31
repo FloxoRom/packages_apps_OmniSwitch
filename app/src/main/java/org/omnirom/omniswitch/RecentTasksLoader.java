@@ -128,11 +128,13 @@ public class RecentTasksLoader {
         int persistentTaskId = recentInfo.persistentId;
         Intent baseIntent = recentInfo.baseIntent;
         String packageName = baseIntent.getComponent().getPackageName();
+        boolean supportsSplitScreenMultiWindow = recentInfo.supportsMultiWindow;
 
         if (DEBUG)
             Log.v(TAG, "creating activity desc for id=" + persistentTaskId);
         TaskDescription ad = new TaskDescription(taskId,
-                persistentTaskId, packageName, baseIntent);
+                persistentTaskId, packageName, baseIntent,
+                supportsSplitScreenMultiWindow);
         return ad;
     }
 

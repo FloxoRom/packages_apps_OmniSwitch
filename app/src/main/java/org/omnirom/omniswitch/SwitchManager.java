@@ -17,34 +17,46 @@
  */
 package org.omnirom.omniswitch;
 
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import android.app.ActivityManager;
+import android.app.ActivityManagerNative;
+import android.app.ActivityOptions;
+import android.app.ActivityTaskManager;
+import android.app.ActivityThread;
+import android.app.IActivityManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.LauncherApps;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.IPowerManager;
+import android.os.RemoteException;
+import android.provider.Settings;
+import android.util.Log;
+
+import com.android.internal.logging.InstanceId;
+import com.android.internal.logging.InstanceIdSequence;
+import com.android.wm.shell.splitscreen.ISplitScreen;
+import com.android.wm.shell.splitscreen.ISplitScreenListener;
 
 import org.omnirom.omniswitch.ui.ISwitchLayout;
 import org.omnirom.omniswitch.ui.SwitchGestureView;
 import org.omnirom.omniswitch.ui.SwitchLayout;
 import org.omnirom.omniswitch.ui.SwitchLayoutVertical;
 
-import android.app.ActivityManager;
-import android.app.ActivityManagerNative;
-import android.app.ActivityOptions;
-import android.app.ActivityTaskManager;
-import android.app.IActivityManager;
-import android.app.TaskStackBuilder;
-import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.Uri;
-import android.os.RemoteException;
-import android.os.IPowerManager;
-import android.os.ServiceManager;
-import android.provider.Settings;
-import android.util.Log;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+import static android.app.ActivityTaskManager.INVALID_TASK_ID;
+import static android.app.PendingIntent.FLAG_MUTABLE;
 
 public class SwitchManager {
     private static final String TAG = "OmniSwitch:SwitchManager";
@@ -59,6 +71,49 @@ public class SwitchManager {
     private final ActivityManager mAm;
     private final IActivityManager mIAm;
     private IPowerManager mPowerService;
+    private LauncherApps mLauncherApps;
+    private Handler mHandler = new Handler();
+
+    private ISplitScreen mSplitScreen;
+    private SplitScreenListener mSplitScreenListener;
+    private InstanceIdSequence mInstanceSequence = new InstanceIdSequence(Integer.MAX_VALUE);
+    private int mMainTaskId = INVALID_TASK_ID;
+    private int mSideTaskId = INVALID_TASK_ID;
+
+    public static final int STAGE_POSITION_UNDEFINED = -1;
+    public static final int STAGE_POSITION_TOP_OR_LEFT = 0;
+    public static final int STAGE_POSITION_BOTTOM_OR_RIGHT = 1;
+
+    public static final int STAGE_TYPE_UNDEFINED = -1;
+    public static final int STAGE_TYPE_MAIN = 0;
+    public static final int STAGE_TYPE_SIDE = 1;
+
+    public static final float DEFAULT_SPLIT_RATIO = 0.5f;
+
+    private class SplitScreenListener extends ISplitScreenListener.Stub {
+        @Override
+        public void onStagePositionChanged(int stage, int position) {
+            Log.d(TAG, "onStagePositionChanged " + stage + " " + position);
+        }
+
+        @Override
+        public void onTaskStageChanged(int taskId, int stage, boolean visible) {
+            Log.d(TAG, "onTaskStageChanged pre taskId = " + taskId + " stage = " + stage + " visible = " + visible);
+            if (stage == STAGE_TYPE_SIDE && visible) {
+                mMainTaskId = taskId;
+            }
+            if (stage == STAGE_TYPE_MAIN && visible) {
+                mSideTaskId = taskId;
+            }
+            if (stage == STAGE_TYPE_UNDEFINED && taskId == mSideTaskId) {
+                mSideTaskId = INVALID_TASK_ID;
+            }
+            if (stage == STAGE_TYPE_UNDEFINED && taskId == mMainTaskId) {
+                mMainTaskId = INVALID_TASK_ID;
+            }
+            Log.d(TAG, "onTaskStageChanged post mMainTaskId = " + mMainTaskId + " mSideTaskId = " + mSideTaskId);
+        }
+    }
 
     public SwitchManager(Context context, int layoutStyle) {
         mContext = context;
@@ -66,12 +121,37 @@ public class SwitchManager {
         mLayoutStyle = layoutStyle;
         mAm = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
         mIAm = ActivityManager.getService();
+        mLauncherApps = (LauncherApps) mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
         init();
+    }
+
+    public void bindSplitScreen(ISplitScreen splitScreen) {
+        Log.d(TAG, "bindSplitScreen");
+        mSplitScreen = splitScreen;
+        mSplitScreenListener = new SplitScreenListener();
+        try {
+            mSplitScreen.registerSplitScreenListener(mSplitScreenListener);
+        } catch (RemoteException e) {
+            Log.e(TAG, "registerSplitScreenListener", e);
+        }
+    }
+
+    public void unbindSplitScreen() {
+        if (mSplitScreen != null) {
+            Log.d(TAG, "unbindSplitScreen");
+            try {
+                mSplitScreen.unregisterSplitScreenListener(mSplitScreenListener);
+            } catch (RemoteException e) {
+                Log.e(TAG, "unregisterSplitScreenListener", e);
+            }
+            mSplitScreenListener = null;
+            mSplitScreen = null;
+        }
     }
 
     public void hide(boolean fast) {
         if (isShowing()) {
-            if (DEBUG){
+            if (DEBUG) {
                 Log.d(TAG, "hide");
             }
             mLayout.hide(fast);
@@ -80,7 +160,7 @@ public class SwitchManager {
 
     public void hideHidden() {
         if (isShowing()) {
-            if (DEBUG){
+            if (DEBUG) {
                 Log.d(TAG, "hideHidden");
             }
             mLayout.hideHidden();
@@ -89,7 +169,7 @@ public class SwitchManager {
 
     public void show() {
         if (!isShowing()) {
-            if (DEBUG){
+            if (DEBUG) {
                 Log.d(TAG, "show");
             }
             mLayout.setHandleRecentsUpdate(true);
@@ -106,7 +186,7 @@ public class SwitchManager {
 
     public void showPreloaded() {
         if (!isShowing()) {
-            if (DEBUG){
+            if (DEBUG) {
                 Log.d(TAG, "showPreloaded");
             }
 
@@ -117,7 +197,7 @@ public class SwitchManager {
 
     public void beforePreloadTasks() {
         if (!isShowing()) {
-            if (DEBUG){
+            if (DEBUG) {
                 Log.d(TAG, "beforePreloadTasks");
             }
             clearTasks();
@@ -127,7 +207,7 @@ public class SwitchManager {
 
     public void showHidden() {
         if (!isShowing()) {
-            if (DEBUG){
+            if (DEBUG) {
                 Log.d(TAG, "showHidden");
             }
             mLayout.setHandleRecentsUpdate(true);
@@ -142,7 +222,7 @@ public class SwitchManager {
     }
 
     private void init() {
-        if (DEBUG){
+        if (DEBUG) {
             Log.d(TAG, "init");
         }
 
@@ -172,6 +252,7 @@ public class SwitchManager {
         }
 
     }
+
     public SwitchGestureView getSwitchGestureView() {
         return mGestureView;
     }
@@ -188,20 +269,25 @@ public class SwitchManager {
             return;
         }
 
-        if(close){
+        if (close) {
             hide(true);
         }
         try {
-            ActivityOptions options = null;
-            if (customAnim) {
-                options = ActivityOptions.makeCustomAnimation(mContext, R.anim.last_app_in, R.anim.last_app_out);
+            if (isValidSideTask(ad)) {
+                int sideTaskId = ad.persistentTaskId;
+                launchTask(sideTaskId, STAGE_POSITION_BOTTOM_OR_RIGHT);
             } else {
-                options = ActivityOptions.makeBasic();
+                ActivityOptions options = null;
+                if (customAnim) {
+                    options = ActivityOptions.makeCustomAnimation(mContext, R.anim.last_app_in, R.anim.last_app_out);
+                } else {
+                    options = ActivityOptions.makeBasic();
+                }
+                ActivityManagerNative.getDefault().startActivityFromRecents(
+                        ad.getPersistentTaskId(), options.toBundle());
             }
-            ActivityManagerNative.getDefault().startActivityFromRecents(
-                        ad.getPersistentTaskId(),  options.toBundle());
             SwitchStatistics.getInstance(mContext).traceStartIntent(ad.getIntent());
-            if (DEBUG){
+            if (DEBUG) {
                 Log.d(TAG, "switch to " + ad.getLabel());
             }
         } catch (Exception e) {
@@ -209,11 +295,11 @@ public class SwitchManager {
     }
 
     public void killTask(TaskDescription ad, boolean close) {
-        if (mConfiguration.mRestrictedMode){
+        if (mConfiguration.mRestrictedMode) {
             return;
         }
 
-        if(close){
+        if (close) {
             hide(false);
         }
 
@@ -223,7 +309,7 @@ public class SwitchManager {
         }
 
         removeTask(ad.getPersistentTaskId());
-        if (DEBUG){
+        if (DEBUG) {
             Log.d(TAG, "kill " + ad.getLabel());
         }
 
@@ -237,15 +323,16 @@ public class SwitchManager {
     /**
      * killall will always remove all tasks - also those that are
      * filtered out (not active)
+     *
      * @param close
      */
     public void killAll(boolean close) {
-        if (mConfiguration.mRestrictedMode){
+        if (mConfiguration.mRestrictedMode) {
             return;
         }
 
         if (mLoadedTasksOriginal.size() == 0) {
-            if(close){
+            if (close) {
                 hide(true);
             }
             return;
@@ -258,7 +345,7 @@ public class SwitchManager {
                 continue;
             }
             removeTask(ad.getPersistentTaskId());
-            if (DEBUG){
+            if (DEBUG) {
                 Log.d(TAG, "kill " + ad.getLabel());
             }
             ad.setKilled();
@@ -267,12 +354,12 @@ public class SwitchManager {
     }
 
     public void killOther(boolean close) {
-        if (mConfiguration.mRestrictedMode){
+        if (mConfiguration.mRestrictedMode) {
             return;
         }
 
         if (mLoadedTasksOriginal.size() <= 1) {
-            if(close){
+            if (close) {
                 hide(true);
             }
             return;
@@ -286,47 +373,47 @@ public class SwitchManager {
                 continue;
             }
             removeTask(ad.getPersistentTaskId());
-            if (DEBUG){
+            if (DEBUG) {
                 Log.d(TAG, "kill " + ad.getLabel());
             }
             ad.setKilled();
         }
-        if(close){
+        if (close) {
             hide(true);
         }
     }
 
     public void killCurrent(boolean close) {
-        if (mConfiguration.mRestrictedMode){
+        if (mConfiguration.mRestrictedMode) {
             return;
         }
 
         if (mLoadedTasksOriginal.size() == 0) {
-            if(close){
+            if (close) {
                 hide(true);
             }
             return;
         }
 
-        if (mLoadedTasksOriginal.size() >= 1){
+        if (mLoadedTasksOriginal.size() >= 1) {
             TaskDescription ad = mLoadedTasksOriginal.get(0);
             if (ad.isLocked()) {
                 // remove from locked
                 toggleLockedApp(ad, ad.isLocked(), false);
             }
             removeTask(ad.getPersistentTaskId());
-            if (DEBUG){
+            if (DEBUG) {
                 Log.d(TAG, "kill " + ad.getLabel());
             }
             ad.setKilled();
         }
-        if(close){
+        if (close) {
             hide(true);
         }
     }
 
     public void goHome(boolean close) {
-        if(close){
+        if (close) {
             hide(true);
         }
 
@@ -349,7 +436,7 @@ public class SwitchManager {
 
     public void toggleLastApp(boolean close) {
         if (mLoadedTasksOriginal.size() < 2) {
-            if(close){
+            if (close) {
                 hide(true);
             }
             return;
@@ -360,20 +447,13 @@ public class SwitchManager {
     }
 
     public void startIntentFromtString(String intent, boolean close) {
-        try {
-            Intent intentapp = Intent.parseUri(intent, 0);
-            ActivityInfo info = mContext.getPackageManager().getActivityInfo(intentapp.getComponent(), 0);
-            if (info != null && DEBUG) {
-                Log.d(TAG, "startIntentFromtString resizable = "  + info.resizeMode);
-            }
-            if(close){
-                hide(true);
-            }
+        if (close) {
+            hide(true);
+        }
+        if (mMainTaskId != INVALID_TASK_ID) {
+            startIntentInStage(intent, STAGE_POSITION_BOTTOM_OR_RIGHT);
+        } else {
             startIntentFromtString(mContext, intent);
-        } catch (URISyntaxException e) {
-            Log.e(TAG, "URISyntaxException: [" + intent + "]");
-        } catch (NameNotFoundException e){
-            Log.e(TAG, "NameNotFoundException: [" + intent + "]");
         }
     }
 
@@ -384,18 +464,18 @@ public class SwitchManager {
             context.startActivity(intentapp);
         } catch (URISyntaxException e) {
             Log.e(TAG, "URISyntaxException: [" + intent + "]");
-        } catch (ActivityNotFoundException e){
+        } catch (ActivityNotFoundException e) {
             Log.e(TAG, "ActivityNotFound: [" + intent + "]");
         }
     }
 
     public void onConfigurationChanged(int height) {
-        if (mLayout.isShowing()){
+        if (mLayout.isShowing()) {
             // close on rotate
             mLayout.hide(true);
         }
         mLayout.updateLayout();
-        if (mGestureView.isShowing()){
+        if (mGestureView.isShowing()) {
             mGestureView.updateDragHandlePosition(height);
         }
     }
@@ -459,7 +539,7 @@ public class SwitchManager {
     }
 
     public List<TaskDescription> getTasks() {
-	    return mLoadedTasks;
+        return mLoadedTasks;
     }
 
     public void clearTasks() {
@@ -489,13 +569,13 @@ public class SwitchManager {
             if (!ActivityTaskManager.getService().isInLockTaskMode()) {
                 switchTask(ad, false, false);
                 ActivityTaskManager.getService().startSystemLockTaskMode(ad.getPersistentTaskId());
-                if (DEBUG){
+                if (DEBUG) {
                     Log.d(TAG, "lock app " + ad.getLabel() + " " + ad.getPersistentTaskId());
                 }
             }
-        } catch(RemoteException e) {
+        } catch (RemoteException e) {
         }
-        if(close){
+        if (close) {
             hide(true);
         }
     }
@@ -504,13 +584,13 @@ public class SwitchManager {
         try {
             if (ActivityTaskManager.getService().isInLockTaskMode()) {
                 ActivityTaskManager.getService().stopSystemLockTaskMode();
-                if (DEBUG){
+                if (DEBUG) {
                     Log.d(TAG, "stop lock app");
                 }
             }
-        } catch(RemoteException e) {
+        } catch (RemoteException e) {
         }
-        if(close){
+        if (close) {
             hide(true);
         }
     }
@@ -522,24 +602,24 @@ public class SwitchManager {
             } else {
                 lockToCurrentApp(false);
             }
-        } catch(RemoteException e) {
+        } catch (RemoteException e) {
         }
-        if(close){
+        if (close) {
             hide(true);
         }
     }
 
     public void forceStop(TaskDescription ad, boolean close) {
-        if (mConfiguration.mRestrictedMode){
+        if (mConfiguration.mRestrictedMode) {
             return;
         }
 
-        if(close){
+        if (close) {
             hide(false);
         }
 
         mAm.forceStopPackage(ad.getPackageName());
-        if (DEBUG){
+        if (DEBUG) {
             Log.d(TAG, "forceStop " + ad.getLabel());
         }
 
@@ -552,7 +632,7 @@ public class SwitchManager {
 
     public void toggleLockedApp(TaskDescription ad, boolean isLockedApp, boolean refresh) {
         List<String> lockedAppsList = mConfiguration.mLockedAppList;
-        if (DEBUG){
+        if (DEBUG) {
             Log.d(TAG, "toggleLockedApp " + lockedAppsList);
         }
         if (isLockedApp) {
@@ -581,4 +661,112 @@ public class SwitchManager {
         }
     }
 
+    public void dockTask(TaskDescription mainTask, boolean close) {
+        if (close) {
+            hide(false);
+        }
+
+        int taskId = mainTask.persistentTaskId;
+
+        if (mSideTaskId != INVALID_TASK_ID) {
+            // just replace main task
+            launchTask(taskId, STAGE_POSITION_TOP_OR_LEFT);
+        } else {
+            // find valid initial side task for split
+            Optional<TaskDescription> sideTask = mLoadedTasksOriginal.stream().filter(new Predicate<TaskDescription>() {
+                @Override
+                public boolean test(TaskDescription taskDescription) {
+                    return taskDescription.persistentTaskId != taskId && taskDescription.isSupportsSplitScreen();
+                }
+            }).findFirst();
+            if (sideTask.isPresent()) {
+                TaskDescription sideTaskDescription = sideTask.get();
+                int sideTaskId = sideTaskDescription.persistentTaskId;
+
+                launchTask(taskId, STAGE_POSITION_TOP_OR_LEFT);
+
+                // TODO - this is ugly but seems to work
+                // without delay its NOT working correctly
+                mHandler.postDelayed(() -> launchTask(sideTaskId, STAGE_POSITION_BOTTOM_OR_RIGHT), 500);
+            } else {
+                // we can not find valid side task so this will be a normal launch
+                launchTask(taskId, STAGE_POSITION_TOP_OR_LEFT);
+            }
+        }
+    }
+
+    private InstanceId getInstanceId() {
+        return mInstanceSequence.newInstanceId();
+    }
+
+    private void startIntentInStage(String intent, int stagePosition) {
+        try {
+            Intent intentapp = Intent.parseUri(intent, 0);
+            PendingIntent taskPendingIntent = PendingIntent.getActivity(mContext, 0 /* requestCode */, intentapp,
+                    FLAG_MUTABLE, null /* opts */);
+            launchIntent(taskPendingIntent, new Intent(), stagePosition, getInstanceId());
+        } catch (URISyntaxException e) {
+            Log.e(TAG, "URISyntaxException: [" + intent + "]");
+        } catch (ActivityNotFoundException e) {
+            Log.e(TAG, "ActivityNotFound: [" + intent + "]");
+        }
+    }
+
+    private void launchIntent(PendingIntent taskPendingIntent,
+                              Intent fillInIntent, int stagePosition,
+                              InstanceId shellInstanceId) {
+
+        try {
+            Log.d(TAG, "launchIntent " + taskPendingIntent);
+            mSplitScreen.startIntent(taskPendingIntent,
+                    fillInIntent,
+                    stagePosition,
+                    null,
+                    shellInstanceId);
+        } catch (RemoteException e) {
+            Log.e(TAG, "launchIntent", e);
+        }
+    }
+
+    private void launchTask(int taskId, int stageType) {
+        try {
+            Log.d(TAG, "startTask " + taskId + " " + stageType);
+            mSplitScreen.startTask(taskId, stageType, null);
+        } catch (RemoteException e) {
+            Log.e(TAG, "launchTask", e);
+        }
+    }
+
+    private void exitSplitScreen() {
+        try {
+            Log.d(TAG, "exitSplitScreen");
+            mSplitScreen.exitSplitScreen(INVALID_TASK_ID);
+        } catch (RemoteException e) {
+            Log.e(TAG, "exitSplitScreen", e);
+        }
+    }
+
+    private boolean isValidSideTask(TaskDescription ad) {
+        if (mMainTaskId != INVALID_TASK_ID && ad.isSupportsSplitScreen()) {
+            if (mMainTaskId != ad.persistentTaskId) {
+                if (mSideTaskId != INVALID_TASK_ID && mSideTaskId == ad.persistentTaskId) {
+                    return false;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isValidMainTask(TaskDescription ad) {
+        if (Utils.isSplitScreenExternal(mContext) && ad.isSupportsSplitScreen()) {
+            if (mMainTaskId != ad.persistentTaskId) {
+                if (mSideTaskId != INVALID_TASK_ID && mSideTaskId == ad.persistentTaskId) {
+                    return false;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 }

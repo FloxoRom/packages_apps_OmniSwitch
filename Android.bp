@@ -36,7 +36,8 @@ android_app {
         "OmniLib",
         "OmniLibCore",
         "OmniPreferenceTheme",
-        "SystemUISharedLib"
+        "SystemUISharedLib",
+        "WindowManager-Shell"
     ],
     kotlincflags: ["-Xjvm-default=enable"],
     optimize: {

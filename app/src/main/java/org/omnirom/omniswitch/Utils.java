@@ -204,10 +204,8 @@ public class Utils {
         return false;
     }
 
-    public static boolean isMultiStackEnabled(Context context) {
-        //return ActivityTaskManager.supportsMultiWindow(context);
-        // TODO
-        return false;
+    public static boolean isSplitScreenExternal(Context context) {
+        return Settings.System.getInt(context.getContentResolver(), "split_screen_external", 0) != 0;
     }
 
     public static void updateFavoritesList(Context context, SwitchConfiguration config, List<String> favoriteList) {

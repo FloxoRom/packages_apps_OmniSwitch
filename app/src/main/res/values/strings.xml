@@ -238,4 +238,9 @@
         <string name="thumb_header_position_side_summary">Position of header on thumbnails</string>
         <string name="thumb_header_position_side_title">Thumbnail side header</string>
         <string name="drag_handle_config_note">Note: If you use gesture system navigation make sure to configure the height of the back region so it does not conflict with the drag handle area.</string>
+        <string name="split_screen_external_title">Split screen support</string>
+        <string name="split_screen_external_summary">Note: if enabled you should not use stock overview split screen options</string>
+        <string name="package_split_task_top_title">Split top</string>
+        <string name="package_split_task_left_title">Split left</string>
+
 </resources>

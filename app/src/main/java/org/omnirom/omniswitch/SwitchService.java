@@ -17,24 +17,25 @@
  */
 package org.omnirom.omniswitch;
 
-import org.omnirom.omniswitch.launcher.Launcher;
-import org.omnirom.omniswitch.ui.BitmapCache;
-import org.omnirom.omniswitch.ui.BitmapUtils;
-import org.omnirom.omniswitch.ui.IconPackHelper;
-
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.os.Build;
+import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.UserHandle;
 import android.preference.PreferenceManager;
@@ -42,8 +43,15 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 
-import java.util.Set;
+import com.android.wm.shell.splitscreen.ISplitScreen;
+
+import org.omnirom.omniswitch.launcher.Launcher;
+import org.omnirom.omniswitch.ui.BitmapCache;
+import org.omnirom.omniswitch.ui.BitmapUtils;
+import org.omnirom.omniswitch.ui.IconPackHelper;
+
 import java.util.HashSet;
+import java.util.Set;
 
 public class SwitchService extends Service {
     private final static String TAG = "OmniSwitch:SwitchService";
@@ -63,11 +71,27 @@ public class SwitchService extends Service {
     private static int mUserId = -1;
     private Set<String> mPrefKeyFilter = new HashSet<String>();
     private static boolean mIsRunning;
-    private static boolean mCommitSuicide;
     private static boolean mPreloadDone;
     private OverlayMonitor mOverlayMonitor;
     private PackageReceiver mPackageReceiver;
     private LocaleChangeReceiver mLocaleReceiver;
+    private boolean mSplitScreenServiceBound;
+    private Handler mHandler = new Handler();
+
+    private final ServiceConnection mSplitsScreenService = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "onServiceConnected " + name + " " + service);
+            ISplitScreen splitScreen = ISplitScreen.Stub.asInterface(service);
+            mManager.bindSplitScreen(splitScreen);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "onServiceDisconnected " + name);
+            mManager.unbindSplitScreen();
+        }
+    };
 
     public static boolean isRunning() {
         return mIsRunning;
@@ -79,6 +103,42 @@ public class SwitchService extends Service {
             mManager.hide(true);
         }
     };
+
+    private final class SettingsObserver extends ContentObserver {
+        private final Uri mSplitScreenExternal =
+                Settings.System.getUriFor("split_screen_external");
+
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = SwitchService.this.getContentResolver();
+            resolver.registerContentObserver(mSplitScreenExternal, false, this);
+        }
+
+        void unobserve() {
+            ContentResolver resolver = SwitchService.this.getContentResolver();
+            resolver.unregisterContentObserver(this);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            update(uri);
+        }
+
+        public void update(Uri uri) {
+            if (mSplitScreenExternal.equals(uri)) {
+                if (Utils.isSplitScreenExternal(SwitchService.this)) {
+                    bindSplitScreenService();
+                } else {
+                    unbindSplitScreenService();
+                }
+            }
+        }
+    }
+
+    private SettingsObserver mSystemPrefsListener = new SettingsObserver((mHandler));
 
     @Override
     public void onCreate() {
@@ -94,7 +154,7 @@ public class SwitchService extends Service {
                 commitSuicide();
                 return;
             }
-            if(mConfiguration.mRestrictedMode){
+            if (mConfiguration.mRestrictedMode) {
                 createErrorNotification();
             }
             mUserId = UserHandle.myUserId();
@@ -146,16 +206,17 @@ public class SwitchService extends Service {
 
             mPrefsListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
                 public void onSharedPreferenceChanged(SharedPreferences prefs,
-                        String key) {
+                                                      String key) {
                     try {
                         updatePrefs(prefs, key);
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                         Log.e(TAG, "updatePrefs", e);
                     }
                 }
             };
 
             mPrefs.registerOnSharedPreferenceChangeListener(mPrefsListener);
+            mSystemPrefsListener.observe();
 
             mOverlayMonitor = new OverlayMonitor(this);
 
@@ -163,11 +224,16 @@ public class SwitchService extends Service {
                 SwitchStatistics.getInstance(this).loadStatistics();
             }
 
-            if (mConfiguration.mDragHandleShow){
+            if (mConfiguration.mDragHandleShow) {
                 mManager.getSwitchGestureView().show();
             }
+
+            if (Utils.isSplitScreenExternal(this)) {
+                bindSplitScreenService();
+            }
+
             mIsRunning = true;
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.e(TAG, "onCreate", e);
             commitSuicide();
         }
@@ -184,7 +250,8 @@ public class SwitchService extends Service {
             unregisterReceiver(mLocaleReceiver);
             unregisterReceiver(mScreenReceiver);
             mPrefs.unregisterOnSharedPreferenceChangeListener(mPrefsListener);
-        } catch(IllegalArgumentException e) {
+            mSystemPrefsListener.unobserve();
+        } catch (IllegalArgumentException e) {
             // ignored on purpose
         }
 
@@ -200,11 +267,12 @@ public class SwitchService extends Service {
         if (mConfiguration.mLaunchStatsEnabled) {
             SwitchStatistics.getInstance(this).saveStatistics();
         }
+
+        unbindSplitScreenService();
+
         mIsRunning = false;
         BitmapCache.getInstance(this).clear();
         RecentTasksLoader.getInstance(this).clearTaskInfoCache();
-
-        mCommitSuicide = false;
     }
 
     public class LocalBinder extends Binder {
@@ -212,6 +280,7 @@ public class SwitchService extends Service {
             return SwitchService.this;
         }
     }
+
     private final LocalBinder mBinder = new LocalBinder();
 
     @Override
@@ -231,17 +300,17 @@ public class SwitchService extends Service {
         public void onReceive(final Context context, Intent intent) {
             try {
                 String action = intent.getAction();
-                if(DEBUG){
+                if (DEBUG) {
                     Log.d(TAG, "onReceive " + action);
                 }
-                if (ACTION_HANDLE_SHOW.equals(action)){
-                    if (mConfiguration.mDragHandleShow){
+                if (ACTION_HANDLE_SHOW.equals(action)) {
+                    if (mConfiguration.mDragHandleShow) {
                         mManager.getSwitchGestureView().show();
                     }
-                } else if (ACTION_HANDLE_HIDE.equals(action)){
+                } else if (ACTION_HANDLE_HIDE.equals(action)) {
                     mManager.getSwitchGestureView().hide();
                 } else if (ACTION_TOGGLE_OVERLAY.equals(action)) {
-                    if (DEBUG){
+                    if (DEBUG) {
                         Log.d(TAG, "ACTION_TOGGLE_OVERLAY " + System.currentTimeMillis());
                     }
                     if (mManager.isShowing()) {
@@ -250,7 +319,7 @@ public class SwitchService extends Service {
                         mManager.show();
                     }
                 } else if (ACTION_TOGGLE_OVERLAY2.equals(action)) {
-                    if (DEBUG){
+                    if (DEBUG) {
                         Log.d(TAG, "ACTION_TOGGLE_OVERLAY2 " + System.currentTimeMillis());
                     }
                     if (mManager.isShowing()) {
@@ -266,7 +335,7 @@ public class SwitchService extends Service {
                     }
                     mPreloadDone = false;
                 } else if (ACTION_HIDE_OVERLAY.equals(action)) {
-                    if (DEBUG){
+                    if (DEBUG) {
                         Log.d(TAG, "ACTION_HIDE_OVERLAY");
                     }
                     if (mManager.isShowing()) {
@@ -275,10 +344,10 @@ public class SwitchService extends Service {
                 } else if (Intent.ACTION_USER_SWITCHED.equals(action)) {
                     int userId = intent.getIntExtra(Intent.EXTRA_USER_HANDLE, -1);
                     Log.d(TAG, "user switch " + mUserId + "->" + userId);
-                    if (userId != mUserId){
+                    if (userId != mUserId) {
                         mManager.getSwitchGestureView().hide();
                     } else {
-                        if (mConfiguration.mDragHandleShow){
+                        if (mConfiguration.mDragHandleShow) {
                             mManager.getSwitchGestureView().show();
                         }
                     }
@@ -286,7 +355,7 @@ public class SwitchService extends Service {
                     Log.d(TAG, "ACTION_SHUTDOWN");
                     mManager.shutdownService();
                 } else if (ACTION_PRELOAD_TASKS.equals(action)) {
-                    if(DEBUG){
+                    if (DEBUG) {
                         Log.d(TAG, "ACTION_PRELOAD_TASKS " + System.currentTimeMillis());
                     }
                     if (!mManager.isShowing()) {
@@ -297,8 +366,8 @@ public class SwitchService extends Service {
                         mPreloadDone = true;
                     }
                 }
-            } catch(Exception e) {
-                Log.e(TAG,"onReceive", e);
+            } catch (Exception e) {
+                Log.e(TAG, "onReceive", e);
             }
         }
     }
@@ -320,7 +389,7 @@ public class SwitchService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if(DEBUG){
+            if (DEBUG) {
                 Log.d(TAG, "onReceive " + action);
             }
             PackageManager.getInstance(context).updatePackageIcons();
@@ -331,7 +400,7 @@ public class SwitchService extends Service {
         if (isFilteredPrefsChange(key)) {
             return;
         }
-        if(DEBUG){
+        if (DEBUG) {
             Log.d(TAG, "updatePrefs " + key);
         }
         BitmapUtils.clearCachedColors();
@@ -343,7 +412,7 @@ public class SwitchService extends Service {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if(DEBUG){
+        if (DEBUG) {
             Log.d(TAG, "onConfigurationChanged");
         }
         try {
@@ -358,18 +427,18 @@ public class SwitchService extends Service {
                     updatePrefs(mPrefs, SettingsActivity.PREF_BG_STYLE);
                 }
                 int newScreenHeight = Math.round(newConfig.screenHeightDp * mConfiguration.mDensity);
-                if(DEBUG){
+                if (DEBUG) {
                     Log.d(TAG, "newScreenHeight = " + newScreenHeight);
                 }
                 mManager.onConfigurationChanged(newScreenHeight);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.e(TAG, "onConfigurationChanged", e);
         }
     }
 
     private void createErrorNotification() {
-        final NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         final Notification notifyDetails = new Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle("OmniSwitch restricted mode")
                 .setContentText("Failed to gain system permissions")
@@ -387,7 +456,6 @@ public class SwitchService extends Service {
 
     private void commitSuicide() {
         disableAutoStart();
-        mCommitSuicide = true;
         Intent stopIntent = new Intent(this, SwitchService.class);
         stopService(stopIntent);
     }
@@ -404,7 +472,7 @@ public class SwitchService extends Service {
     }
 
     private void createOverlayNotification() {
-        final NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         PendingIntent settingsIntent = PendingIntent.getActivity(this, START_PERMISSION_SETTINGS_ID,
                 new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
@@ -428,7 +496,7 @@ public class SwitchService extends Service {
     }
 
     private void createNotificationChannel() {
-        final NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         CharSequence name = getString(R.string.notification_channel_name);
         String description = getString(R.string.notification_channel_description);
@@ -436,5 +504,29 @@ public class SwitchService extends Service {
         NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
         channel.setDescription(description);
         notificationManager.createNotificationChannel(channel);
+    }
+
+    private void bindSplitScreenService() {
+        if (!mSplitScreenServiceBound) {
+            Log.d(TAG, "bindSplitScreenService");
+            Intent serviceIntent = new Intent("android.intent.action.OMNI_SPLITSCREEN_SERVICE")
+                    .setPackage("com.android.systemui");
+            try {
+                mSplitScreenServiceBound = bindService(serviceIntent,
+                        mSplitsScreenService,
+                        Context.BIND_AUTO_CREATE);
+            } catch (SecurityException e) {
+                Log.e(TAG, "Unable to bind because of security error", e);
+            }
+        }
+    }
+
+    private void unbindSplitScreenService() {
+        if (mSplitScreenServiceBound) {
+            Log.d(TAG, "unbindSplitScreenService");
+            mManager.unbindSplitScreen();
+            unbindService(mSplitsScreenService);
+            mSplitScreenServiceBound = false;
+        }
     }
 }

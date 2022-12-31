@@ -22,6 +22,12 @@
         android:key="enable"
         android:title="@string/enable_title" />
 
+    <org.omnirom.omnilib.preference.SystemSettingSwitchPreference
+        android:key="split_screen_external"
+        android:title="@string/split_screen_external_title"
+        android:summary="@string/split_screen_external_summary"
+        android:defaultValue="false" />
+
     <PreferenceCategory
         android:key="category_icons"
         android:title="@string/category_icons_title">

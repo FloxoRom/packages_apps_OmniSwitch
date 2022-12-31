@@ -39,8 +39,10 @@ public final class TaskDescription {
     private CharSequence mLabel;
     private boolean mLocked;
     private boolean mNeedsUpdate;
+    private boolean mSupportsSplitScreen;
     private int mActivityPrimaryColor;
     private boolean mUseLightOnPrimaryColor;
+    private boolean mMultiWindowMode;
     private String mPackageName;
 
     public static interface ThumbChangeListener {
@@ -49,11 +51,12 @@ public final class TaskDescription {
     }
 
     public TaskDescription(int _taskId, int _persistentTaskId, String packageName,
-            Intent _intent) {
+            Intent _intent, boolean supportsSplitScreen) {
         intent = _intent;
         taskId = _taskId;
         mPackageName = packageName;
         persistentTaskId = _persistentTaskId;
+        mSupportsSplitScreen = supportsSplitScreen;
     }
 
     public Drawable getIcon() {
@@ -147,6 +150,10 @@ public final class TaskDescription {
 
     public void setNeedsUpdate(boolean value) {
         mNeedsUpdate = value;
+    }
+
+    public boolean isSupportsSplitScreen() {
+        return mSupportsSplitScreen;
     }
 
     public void setTaskPrimaryColor(int activityColor) {

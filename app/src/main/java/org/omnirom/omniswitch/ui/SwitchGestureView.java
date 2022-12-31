@@ -415,6 +415,7 @@ public class SwitchGestureView {
         lp.privateFlags |=
                 (WindowManager.LayoutParams.SYSTEM_FLAG_SHOW_FOR_ALL_USERS
                         | WindowManager.LayoutParams.PRIVATE_FLAG_EXCLUDE_FROM_SCREEN_MAGNIFICATION);
+        lp.setTitle(TAG + mContext.getDisplayId());
         lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
         return lp;
     }
