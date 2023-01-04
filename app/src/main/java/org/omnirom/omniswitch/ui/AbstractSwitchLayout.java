@@ -188,17 +188,7 @@ public abstract class AbstractSwitchLayout implements ISwitchLayout {
                 case MotionEvent.ACTION_MOVE:
                     if (!mMoveStarted) {
                         if (Math.abs(distanceX) > mSlop) {
-                            if (mLastX > xRaw) {
-                                // move left
-                                if (mConfiguration.mLocation != 0) {
-                                    mMoveStarted = true;
-                                }
-                            } else {
-                                // move right
-                                if (mConfiguration.mLocation == 0) {
-                                    mMoveStarted = true;
-                                }
-                            }
+                            mMoveStarted = true;
                         }
                     } else {
                         mVelocityTracker.computeCurrentVelocity(1000);

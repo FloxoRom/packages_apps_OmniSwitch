@@ -218,27 +218,12 @@ public class SwitchGestureView {
                                 return true;
                             }
                             if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > mDetectSlop) {
-                                if (mLastX > xRaw) {
-                                    // move left
-                                    if (mConfiguration.mLocation == 0) {
-                                        if (DEBUG) {
-                                            Log.d(TAG, "mMoveStarted " + distanceX + " " + distanceY);
-                                        }
-                                        mMoveStarted = true;
-                                        mFlingOpen = true;
-                                        mRecentsManager.showHidden();
-                                    }
-                                } else {
-                                    // move right
-                                    if (mConfiguration.mLocation != 0) {
-                                        if (DEBUG) {
-                                            Log.d(TAG, "mMoveStarted " + distanceX + " " + distanceY);
-                                        }
-                                        mMoveStarted = true;
-                                        mFlingOpen = true;
-                                        mRecentsManager.showHidden();
-                                    }
+                                if (DEBUG) {
+                                    Log.d(TAG, "mMoveStarted " + distanceX + " " + distanceY);
                                 }
+                                mMoveStarted = true;
+                                mFlingOpen = true;
+                                mRecentsManager.showHidden();
                             }
                             if (mMoveStarted) {
                                 // Capture inputs
