@@ -33,7 +33,7 @@
         <string name="icon_size_title">Icon size</string>
         <string name="ok">OK</string>
         <string name="cancel">Cancel</string>
-        <string name="drag_handle_color_title">Color</string>
+        <string name="drag_handle_color_title">Color and transparency</string>
         <string name="drag_handle_color_dialog_title">Color</string>
         <string name="service_background_processes"><xliff:g id="memory">%1$s</xliff:g> free</string>
         <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> used</string>

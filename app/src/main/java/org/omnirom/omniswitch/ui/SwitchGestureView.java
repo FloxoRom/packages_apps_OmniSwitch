@@ -121,7 +121,7 @@ public class SwitchGestureView {
         mConfiguration = SwitchConfiguration.getInstance(mContext);
         ViewConfiguration vc = ViewConfiguration.get(context);
         mDefaultSlop = vc.getScaledTouchSlop();
-        mDetectSlop = mDefaultSlop * 0.5f;
+        mDetectSlop = mDefaultSlop * 0.75f;
         mLongPressTimeout = ViewConfiguration.getLongPressTimeout();
 
         mDragHandleImage = mContext.getDrawable(R.drawable.drag_handle_shape);

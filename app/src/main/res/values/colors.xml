@@ -44,7 +44,7 @@
     <color name="text_color_light">@color/material_grey_850</color>
     <color name="ic_launcher_background">#ff4caf50</color>
     <color name="system_default_accent">#ff009688</color>
-    <color name="default_drag_handle_color">@color/omni_logo_color</color>
+    <color name="default_drag_handle_color">#48a1c729</color>
     <color name="colorPrimary">@android:color/system_accent1_600</color>
     <color name="omni_logo_color">#a1c729</color>
     <color name="text_color_default">@android:color/black</color>

@@ -310,6 +310,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         mResetButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 resetPosition();
+                resetColor();
             }
         });
 
@@ -474,12 +475,18 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         mContext.sendBroadcast(intent);
     }
 
-    public void resetPosition() {
+    private void resetPosition() {
         mStartY = mConfiguration.getDefaultOffsetStart();
         mEndY = mConfiguration.getDefaultOffsetEnd();
         mDragHandleWidth = mConfiguration.mDefaultDragHandleWidth;
         mDragHandleWidthBar.setProgress(40);
         updateLayout();
+    }
+
+    private void resetColor() {
+        mColor = mConfiguration.getDefaultDragHandleColor();
+        updateColorRect();
+        updateDragHandleImage();
     }
 
     public boolean isShowing() {
@@ -556,7 +563,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
 
     private int getDragHandleColor() {
         if (mDragHandleDynamicColor.isChecked()) {
-            return mConfiguration.getSystemAccentColor();
+            return mConfiguration.getSystemAccentColorWithAlpha(0.25f);
         }
         return mColor;
     }

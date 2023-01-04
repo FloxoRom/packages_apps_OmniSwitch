@@ -20,6 +20,7 @@ package org.omnirom.omniswitch;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TypedValue;
@@ -82,7 +83,7 @@ public class SwitchConfiguration {
     public boolean mSideHeader = true;
     private static SwitchConfiguration mInstance;
     private WindowManager mWindowManager;
-    public int mDefaultHandleHeight;
+    public int mDefaultDragHandleHeight;
     private int mLabelFontSizePx;
     public int mMaxHeight;
     public int mMemDisplaySize;
@@ -169,7 +170,8 @@ public class SwitchConfiguration {
             Log.d(TAG, "setConfiguration " + mDensity);
         }
 
-        mDefaultHandleHeight = Math.round(100 * mDensity);
+        mDefaultDragHandleHeight = Math.round(200 * mDensity);
+        mDefaultDragHandleWidth = Math.round(60 * mDensity);
         mRestrictedMode = !hasSystemPermission(context);
         mLevelHeight = Math.round(80 * mDensity);
         mItemChangeWidthX = Math.round(40 * mDensity);
@@ -240,7 +242,7 @@ public class SwitchConfiguration {
                 .getInt(SettingsActivity.PREF_HANDLE_POS_START_RELATIVE,
                         relHeightStart);
         mDragHandleHeight = prefs.getInt(SettingsActivity.PREF_HANDLE_HEIGHT,
-                mDefaultHandleHeight);
+                mDefaultDragHandleHeight);
 
         mIconSizePx = Math.round(mIconSize * mDensity);
         mMaxWidth = Math.round((mIconSize + mIconBorderDp) * mDensity);
@@ -252,7 +254,6 @@ public class SwitchConfiguration {
                 SettingsActivity.PREF_DRAG_HANDLE_COLOR_NEW, getDefaultDragHandleColor());
         mDimBehind = prefs.getBoolean(SettingsActivity.PREF_DIM_BEHIND, false);
 
-        mDefaultDragHandleWidth = Math.round(40 * mDensity);
         Utils.convertLegacyDragHandleSize(mContext, Math.round(20 * mDensity));
         mDragHandleWidth = prefs.getInt(
                 SettingsActivity.PREF_HANDLE_WIDTH, mDefaultDragHandleWidth);
@@ -355,7 +356,7 @@ public class SwitchConfiguration {
     }
 
     public int getDefaultOffsetStart() {
-        return ((getCurrentDisplayHeight() / 2) - mDefaultHandleHeight / 2);
+        return ((getCurrentDisplayHeight() / 2) - mDefaultDragHandleHeight / 2);
     }
 
     public int getCurrentOffsetEnd() {
@@ -367,7 +368,7 @@ public class SwitchConfiguration {
     }
 
     public int getDefaultOffsetEnd() {
-        return getDefaultOffsetStart() + mDefaultHandleHeight;
+        return getDefaultOffsetStart() + mDefaultDragHandleHeight;
     }
 
     private boolean hasSystemPermission(Context context) {
@@ -427,7 +428,7 @@ public class SwitchConfiguration {
 
     public int getDragHandleColor() {
         if (mDynamicDragHandleColor) {
-            return getSystemAccentColor();
+            return getSystemAccentColorWithAlpha(0.25f);
         }
         return mDragHandleColor;
     }
@@ -474,6 +475,11 @@ public class SwitchConfiguration {
 
     public int getSystemAccentColor() {
         return mContext.getResources().getColor(R.color.colorPrimary);
+    }
+
+    public int getSystemAccentColorWithAlpha(float alpha) {
+        Color accentColor = Color.valueOf(mContext.getResources().getColor(R.color.colorPrimary));
+        return Color.argb(alpha, accentColor.red(), accentColor.green(), accentColor.blue());
     }
 
     public int getTaskHeaderColor() {
