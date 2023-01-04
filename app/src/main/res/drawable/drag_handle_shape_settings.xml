@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/drag_handle_shape">
+        <shape android:shape="rectangle">
+
+            <size
+                android:width="30dp"
+                android:height="100dp" />
+
+            <gradient
+                android:angle="180"
+                android:centerX="1.0"
+                android:centerY="1.0"
+                android:endColor="#00ffffff"
+                android:startColor="#fff"
+                android:type="linear" />
+
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+    <item android:id="@+id/drag_handle_border">
+        <shape android:shape="rectangle">
+
+            <size
+                android:width="30dp"
+                android:height="100dp" />
+
+            <stroke
+                android:width="2dp"
+                android:color="?attr/colorPrimary" />
+
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+</layer-list>

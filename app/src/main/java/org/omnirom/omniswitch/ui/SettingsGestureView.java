@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.preference.PreferenceManager;
@@ -35,8 +36,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -62,8 +65,8 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
     private Button mLocationButton;
     private Button mResetButton;
     private LinearLayout mView;
-    private LinearLayout mDragHandleViewLeft;
-    private LinearLayout mDragHandleViewRight;
+    private ViewGroup mDragHandleViewLeft;
+    private ViewGroup mDragHandleViewRight;
     private Context mContext;
     private int mLocation = 0; // 0 = right 1 = left
     private boolean mShowing;
@@ -73,15 +76,15 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
     private int mHandleHeight;
     private int mEndY;
     private int mColor;
-    private Drawable mDragHandle;
+    private LayerDrawable mDragHandle;
     private Drawable mDragHandleStart;
     private Drawable mDragHandleEnd;
     private SharedPreferences mPrefs;
     private float mDownY;
-    private float mDeltaY;
     private int mSlop;
     private int mDragHandleMinHeight;
     private int mDragHandleLimiterHeight;
+    private int mDragHandleLimiterWidth;
     private SwitchConfiguration mConfiguration;
     private SeekBar mDragHandleWidthBar;
     private int mDragHandleWidth;
@@ -89,6 +92,8 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
     private View mDragHandleColorContainer;
     private Dialog mDialog;
     private Switch mDragHandleDynamicColor;
+    private int mMoveStartY;
+    private int mMoveEndY;
 
     public SettingsGestureView(Context context) {
         mContext = context;
@@ -99,24 +104,25 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         mSlop = vc.getScaledTouchSlop();
         mConfiguration = SwitchConfiguration.getInstance(mContext);
 
-        mDragHandleLimiterHeight = Math.round(20 * mDensity);
         mDragHandleMinHeight = Math.round(60 * mDensity);
         mDragHandleWidth = mConfiguration.mDefaultDragHandleWidth;
 
-        mDragHandle = mContext.getResources().getDrawable(
-                R.drawable.drag_handle_shape);
-        mDragHandleStart = mContext.getResources().getDrawable(
-                R.drawable.drag_handle_marker);
-        mDragHandleEnd = mContext.getResources().getDrawable(
-                R.drawable.drag_handle_marker);
+        mDragHandle = (LayerDrawable) mContext.getDrawable(
+                R.drawable.drag_handle_shape_settings);
+        mDragHandleStart = mContext.getDrawable(
+                R.drawable.drag_handle_marker_alt);
+        mDragHandleEnd = mContext.getDrawable(
+                R.drawable.drag_handle_marker_alt);
+        mDragHandleLimiterHeight = mDragHandleEnd.getIntrinsicHeight();
+        mDragHandleLimiterWidth = mDragHandleEnd.getIntrinsicWidth();
 
         LayoutInflater inflater = (LayoutInflater) mContext
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         mView = (LinearLayout) inflater.inflate(R.layout.settings_gesture_view, null, false);
 
-        mDragHandleViewLeft = (LinearLayout) mView.findViewById(R.id.drag_handle_view_left);
-        mDragHandleViewRight = (LinearLayout) mView.findViewById(R.id.drag_handle_view_right);
+        mDragHandleViewLeft = mView.findViewById(R.id.drag_handle_view_left);
+        mDragHandleViewRight = mView.findViewById(R.id.drag_handle_view_right);
 
         mOkButton = (Button) mView.findViewById(R.id.ok_button);
         mCancelButton = (Button) mView.findViewById(R.id.cancel_button);
@@ -124,118 +130,86 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         mResetButton = (Button) mView.findViewById(R.id.reset_button);
 
         mDragButton = new ImageView(mContext);
-        mDragButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                int action = event.getAction();
+        mDragButton.setOnTouchListener((v, event) -> {
+            int action = event.getAction();
 
-                switch (action) {
-                    case MotionEvent.ACTION_DOWN:
-                        mDownY = event.getRawY();
-                        mDeltaY = 0;
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        if (mDeltaY != 0) {
-                            mStartY += mDeltaY;
-                            mEndY += mDeltaY;
+            switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                    mDownY = event.getRawY();
+                    mMoveStartY = mStartY;
+                    mMoveEndY = mEndY;
+                    break;
+                case MotionEvent.ACTION_UP:
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    mDownY = 0;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    int deltaY = (int) (event.getRawY() - mDownY);
+                    if (Math.abs(deltaY) > mSlop) {
+                        if ((mMoveEndY + deltaY < getLowerHandleLimit())
+                                && (mMoveStartY + deltaY > getUpperHandleLimit())) {
+                            mStartY = mMoveStartY + deltaY;
+                            mEndY = mMoveEndY + deltaY;
                             updateDragHandleLayoutParams();
                         }
-                        mDragButton.setTranslationY(0);
-                        mDragButtonStart.setTranslationY(0);
-                        mDragButtonEnd.setTranslationY(0);
-                        mDownY = 0;
-                        break;
-                    case MotionEvent.ACTION_CANCEL:
-                        mDownY = 0;
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        float deltaY = event.getRawY() - mDownY;
-                        if (Math.abs(deltaY) > mSlop) {
-                            if (((mEndY + deltaY) < getLowerHandleLimit())
-                                    && (mStartY + deltaY > getUpperHandleLimit())) {
-                                mDeltaY = deltaY;
-                                mDragButton.setTranslationY(mDeltaY);
-                                mDragButtonStart.setTranslationY(mDeltaY);
-                                mDragButtonEnd.setTranslationY(mDeltaY);
-                            }
-                        }
-                        break;
-                }
-                return true;
+                    }
+                    break;
             }
+            return true;
         });
 
         mDragButtonStart = new ImageView(mContext);
-        mDragButtonStart.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                int action = event.getAction();
+        mDragButtonStart.setOnTouchListener((v, event) -> {
+            int action = event.getAction();
 
-                switch (action) {
-                    case MotionEvent.ACTION_DOWN:
-                        mDownY = event.getRawY();
-                        mDeltaY = 0;
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        if (mDeltaY != 0) {
-                            mStartY += mDeltaY;
+            switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                    mDownY = event.getRawY();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    mDownY = 0;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    int deltaY = (int) (event.getRawY() - mDownY);
+                    if (Math.abs(deltaY) > mSlop) {
+                        if ((event.getRawY() < mEndY - mDragHandleMinHeight)
+                                && (event.getRawY() - mDragHandleLimiterHeight > getUpperHandleLimit())) {
+                            mStartY = (int) event.getRawY();
                             updateDragHandleLayoutParams();
                         }
-                        mDragButtonStart.setTranslationY(0);
-                        mDownY = 0;
-                        break;
-                    case MotionEvent.ACTION_CANCEL:
-                        mDownY = 0;
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        float deltaY = event.getRawY() - mDownY;
-                        if (Math.abs(deltaY) > mSlop) {
-                            if (((mStartY + deltaY) < (mEndY - mDragHandleMinHeight))
-                                    && (mStartY + deltaY - mDragHandleLimiterHeight > getUpperHandleLimit())) {
-                                mDeltaY = deltaY;
-                                mDragButtonStart.setTranslationY(mDeltaY);
-                            }
-                        }
-                        break;
-                }
-                return true;
+                    }
+                    break;
             }
+            return true;
         });
         mDragButtonEnd = new ImageView(mContext);
-        mDragButtonEnd.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                int action = event.getAction();
+        mDragButtonEnd.setOnTouchListener((v, event) -> {
+            int action = event.getAction();
 
-                switch (action) {
-                    case MotionEvent.ACTION_DOWN:
-                        mDownY = event.getRawY();
-                        mDeltaY = 0;
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        if (mDeltaY != 0) {
-                            mEndY += mDeltaY;
+            switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                    mDownY = event.getRawY();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    mDownY = 0;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    int deltaY = (int) (event.getRawY() - mDownY);
+                    if (Math.abs(deltaY) > mSlop) {
+                        if ((event.getRawY() > mStartY + mDragHandleMinHeight)
+                                && (event.getRawY() + mDragHandleLimiterHeight < getLowerHandleLimit())) {
+                            mEndY = (int) event.getRawY();
                             updateDragHandleLayoutParams();
                         }
-                        mDragButtonEnd.setTranslationY(0);
-                        mDownY = 0;
-                        break;
-                    case MotionEvent.ACTION_CANCEL:
-                        mDownY = 0;
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        float deltaY = event.getRawY() - mDownY;
-                        if (Math.abs(deltaY) > mSlop) {
-                            if (((mEndY + deltaY) > (mStartY + mDragHandleMinHeight))
-                                    && (mEndY + deltaY + mDragHandleLimiterHeight < getLowerHandleLimit())) {
-                                mDeltaY = deltaY;
-                                mDragButtonEnd.setTranslationY(mDeltaY);
-                            }
-                        }
-                        break;
-                }
-                return true;
+                    }
+                    break;
             }
+            return true;
         });
 
         mDragHandleWidthBar = (SeekBar) mView.findViewById(R.id.drag_handle_width);
@@ -368,14 +342,15 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         mDragHandleViewRight.removeAllViews();
 
         updateDragHandleImage();
-        updateDragHandleLayoutParams();
 
-        getDragHandleContainer().addView(mDragButtonStart);
         getDragHandleContainer().addView(mDragButton);
+        getDragHandleContainer().addView(mDragButtonStart);
         getDragHandleContainer().addView(mDragButtonEnd);
+
+        updateDragHandleLayoutParams();
     }
 
-    private LinearLayout getDragHandleContainer() {
+    private ViewGroup getDragHandleContainer() {
         if (mLocation == 1) {
             return mDragHandleViewLeft;
         } else {
@@ -384,9 +359,10 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
     }
 
     private void updateDragHandleLayoutParams() {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 mDragHandleWidth,
-                (int) (mEndY - mStartY));
+                mEndY - mStartY);
+        params.topMargin = mStartY;
         params.gravity = mLocation == 1 ? Gravity.LEFT : Gravity.RIGHT;
         if (mLocation == 1) {
             params.leftMargin = -mDragHandleWidth/2;
@@ -395,20 +371,32 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         }
         mDragButton.setLayoutParams(params);
 
-        params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                mDragHandleLimiterHeight);
-        params.topMargin = mStartY - mDragHandleLimiterHeight;
+        params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.topMargin = mStartY - mDragHandleLimiterHeight / 2 + 2;
         params.gravity = mLocation == 1 ? Gravity.LEFT : Gravity.RIGHT;
+        int dragButtonLimiterMargin = Math.max(0, (mDragHandleWidth / 2 - mDragHandleLimiterHeight) / 2);
+        if (mLocation == 1) {
+            params.leftMargin = dragButtonLimiterMargin;
+        } else {
+            params.rightMargin = dragButtonLimiterMargin;
+        }
         mDragButtonStart.setLayoutParams(params);
 
-        params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                mDragHandleLimiterHeight);
+        params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.topMargin = mEndY - mDragHandleLimiterHeight / 2 - 2;
         params.gravity = mLocation == 1 ? Gravity.LEFT : Gravity.RIGHT;
+        if (mLocation == 1) {
+            params.leftMargin = dragButtonLimiterMargin;
+        } else {
+            params.rightMargin = dragButtonLimiterMargin;
+        }
         mDragButtonEnd.setLayoutParams(params);
 
-        mStartYRelative = (int) (mStartY / (mConfiguration.getCurrentDisplayHeight() / 100));
+        mStartYRelative = mStartY / (mConfiguration.getCurrentDisplayHeight() / 100);
         mHandleHeight = mEndY - mStartY;
     }
 
@@ -418,7 +406,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         Drawable d2 = mDragHandleEnd;
 
         mDragButton.setScaleType(ImageView.ScaleType.FIT_XY);
-        mDragHandle.setTint(getDragHandleColor());
+        mDragHandle.findDrawableByLayerId(R.id.drag_handle_shape).setTint(getDragHandleColor());
 
         mDragButton.setImageDrawable(mDragHandle);
         mDragButton.setRotation(mLocation == 1 ? 180 : 0);

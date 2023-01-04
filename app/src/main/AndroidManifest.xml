@@ -38,6 +38,9 @@
     <uses-permission android:name="android.permission.MANAGE_ACTIVITY_TASKS"/>
     <uses-permission android:name="org.omnirom.omnijaws.READ_WEATHER" />
 
+    <protected-broadcast android:name="org.omnirom.omniswitch.ACTION_HANDLE_HIDE" />
+    <protected-broadcast android:name="org.omnirom.omniswitch.ACTION_HANDLE_SHOW" />
+
     <application
         android:name=".OmniSwitch"
         android:icon="@mipmap/ic_launcher"
