@@ -70,6 +70,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String PREF_FAVORITE_APPS = "favorite_apps_new";
     public static final String PREF_FAVORITE_APPS_OLD = "favorite_apps";
     public static final String PREF_HANDLE_POS_START_RELATIVE = "handle_pos_start_relative";
+    public static final String PREF_HANDLE_POS_END_RELATIVE = "handle_pos_end_relative";
     public static final String PREF_HANDLE_HEIGHT = "handle_height";
     public static final String PREF_BUTTON_CONFIG = "button_config";
     public static final String PREF_BUTTONS_NEW = "buttons_new";
@@ -509,15 +510,6 @@ public class SettingsActivity extends AppCompatActivity {
             mButtonImages[12] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_assist));
             mButtonImages[13] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_voice_assist));
             mButtonImages[14] = BitmapUtils.colorize(getResources(), color, getResources().getDrawable(R.drawable.ic_qs_flashlight));
-        }
-
-        @Override
-        public void onConfigurationChanged(Configuration newConfig) {
-            super.onConfigurationChanged(newConfig);
-            // dont restart activity on orientation changes
-            if (mGestureView != null && mGestureView.isShowing()) {
-                mGestureView.handleRotation();
-            }
         }
 
         public void updatePrefs(SharedPreferences prefs, String key) {

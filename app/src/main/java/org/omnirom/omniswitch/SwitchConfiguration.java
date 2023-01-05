@@ -61,7 +61,7 @@ public class SwitchConfiguration {
     public int mMaxWidth;
     public boolean mShowRambar = true;
     public int mStartYRelative;
-    public int mDragHandleHeight;
+    public int mEndYRelative;
     public int mDragHandleWidth;
     public int mDefaultDragHandleWidth;
     public boolean mShowLabels = true;
@@ -83,7 +83,7 @@ public class SwitchConfiguration {
     public boolean mSideHeader = true;
     private static SwitchConfiguration mInstance;
     private WindowManager mWindowManager;
-    public int mDefaultDragHandleHeight;
+    private int mDefaultDragHandleHeight;
     private int mLabelFontSizePx;
     public int mMaxHeight;
     public int mMemDisplaySize;
@@ -236,13 +236,20 @@ public class SwitchConfiguration {
         mShowRambar = prefs.getBoolean(SettingsActivity.PREF_SHOW_RAMBAR, true);
         mShowLabels = prefs.getBoolean(SettingsActivity.PREF_SHOW_LABELS, true);
 
-        int relHeightStart = (int) (getDefaultOffsetStart() / (getCurrentDisplayHeight() / 100));
+        mDefaultDragHandleHeight = prefs.getInt(SettingsActivity.PREF_HANDLE_HEIGHT,
+                mDefaultDragHandleHeight);
+
+        int relHeightStart = getDefaultOffsetStart() / (getCurrentDisplayHeight() / 100);
 
         mStartYRelative = prefs
                 .getInt(SettingsActivity.PREF_HANDLE_POS_START_RELATIVE,
                         relHeightStart);
-        mDragHandleHeight = prefs.getInt(SettingsActivity.PREF_HANDLE_HEIGHT,
-                mDefaultDragHandleHeight);
+
+        int relHeightEnd = getDefaultOffsetEnd() / (getCurrentDisplayHeight() / 100);
+
+        mEndYRelative= prefs
+                .getInt(SettingsActivity.PREF_HANDLE_POS_END_RELATIVE,
+                        relHeightEnd);
 
         mIconSizePx = Math.round(mIconSize * mDensity);
         mMaxWidth = Math.round((mIconSize + mIconBorderDp) * mDensity);
@@ -360,11 +367,11 @@ public class SwitchConfiguration {
     }
 
     public int getCurrentOffsetEnd() {
-        return getCurrentOffsetStart() + mDragHandleHeight;
+        return (getCurrentDisplayHeight() / 100) * mEndYRelative;
     }
 
-    public int getCustomOffsetEnd(int startYRelative, int handleHeight) {
-        return getCustomOffsetStart(startYRelative) + handleHeight;
+    public int getCurrentOffsetEnd(int height) {
+        return (height / 100) * mEndYRelative;
     }
 
     public int getDefaultOffsetEnd() {

@@ -19,5 +19,7 @@
 
 	<dimen name="thumbnail_width">140dp</dimen>
 	<dimen name="thumbnail_height">140dp</dimen>
+	<dimen name="drage_handle_top_limit">50dp</dimen>
+	<dimen name="drage_handle_bottom_limit">50dp</dimen>
 
 </resources>

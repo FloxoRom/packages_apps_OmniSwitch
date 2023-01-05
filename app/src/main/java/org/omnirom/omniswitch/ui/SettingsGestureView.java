@@ -248,9 +248,10 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
                 }
                 Editor edit = mPrefs.edit();
                 edit.putInt(SettingsActivity.PREF_DRAG_HANDLE_LOCATION, mLocation);
-                int relHeight = (int) (mStartY / (mConfiguration.getCurrentDisplayHeight() / 100));
+                int relHeight = mStartY / (mConfiguration.getCurrentDisplayHeight() / 100);
                 edit.putInt(SettingsActivity.PREF_HANDLE_POS_START_RELATIVE, relHeight);
-                edit.putInt(SettingsActivity.PREF_HANDLE_HEIGHT, mEndY - mStartY);
+                int relHeightEnd = mEndY / (mConfiguration.getCurrentDisplayHeight() / 100);
+                edit.putInt(SettingsActivity.PREF_HANDLE_POS_END_RELATIVE, relHeightEnd);
                 edit.putInt(SettingsActivity.PREF_HANDLE_WIDTH, mDragHandleWidth);
                 edit.putInt(SettingsActivity.PREF_DRAG_HANDLE_COLOR_NEW, mColor);
                 edit.putBoolean(SettingsActivity.PREF_DRAG_HANDLE_DYNAMIC_COLOR, mDragHandleDynamicColor.isChecked());
@@ -365,9 +366,9 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         params.topMargin = mStartY;
         params.gravity = mLocation == 1 ? Gravity.LEFT : Gravity.RIGHT;
         if (mLocation == 1) {
-            params.leftMargin = -mDragHandleWidth/2;
+            params.leftMargin = -mDragHandleWidth / 2;
         } else {
-            params.rightMargin = -mDragHandleWidth/2;
+            params.rightMargin = -mDragHandleWidth / 2;
         }
         mDragButton.setLayoutParams(params);
 
@@ -479,12 +480,6 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
 
     public boolean isShowing() {
         return mShowing;
-    }
-
-    public void handleRotation() {
-        mStartY = mConfiguration.getCustomOffsetStart(mStartYRelative);
-        mEndY = mConfiguration.getCustomOffsetEnd(mStartYRelative, mHandleHeight);
-        updateLayout();
     }
 
     private int getLowerHandleLimit() {

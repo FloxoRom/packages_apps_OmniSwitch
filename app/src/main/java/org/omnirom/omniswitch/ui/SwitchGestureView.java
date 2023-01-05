@@ -88,9 +88,9 @@ public class SwitchGestureView {
 
     static {
         mDragHandleShowSettings.add(SettingsActivity.PREF_DRAG_HANDLE_LOCATION);
-        mDragHandleShowSettings.add(SettingsActivity.PREF_HANDLE_HEIGHT);
         mDragHandleShowSettings.add(SettingsActivity.PREF_HANDLE_WIDTH);
         mDragHandleShowSettings.add(SettingsActivity.PREF_HANDLE_POS_START_RELATIVE);
+        mDragHandleShowSettings.add(SettingsActivity.PREF_HANDLE_POS_END_RELATIVE);
         mDragHandleShowSettings.add(SettingsActivity.PREF_DRAG_HANDLE_COLOR_NEW);
         mDragHandleShowSettings.add(SettingsActivity.PREF_DRAG_HANDLE_DYNAMIC_COLOR);
     }
@@ -398,9 +398,10 @@ public class SwitchGestureView {
     }
 
     public WindowManager.LayoutParams getParamsSmall() {
+        int currentHeight = mConfiguration.getCurrentOffsetEnd() - mConfiguration.getCurrentOffsetStart();
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
                 mConfiguration.mDragHandleWidth,
-                mConfiguration.mDragHandleHeight,
+                currentHeight,
                 WindowManager.LayoutParams.TYPE_PHONE,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
@@ -427,9 +428,10 @@ public class SwitchGestureView {
     }
 
     private FrameLayout.LayoutParams getDragHandleLayoutParamsSmall() {
+        int currentHeight = mConfiguration.getCurrentOffsetEnd() - mConfiguration.getCurrentOffsetStart();
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 mConfiguration.mDragHandleWidth,
-                mConfiguration.mDragHandleHeight);
+                currentHeight);
         params.gravity = Gravity.CENTER;
         if (mConfiguration.mLocation == 0) {
             params.rightMargin = -mConfiguration.mDragHandleWidth / 2;
@@ -437,23 +439,6 @@ public class SwitchGestureView {
             params.leftMargin = -mConfiguration.mDragHandleWidth / 2;
         }
         return params;
-    }
-
-    private int getItemViewTopMargin() {
-        return Math.max(0, (int) mInitDownPoint[1] - mConfiguration.mThumbnailHeight * 2);
-    }
-
-    private int getItemViewHeight() {
-        return Math.round(300 * mConfiguration.mDensity);
-    }
-
-    public FrameLayout.LayoutParams getItemViewParams() {
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-                mConfiguration.getCurrentDisplayWidth(),
-                getItemViewHeight());
-        lp.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
-        lp.topMargin = getItemViewTopMargin();
-        return lp;
     }
 
     private void updateDragHandleImage() {
@@ -464,6 +449,7 @@ public class SwitchGestureView {
         mDragButton.setRotation(mConfiguration.mLocation == 0 ? 0f : 180f);
         mDragHandleImage.setTint(mConfiguration.getDragHandleColor());
         mDragButton.setImageDrawable(mDragHandleImage);
+        mDragButton.setLayoutParams(getDragHandleLayoutParamsSmall());
     }
 
     public void updatePrefs(SharedPreferences prefs, String key) {
@@ -549,6 +535,8 @@ public class SwitchGestureView {
                 Log.d(TAG, "updateLayout " + mConfiguration.getCurrentOffsetStart(height));
             }
             mWindowManager.updateViewLayout(mView, getCustomParamsSmall(height));
+            // image layout params have changed
+            updateDragHandleImage();
             // recalc next time needed
             resetDragButtonLocation();
         }

@@ -446,9 +446,10 @@ public class SwitchLayout extends AbstractSwitchLayout {
     }
 
     private void setViewTopMargin() {
+        int currentHeight = mConfiguration.getCurrentOffsetEnd() - mConfiguration.getCurrentOffsetStart();
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mView.getLayoutParams();
         lp.topMargin = mConfiguration.getCurrentOffsetStart()
-                + mConfiguration.mDragHandleHeight / 2
+                + currentHeight / 2
                 - getMaxViewHeight() / 2;
         mView.setLayoutParams(lp);
     }
