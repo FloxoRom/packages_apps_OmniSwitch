@@ -121,7 +121,7 @@ public class SwitchGestureView {
         mConfiguration = SwitchConfiguration.getInstance(mContext);
         ViewConfiguration vc = ViewConfiguration.get(context);
         mDefaultSlop = vc.getScaledTouchSlop();
-        mDetectSlop = mDefaultSlop * 0.75f;
+        mDetectSlop = mDefaultSlop * 0.5f;
         mLongPressTimeout = ViewConfiguration.getLongPressTimeout();
 
         mDragHandleImage = mContext.getDrawable(R.drawable.drag_handle_shape);
@@ -221,16 +221,15 @@ public class SwitchGestureView {
                                 if (DEBUG) {
                                     Log.d(TAG, "mMoveStarted " + distanceX + " " + distanceY);
                                 }
+                                mInputMonitor.pilferPointers();
+                                mInputEventReceiver.setBatchingEnabled(true);
+
                                 mMoveStarted = true;
                                 mFlingOpen = true;
                                 mRecentsManager.showHidden();
                             }
-                            if (mMoveStarted) {
-                                // Capture inputs
-                                mInputMonitor.pilferPointers();
-                                mInputEventReceiver.setBatchingEnabled(true);
-                            }
-                        } else {
+                        }
+                        if (mMoveStarted) {
                             mVelocityTracker.computeCurrentVelocity(1000);
                             float xVelocity = mVelocityTracker.getXVelocity();
                             boolean isSlow = Math.abs(xVelocity) < 500;

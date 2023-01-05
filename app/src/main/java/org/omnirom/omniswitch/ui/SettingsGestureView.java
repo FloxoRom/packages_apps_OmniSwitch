@@ -104,7 +104,7 @@ public class SettingsGestureView implements DialogInterface.OnDismissListener {
         mSlop = vc.getScaledTouchSlop();
         mConfiguration = SwitchConfiguration.getInstance(mContext);
 
-        mDragHandleMinHeight = Math.round(60 * mDensity);
+        mDragHandleMinHeight = Math.round(80 * mDensity);
         mDragHandleWidth = mConfiguration.mDefaultDragHandleWidth;
 
         mDragHandle = (LayerDrawable) mContext.getDrawable(
